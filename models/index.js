@@ -25,6 +25,15 @@ fs
     db[model.name] = model;
   });
 
+//TABLE 객체선언
+db.User = require('./user')(sequelize, Sequelize);
+
+
+//TABLE 관계 맺기
+
+
+
+
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {
     db[modelName].associate(db);

@@ -5,24 +5,56 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 const session = require('express-session');
+const flash = require('connect-flash');
+const cors = require('cors');
+require('dotenv').config(); //.env 설정
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+//router 객체 선언
+const authRouter = require('./routes/auth');
+const userRouter = require('./routes/users');
 
-var app = express();
+const { sequelize } = require('./models');
+const app = express();
+sequelize.sync();
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+// app.set('views', path.join(__dirname, 'views'));
+// app.set('view engine', 'jade');
+app.set('port', process.env.PORT || 8000); //포트 설정
+
+
+// parse JSON and url-encoded query
+app.use(function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.header('Access-Control-Allow-Headers', 'content-type, x-access-token'); //1
+  next();
+});
 
 app.use(logger('dev'));
+app.use(cors({
+  origin: true,
+  credentials: true,
+}));
+app.use('/', express.static('public'));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(cookieParser(process.env.COOKIE_SECRET));
+app.use(session({
+  resave: false,
+  saveUninitialized: false,
+  secret: process.env.COOKIE_SECRET,
+  cookie: {
+      httpOnly: true,
+      secure: false,
+  },
+}));
+// app.use(express.static(path.join(__dirname, 'public')));
+app.use(flash()); //1회성 메세지
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/auth', authRouter);
+app.use('/users', userRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -38,6 +70,10 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+app.listen(app.get('port'), () => {
+  console.log(`${app.get('port')}번 포트에서 서버 실행중입니다.`);
 });
 
 module.exports = app;
