@@ -1,8 +1,7 @@
 # remindFeedback_backend_test_api
-<<<<<<< HEAD
 ## 설치 순서
 ### 1. git clone
-    npm 설치를 우선 합니다
+    소스를 받기전 node와 npm 설치를 합니다
 	해당 소스 코드를 받습니다.
 
 ###	2. npm i
