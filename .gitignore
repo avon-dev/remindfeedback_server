@@ -59,6 +59,3 @@ typings/
 .env
 # next.js build output
 .next
-
-# jwt.js
-config/jwt.js

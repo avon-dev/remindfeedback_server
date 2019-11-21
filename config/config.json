@@ -18,7 +18,7 @@
   },
   "production": {
     "username": "root",
-    "password": "xkfshqk",
+    "password": "avon",
     "database": "rf_db",
     "host": "127.0.0.1",
     "dialect": "mariadb",
