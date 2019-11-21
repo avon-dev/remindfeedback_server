@@ -13,16 +13,14 @@
     "password": "avon",
     "database": "rf_db",
     "host": "127.0.0.1",
-    "port": "3307",
     "dialect": "mariadb",
     "operatorsAliases": false
   },
   "production": {
     "username": "root",
-    "password": "avon",
+    "password": "xkfshqk",
     "database": "rf_db",
     "host": "127.0.0.1",
-    "port": "3307",
     "dialect": "mariadb",
     "operatorsAliases": false
   }

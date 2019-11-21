@@ -2,16 +2,20 @@ var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+var morgan = require('morgan');
 
 const session = require('express-session');
 const flash = require('connect-flash');
 const cors = require('cors');
+const hpp = require('hpp');
+const helmet = require('helmet');
 require('dotenv').config(); //.env 설정
 
 //router 객체 선언
 const authRouter = require('./routes/auth');
 const userRouter = require('./routes/users');
+
+const prod = process.env.NODE_ENV === 'production';
 
 const { sequelize } = require('./models');
 const app = express();
@@ -31,11 +35,22 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.use(logger('dev'));
-app.use(cors({
-  origin: true,
-  credentials: true,
-}));
+if (prod) {
+  app.use(hpp());
+  app.use(helmet());
+  app.use(morgan('combined'));
+  app.use(cors({
+    origin: true,
+    credentials: true,
+  }));
+} else {
+  app.use(morgan('dev'));
+  app.use(cors({
+    origin: true,
+    credentials: true,
+  }));
+}
+
 app.use('/', express.static('public'));
 
 app.use(express.json());
@@ -53,6 +68,9 @@ app.use(session({
 // app.use(express.static(path.join(__dirname, 'public')));
 app.use(flash()); //1회성 메세지
 
+app.get('/', (req, res) => {
+  res.send('remindfeedback 백엔드 정상 동작!');
+});
 app.use('/auth', authRouter);
 app.use('/users', userRouter);
 
@@ -72,7 +90,7 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-app.listen(app.get('port'), () => {
+app.listen(prod ? app.get('port') : 8000, () => {
   console.log(`${app.get('port')}번 포트에서 서버 실행중입니다.`);
 });
 
