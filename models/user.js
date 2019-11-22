@@ -2,7 +2,7 @@
 module.exports = (sequelize, DataTypes) => (
     sequelize.define('user', {
         user_uid: {
-            type: DataTypes.STRING(255),
+            type: DataTypes.STRING,
             allowNull: false,
             unique: true,
             primaryKey: true,
@@ -17,11 +17,11 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: true,
         }, 
         password: {
-            type: DataTypes.STRING(255),
+            type: DataTypes.STRING,
             allowNull: true, //카카오일시 필수가 아니어도되니 false
         }, 
         portrait: {
-            type: DataTypes.STRING(255),
+            type: DataTypes.STRING,
             allowNull: false,
         },
         introduction: {
