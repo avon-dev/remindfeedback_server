@@ -26,7 +26,7 @@
 
 * **URL**
 
-  localhost:8000/auth/signup
+  http://54.180.118.35/auth/signup
 
 * **Method:**
 
@@ -61,7 +61,7 @@
 
   <!-- ```javascript
     axios
-    .post(`localhost:8000/auth/signup`, {
+    .post(`http://54.180.118.35/auth/signup`, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -90,7 +90,7 @@
 
 * **URL**
 
-  localhost:8000/auth/login
+  http://54.180.118.35/auth/login
 
 * **Method:**
 
@@ -132,7 +132,7 @@
 
   <!-- ```javascript
     axios
-    .post(`localhost:8000/auth/login`, {
+    .post(`http://54.180.118.35/auth/login`, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -158,7 +158,7 @@
 
 * **URL**
 
-  localhost:8000/auth/me
+  http://54.180.118.35/auth/me
 
 * **Method:**
 
@@ -190,7 +190,7 @@
 
   ```javascript
     axios
-    .post(`localhost:8000/auth/me`, {
+    .post(`http://54.180.118.35/auth/me`, {
       headers: {
         'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFzZGZAYXNkZi5jb20iLCJpYXQiOjE1NzQwNjIwMDMsImV4cCI6MTU3NDA2MjAwOX0.FhdS3dX1DiMtEeadvosyGvpYjjw50JrcWOht1-R3il0',
       }
@@ -214,7 +214,7 @@
 
 * **URL**
 
-  localhost:8000/auth/refresh
+  http://54.180.118.35/auth/refresh
 
 * **Method:**
 
@@ -249,7 +249,7 @@
 
   ```javascript
     axios
-    .post(`localhost:8000/auth/me`, {
+    .post(`http://54.180.118.35/auth/me`, {
       headers: {
         'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFzZGZAYXNkZi5jb20iLCJpYXQiOjE1NzQwNjIwMDMsImV4cCI6MTU3NDA2MjAwOX0.FhdS3dX1DiMtEeadvosyGvpYjjw50JrcWOht1-R3il0',
       }
