@@ -29,9 +29,11 @@ router.post('/signup', async (req, res, next) => {
             password: pw,
             portrait: '',
             introduction: ''
-        });
+        })
+    
         // let text = {password,pw}
-        res.status(201).json(newUser);
+        console.log('newUser',newUser.nickname);
+        res.status(201).json({newUser});
     } catch(e){
         console.error(e);
         return next(e);
@@ -69,9 +71,10 @@ router.post('/login', async (req, res, next) => {
 }, async (req, res, next) => {
     try{
         const { email, password } = req.body;
-        const exUser = await User.findOne({where: { email:email } });
+        const exUser = await User.findOne({where: { email:email } })
+        console.log('exUser', exUser.nickname)
         const pass = await bcrypt.compare(password, exUser.password);
-        if(pass){
+        if(exUser && pass){
             let payload = { 
                 email : exUser.email
             };
