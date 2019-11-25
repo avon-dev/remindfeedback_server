@@ -90,7 +90,8 @@ router.post('/login', async (req, res, next) => {
                 jwt.sign(payload, secretOrPrivateKey, accessOptions, (err, token) => {
                     if(err) return res.json(util.successFalse(err));
                     resToken.accessToken = util.successTrue(token);
-                    console.log('access 생성')
+                    res.header('x-access-token', token);
+                    console.log('access 생성');
                     res.status(201).json(resToken);
                 });
             });

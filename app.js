@@ -67,7 +67,9 @@ app.use(session({
 }));
 // app.use(express.static(path.join(__dirname, 'public')));
 app.use(flash()); //1회성 메세지
-
+app.get('/favicon.ico', (req, res) => {
+  res.status(204);
+})
 app.get('/', (req, res) => {
   res.send('remindfeedback 백엔드 정상 동작!');
 });
