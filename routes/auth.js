@@ -1,9 +1,8 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const { User } = require('../models');
-const util = require('../util');
-const jwt = require('jsonwebtoken');
-
+const passport = require('passport');
+const { isLoggedIn, isNotLoggedIn } = require('./middlewares'); 
 const router = express.Router();
 
 /* Sign Up API
@@ -28,12 +27,13 @@ router.post('/signup', async (req, res, next) => {
             nickname,
             password: pw,
             portrait: '',
-            introduction: ''
+            introduction: '',
+            tutorial: false,
         })
     
         // let text = {password,pw}
         console.log('newUser',newUser.nickname);
-        res.status(201).json({newUser});
+        res.status(201).json(newUser);
     } catch(e){
         console.error(e);
         return next(e);
@@ -42,114 +42,60 @@ router.post('/signup', async (req, res, next) => {
 
 router.post('/login', async (req, res, next) => {
     try{
-        const { email, password } = req.body;
-
-        let isValid = true;
-        let validationError = {
-            name:'ValidationError',
-            errors:{}
-        };
-        if(!email){
-            console.log('email 탐');
-            isValid = false;
-            validationError.errors.email = {"message":'email is required!'};
-        }
-        if(!password){
-            console.log('password 탐');
-            isValid = false;
-            validationError.errors.password = {"message":'Password is required!'};
-        }
-
-        if(!isValid) return res.status(201).json(util.successFalse(validationError));
-        else next();
-
-
-    } catch(e){
-        console.error(e);
-        return next(e);
-    }
-}, async (req, res, next) => {
-    try{
-        const { email, password } = req.body;
-        const exUser = await User.findOne({where: { email:email } })
-        console.log('exUser', exUser)
-        let pass = false;
-        if(exUser) {pass = await bcrypt.compare(password, exUser.password);}
-        if(pass){
-            let payload = { 
-                email : exUser.email
-            };
-            const secretOrPrivateKey = process.env.JWT_SECRET;
-            let resToken = {
-                accessToken:'',
-                refreshToken:'',
-            };
-            let refreshOptions = {expiresIn: 60*60*24*14};
-            let accessOptions = {expiresIn: 60*60};
-            await jwt.sign(payload, secretOrPrivateKey, refreshOptions, (err, token) => {
-                if(err) return res.json(util.successFalse(err));
-                resToken.refreshToken = util.successTrue(token);
-                console.log('refresh 생성')
-
-                jwt.sign(payload, secretOrPrivateKey, accessOptions, (err, token) => {
-                    if(err) return res.json(util.successFalse(err));
-                    resToken.accessToken = util.successTrue(token);
-                    res.header('x-access-token', token);
-                    console.log('access 생성');
-                    res.status(201).json(resToken);
-                });
+        passport.authenticate('local', (authError, user, info) => { //done(에러, 성공, 실패)
+            if (authError) {
+              console.error(authError);
+              return next(authError);
+            }
+            if (!user) {
+                return res.status(201).send(info.message+ ' 유저없음');
+            }
+            return req.login(user, (loginError) => { // req.user 사용자 정보가 들어있다.
+                if (loginError) {
+                    console.error(loginError);
+                    return next(loginError);
+                }
+                if(user.tutorial === false){
+                    User.update({tutorial:true},{where:{user_uid:user.user_uid}});
+                }
+                console.log('로그인 요청시도')
+                console.log('로그인??',req.isAuthenticated());
+                let jsonuser = {
+                    email: user.email,
+                    nickname: user.nickname,
+                    tutorial: user.tutorial,
+                }
+                return res.status(201).json(jsonuser);
             });
-            
-        }else{
-            return res.status(201).json(util.successFalse(null, '이메일과 비밀번호를 확인해주세요'))
-        }
+        })(req, res, next); // 미들웨어 내의 미들웨어에는 (req, res, next)를 붙입니다.
+
     } catch(e){
         console.error(e);
         return next(e);
     }
 });
 
-router.get('/me', util.isLoggedin, async (req,res,next) => {
+router.get('/me', isLoggedIn, async (req,res,next) => {
     try{
-        console.log('me탐', req.decoded.email)
-        const user = await User.findOne({where: {email: req.decoded.email}})
-        if (user) {
-            res.json(util.successTrue(user)), console.log('me성공');
-        } else{
-            return res.status(200).json(util.successFalse(null, '유저정보가 없습니다')), console.error('me에러')
+        const user = await User.findOne({where:{user_uid: req.user.user_uid}});
+        let sendUser = await {
+            email: user.email,
+            nickname: user.nickname,
+            portrait: user.portrait,
+            introduction: user.introduction,
+            tutorial: user.tutorial,
         }
+        res.status(201).json(sendUser);
     } catch(e){
         console.error(e);
         return next(e);
     }
-    
   }
 );
 
-// refresh
-router.get('/refresh', util.isLoggedin, async (req,res,next) => {
-    try{
-        console.log('refresh탐')
-        const user = await User.findOne({where: {email: req.decoded.email}})
-        if(user) {
-            let payload = {
-                email: user.email
-            };
-            const secretOrPrivateKey = process.env.JWT_SECRET;
-            const options = {expiresIn: 60*60};
-            jwt.sign(payload, secretOrPrivateKey, options,  (err, token) => {
-                if(err) return res.json(util.successFalse(err));
-                else res.json(util.successTrue(token));
-            });
-        }else{
-            return res.status(200).json(util.successFalse(null,'유저정보가 없습니다'));
-        }
-    }catch(e){
-        console.error(e);
-        return next(e);
-    }
-    
-  }
-);
+router.get('/logout', isLoggedIn, (req, res) => {
+    req.logout();
+    res.status(200).json('logout');
+})
 
 module.exports = router;

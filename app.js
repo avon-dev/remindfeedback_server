@@ -6,6 +6,7 @@ var morgan = require('morgan');
 
 const session = require('express-session');
 const flash = require('connect-flash');
+const passport = require('passport');
 const cors = require('cors');
 const hpp = require('hpp');
 const helmet = require('helmet');
@@ -18,22 +19,12 @@ const userRouter = require('./routes/users');
 const prod = process.env.NODE_ENV === 'production';
 
 const { sequelize } = require('./models');
+const passportConfig = require('./passport');
 const app = express();
 sequelize.sync();
+passportConfig(passport);
 
-// view engine setup
-// app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'jade');
 app.set('port', process.env.PORT || 8000); //포트 설정
-
-
-// parse JSON and url-encoded query
-app.use(function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.header('Access-Control-Allow-Headers', 'content-type, x-access-token'); //1
-  next();
-});
 
 if (prod) {
   app.use(hpp());
@@ -67,6 +58,8 @@ app.use(session({
 }));
 // app.use(express.static(path.join(__dirname, 'public')));
 app.use(flash()); //1회성 메세지
+app.use(passport.initialize()); //설정초기화 (미들웨어 연결)
+app.use(passport.session()); //로그인시 로컬로 로그인했을때 세션에 저장하는 역할
 app.get('/favicon.ico', (req, res) => {
   res.status(204);
 })

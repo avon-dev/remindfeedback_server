@@ -28,6 +28,10 @@ module.exports = (sequelize, DataTypes) => (
             type: DataTypes.STRING(100),
             allowNull: false,
         },
+        tutorial: {
+            type: DataTypes.BOOLEAN,
+            allowNull: true,
+        }
     }, {
         timestamps: true, //생성일, 수정일 기록
         paranoid: true, //삭제일기록(복구용)

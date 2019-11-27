@@ -85,7 +85,7 @@
 **LogIn**
 ----
   
-  회원가입 이후 로그인 (jwt방식).
+  회원가입 이후 로그인 (passport방식).
   <!--삭제 시 삭제된 객체를 리턴할 지 그냥 성공 메시지 리턴할지?-->
 
 * **URL**
@@ -115,18 +115,14 @@
   * **Code:** 201 <br />
     **Response:**
 
-    * `refreshToken=[object]` 만료기간 2주 토큰
-      - `success` 로그인 성공여부
-      - `message` 유저여부, 토큰만료 정보
-      - `errors` 에러 내용
-      - `data` refreshToken 으로 access 토큰 만료시 header 에 넣어야 하는 값
+    * `user=[object]` 유저 객체
+      - `user_uid` 유저uid
+      - `email` 이메일
+      - `nickname` 닉네임
+      - `tutorial` 튜토리얼 진행여부 (false일시 튜토리얼 진행)
+    * `connect.sid=[cookie]` 
+      - `value` connect.sid=value "쿠키"로 보내야 로그인 여부 확인가능 (토큰역할)
 
-    * `accessToken=[object]` 만료기간 1시간 토큰
-      - `success` 로그인 성공여부
-      - `message` 유저여부, 토큰만료 정보
-      - `errors` 에러 내용
-      - `data` accessToken 으로 데이터 요청시 header 에 넣어야 하는 값 (쿠키등에 저장하여 보관)
- 
 
 <!-- * **Sample Call:** -->
 
@@ -140,7 +136,7 @@
       password : "1234",
     });
   ``` -->
-* **Sample JSON data:**
+* **Sample request JSON data:**
   ```json
   {
       "headers": {
@@ -153,8 +149,7 @@
 
 **GET User (Me)**
 ----
-  로그인 후 본인 정보 get (jwt방식).
-  <!--삭제 시 삭제된 객체를 리턴할 지 그냥 성공 메시지 리턴할지?-->
+  로그인 후 본인 정보 get (passport방식).
 
 * **URL**
 
@@ -166,17 +161,15 @@
   
 *  **URL Params**
 
-    **header:**
+    **cookie:**
     
-    * `x-access-token` 로그인 시 발급된 access토큰 정보기입
+    * `connect.sid` 로그인 시 발급된 cookie 정보
 
     
 
 * **Data Params**
   
   None
-
-
 
 * **Success Response:**
   <!--삭제 성공 시 http code 뭐할지?-->
@@ -184,37 +177,31 @@
     **Response:**
 
     * `user=[object]` 로그인한 유저정보
- 
+      - `email` 이메일
+      - `nickname` 닉네임
+      - `portrait` 프로필사진명
+      - `introduction` 상태메세지
+      - `tutorial` 튜토리얼 진행여부 (false일시 튜토리얼 진행)
 
-<!-- * **Sample Call:**
-
-  ```javascript
-    axios
-    .post(`http://54.180.118.35/auth/me`, {
-      headers: {
-        'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFzZGZAYXNkZi5jb20iLCJpYXQiOjE1NzQwNjIwMDMsImV4cCI6MTU3NDA2MjAwOX0.FhdS3dX1DiMtEeadvosyGvpYjjw50JrcWOht1-R3il0',
-      }
-    });
-  ``` -->
-  * **Sample JSON data:**
+  * **Sample request JSON data:**
   ```json
   {
-      "headers": {
-        "x-access-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFzZGZAYXNkZi5jb20iLCJpYXQiOjE1NzQwNjIwMDMsImV4cCI6MTU3NDA2MjAwOX0.FhdS3dX1DiMtEeadvosyGvpYjjw50JrcWOht1-R3il0",
+      "cookie": {
+        "connect.sid": "s%3AfxZgKcirzD_d0zAHVTEnf9DQu9FVI2rO.Ijf7scJ%2Buj6YtprVUB6Vcuf1QVNXDIR64MP43366CaQ",
       }
   }
   ```
 
 
 
-**RefreshToken**
+
+**LogOut**
 ----
-  access토큰 만료시 refresh토큰을 보내어 access토큰 재발급 (jwt방식).
-  <!--삭제 시 삭제된 객체를 리턴할 지 그냥 성공 메시지 리턴할지?-->
+  로그인 후 본인 정보 get (passport방식).
 
 * **URL**
 
-  http://54.180.118.35/auth/refresh
+  http://54.180.118.35/auth/logout
 
 * **Method:**
 
@@ -222,9 +209,9 @@
   
 *  **URL Params**
 
-    **header:**
+    **cookie:**
     
-    * `x-access-token` 로그인 시 발급된 refresh토큰 정보기입
+    * `connect.sid` 로그인 시 발급된 cookie 정보
 
     
 
@@ -232,39 +219,18 @@
   
   None
 
-
-
 * **Success Response:**
   <!--삭제 성공 시 http code 뭐할지?-->
   * **Code:** 200 <br />
     **Response:**
 
-    * `accessToken=[object]` 만료기간 1시간 토큰
-      - `success` 로그인 성공여부
-      - `message` 유저여부, 토큰만료 정보
-      - `errors` 에러 내용
-      - `data` accessToken 으로 데이터 요청시 header 에 넣어야 하는 값 (쿠키등에 저장하여 보관)
+    * `logout` logout Text 문자열
 
-<!-- * **Sample Call:**
-
-  ```javascript
-    axios
-    .post(`http://54.180.118.35/auth/me`, {
-      headers: {
-        'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFzZGZAYXNkZi5jb20iLCJpYXQiOjE1NzQwNjIwMDMsImV4cCI6MTU3NDA2MjAwOX0.FhdS3dX1DiMtEeadvosyGvpYjjw50JrcWOht1-R3il0',
-      }
-    });
-  ``` -->
-  * **Sample JSON data:**
+  * **Sample request JSON data:**
   ```json
   {
-      "headers": {
-        "x-access-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFzZGZAYXNkZi5jb20iLCJpYXQiOjE1NzQwNTMwNDMsImV4cCI6MTU3NDEzOTQ0M30.BDYuub-TMKKQi0o546kf51OehKo7kPZpge68kDT9ZIQ",
+      "cookie": {
+        "connect.sid": "s%3AfxZgKcirzD_d0zAHVTEnf9DQu9FVI2rO.Ijf7scJ%2Buj6YtprVUB6Vcuf1QVNXDIR64MP43366CaQ",
       }
   }
   ```
-
-
-**LogOut**
-----
-  로그인 시 발급된 모든 토큰을 삭제 시켜주면 됩니다.
