@@ -71,10 +71,10 @@ router.get('/selectall', isLoggedIn, async (req, res, next) => {
 });
 
 // one category select
-router.get('/selectone', isLoggedIn, async (req, res, next) => {
+router.get('/selectone/:category_id', isLoggedIn, async (req, res, next) => {
     try {
         const user_uid = req.user.user_uid;
-        const { category_id } = req.body;
+        const category_id = req.params.category_id;
         console.log('특정 카테고리 데이터 요청');
         // SELECT category FROM User WHERE user_uid = 'user_uid';
         const jsonAllCategory = await User.findOne({ attributes: ['category'], where: { user_uid: user_uid } });
@@ -121,16 +121,17 @@ router.post('/update', isLoggedIn, async (req, res, next) => {
 });
 
 // one category delete
-router.post('/deleteone', isLoggedIn, async (req, res, next) => {
+router.post('/deleteone/:category_id', isLoggedIn, async (req, res, next) => {
     try {
-        const { user_uid, category_id } = req.body;
+        const user_uid = req.user.user_uid;
+        const category_id = req.params.category_id;
         console.log('선택한 카테고리 삭제 요청');
         // 카테고리 번호 검사(기본값 삭제 불가)
         if (category_id == 0) {
             return res.status(201).json({ msg: '기본 카테고리는 삭제할 수 없습니다.' });
         }
         // SELECT category FROM User WHERE user_uid = 'user_uid';
-        const jsonAllCategory = await User.findOne({ attributes: ['category'], where: { user_uid: req.user.user_uid } });
+        const jsonAllCategory = await User.findOne({ attributes: ['category'], where: { user_uid: user_uid } });
         const parseAllCategory = JSON.parse(jsonAllCategory);
         // 선택한 카테고리 삭제 후 json array 변경
         parseAllCategory.splice(category_id, 1);

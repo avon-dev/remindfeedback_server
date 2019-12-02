@@ -16,6 +16,7 @@ require('dotenv').config(); //.env 설정
 const authRouter = require('./routes/auth');
 const userRouter = require('./routes/users');
 const feedbackRouter = require('./routes/feedback');
+const categoryRouter = require('/routes/category');
 
 const prod = process.env.NODE_ENV === 'production';
 
