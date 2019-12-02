@@ -90,7 +90,7 @@ router.get('/selectone', isLoggedIn, async (req, res, next) => {
 });
 
 // one category update
-router.patch('/update', isLoggedIn, async (req, res, next) => {
+router.post('/update', isLoggedIn, async (req, res, next) => {
     try {
         const { category_id, category_title, category_color } = req.body;
         console.log('선택한 카테고리 수정 요청');
