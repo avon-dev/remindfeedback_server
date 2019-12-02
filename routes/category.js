@@ -10,7 +10,7 @@ const router = express.Router();
  * - parameter category_color : 카테고리 색상
  */
 // category insert
-router.push('/insert', isLoggedIn, async (req, res, next) => {
+router.post('/insert', isLoggedIn, async (req, res, next) => {
     try {
         const user_uid = req.user.user_uid;
         const { category_title, category_color } = req.body;
