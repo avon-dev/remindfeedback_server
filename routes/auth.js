@@ -48,7 +48,7 @@ router.post('/login', async (req, res, next) => {
               return next(authError);
             }
             if (!user) {
-                return res.status(201).send(info.message+ ' 유저없음');
+                return res.status(201).send(info.message);
             }
             return req.login(user, (loginError) => { // req.user 사용자 정보가 들어있다.
                 if (loginError) {

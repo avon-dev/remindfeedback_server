@@ -27,7 +27,7 @@ fs
 
 //TABLE 객체선언
 db.User = require('./user')(sequelize, Sequelize);
-
+db.Feedback = require('./feedback')(sequelize, Sequelize);
 
 //TABLE 관계 맺기
 
