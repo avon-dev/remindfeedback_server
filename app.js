@@ -16,6 +16,7 @@ require('dotenv').config(); //.env 설정
 const authRouter = require('./routes/auth');
 const userRouter = require('./routes/users');
 const feedbackRouter = require('./routes/feedback');
+const categoryRouter = require('./routes/category');
 
 const prod = process.env.NODE_ENV === 'production';
 
@@ -85,6 +86,7 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
+  console.log(`${err} / ${err.status}`);
   res.render('error');
 });
 

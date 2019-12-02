@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: true, //카카오일시 필수가 아니어도되니 false
         }, 
         category: {
-            type: DataTypes.STRING,
+            type: DataTypes.JSON,
             allowNull: false,
             defaultValue: stringifyCategory,
         },
