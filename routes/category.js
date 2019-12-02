@@ -10,12 +10,12 @@ const router = express.Router();
  * - parameter category_color : 카테고리 색상
  */
 // category insert
-router.patch('/insert', async (req, res, next) => {
+router.patch('/insert', isLoggedIn, async (req, res, next) => {
     try {
-        const { user_uid, category_title, category_color } = req.body;
-        console.log('카테고리 저장 요청', user_uid, category_title, category_color);
+        const { category_title, category_color } = req.body;
+        console.log('카테고리 저장 요청', category_title, category_color);
         // SELECT category FROM User WHERE user_uid = 'user_uid';
-        const jsonAllCategory = await User.findOne({ attributes: ['category'], where: { user_uid } });
+        const jsonAllCategory = await User.findOne({ attributes: ['category'], where: { user_uid: req.user.user_uid } });
         const parseAllCategory = JSON.parse(jsonAllCategory);
         // 카테고리 개수 검사(10개 제한)
         if (parseAllCategory.length > 10) {
@@ -50,12 +50,11 @@ router.patch('/insert', async (req, res, next) => {
 });
 
 // all category select
-router.get('/selectall', async (req, res, next) => {
+router.get('/selectall', isLoggedIn, async (req, res, next) => {
     try {
-        const { user_uid } = req.body;
         console.log('모든 카테고리 데이터 요청')
         // SELECT category FROM User WHERE user_uid = 'user_uid';
-        const jsonAllCategory = await User.findOne({ attributes: ['category'], where: { user_uid } });
+        const jsonAllCategory = await User.findOne({ attributes: ['category'], where: { user_uid: req.user.user_uid } });
         // all category response
         console.log('allCategory', jsonAllCategory);
         res.status(201).send(jsonAllCategory);
@@ -66,12 +65,12 @@ router.get('/selectall', async (req, res, next) => {
 });
 
 // one category select
-router.get('/selectone', async (req, res, next) => {
+router.get('/selectone', isLoggedIn, async (req, res, next) => {
     try {
-        const { user_uid, category_id } = req.body;
+        const { category_id } = req.body;
         console.log('특정 카테고리 데이터 요청');
         // SELECT category FROM User WHERE user_uid = 'user_uid';
-        const jsonAllCategory = await User.findOne({ attributes: ['category'], where: { user_uid } });
+        const jsonAllCategory = await User.findOne({ attributes: ['category'], where: { user_uid: req.user.user_uid } });
         const parseAllCategory = JSON.parse(jsonAllCategory);
         const stringifyOneCategory = JSON.stringify(parseAllCategory[category_id]);
         // one category response
@@ -84,16 +83,16 @@ router.get('/selectone', async (req, res, next) => {
 });
 
 // one category update
-router.patch('/update', async (req, res, next) => {
+router.patch('/update', isLoggedIn, async (req, res, next) => {
     try {
-        const { user_uid, category_id, category_title, category_color } = req.body;
+        const { category_id, category_title, category_color } = req.body;
         console.log('선택한 카테고리 수정 요청');
         // 카테고리 번호 검사(기본값 수정 불가)
         if (category_id == 0) {
             return res.status(201).json({ msg: '기본 카테고리는 수정할 수 없습니다.' });
         }
         // SELECT category FROM User WHERE user_uid = 'user_uid';
-        const jsonAllCategory = await User.findOne({ attributes: ['category'], where: { user_uid } });
+        const jsonAllCategory = await User.findOne({ attributes: ['category'], where: { user_uid: req.user.user_uid } });
         const parseAllCategory = JSON.parse(jsonAllCategory);
         // 선택한 카테고리 수정 후 json array 변경
         parseAllCategory[category_id].category_title = category_title;
@@ -115,7 +114,7 @@ router.patch('/update', async (req, res, next) => {
 });
 
 // one category delete
-router.post('/deleteone', async (req, res, next) => {
+router.post('/deleteone', isLoggedIn, async (req, res, next) => {
     try {
         const { user_uid, category_id } = req.body;
         console.log('선택한 카테고리 삭제 요청');
@@ -124,7 +123,7 @@ router.post('/deleteone', async (req, res, next) => {
             return res.status(201).json({ msg: '기본 카테고리는 삭제할 수 없습니다.' });
         }
         // SELECT category FROM User WHERE user_uid = 'user_uid';
-        const jsonAllCategory = await User.findOne({ attributes: ['category'], where: { user_uid } });
+        const jsonAllCategory = await User.findOne({ attributes: ['category'], where: { user_uid: req.user.user_uid } });
         const parseAllCategory = JSON.parse(jsonAllCategory);
         // 선택한 카테고리 삭제 후 json array 변경
         parseAllCategory.splice(category_id, 1);
