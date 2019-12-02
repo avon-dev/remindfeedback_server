@@ -70,6 +70,7 @@ app.get('/', (req, res) => {
 app.use('/auth', authRouter);
 app.use('/users', userRouter);
 app.use('/feedback', feedbackRouter);
+app.use('/category', categoryRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
