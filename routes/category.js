@@ -10,19 +10,24 @@ const router = express.Router();
  * - parameter category_color : 카테고리 색상
  */
 // category insert
-router.patch('/insert', isLoggedIn, async (req, res, next) => {
+router.push('/insert', isLoggedIn, async (req, res, next) => {
     try {
+        const user_uid = req.user.user_uid;
         const { category_title, category_color } = req.body;
         console.log('카테고리 저장 요청', category_title, category_color);
         // SELECT category FROM User WHERE user_uid = 'user_uid';
-        const jsonAllCategory = await User.findOne({ attributes: ['category'], where: { user_uid: req.user.user_uid } });
+        const jsonAllCategory = await User.findOne({ attributes: ['category'], where: { user_uid: user_uid } });
         const parseAllCategory = JSON.parse(jsonAllCategory);
-        // 카테고리 개수 검사(10개 제한)
-        if (parseAllCategory.length > 10) {
+        // 카테고리 개수 검사(10개 제한, 0 ~ 9)
+        if (parseAllCategory.length >= 10) {
             return res.status(201).json({ msg: '카테고리 제한 개수를 초과하였습니다.' });
         }
+        // 기본 카테고리 명 검사
+        if (category_title == parseAllCategory[0].category_title){
+            return res.status(201).json({ msg: '기본 카테고리 이름으로 생성할 수 없습니다.' });
+        }
         // 반복문을 돌려 카테고리 명이 중복되는지 검사
-        for (var i = 0; i < obj.length; i++) {
+        for (var i = 1; i < obj.length; i++) {
             if (category_title == parseAllCategory[i].category_title) {
                 return res.status(201).json({ msg: '이미 생성된 카테고리입니다.' });
             }
@@ -52,9 +57,10 @@ router.patch('/insert', isLoggedIn, async (req, res, next) => {
 // all category select
 router.get('/selectall', isLoggedIn, async (req, res, next) => {
     try {
+        const user_uid = req.user.user_uid;
         console.log('모든 카테고리 데이터 요청')
         // SELECT category FROM User WHERE user_uid = 'user_uid';
-        const jsonAllCategory = await User.findOne({ attributes: ['category'], where: { user_uid: req.user.user_uid } });
+        const jsonAllCategory = await User.findOne({ attributes: ['category'], where: { user_uid: user_uid } });
         // all category response
         console.log('allCategory', jsonAllCategory);
         res.status(201).send(jsonAllCategory);
@@ -67,10 +73,11 @@ router.get('/selectall', isLoggedIn, async (req, res, next) => {
 // one category select
 router.get('/selectone', isLoggedIn, async (req, res, next) => {
     try {
+        const user_uid = req.user.user_uid;
         const { category_id } = req.body;
         console.log('특정 카테고리 데이터 요청');
         // SELECT category FROM User WHERE user_uid = 'user_uid';
-        const jsonAllCategory = await User.findOne({ attributes: ['category'], where: { user_uid: req.user.user_uid } });
+        const jsonAllCategory = await User.findOne({ attributes: ['category'], where: { user_uid: user_uid } });
         const parseAllCategory = JSON.parse(jsonAllCategory);
         const stringifyOneCategory = JSON.stringify(parseAllCategory[category_id]);
         // one category response
@@ -142,3 +149,5 @@ router.post('/deleteone', isLoggedIn, async (req, res, next) => {
         return next(e);
     }
 });
+
+module.exports = router;
