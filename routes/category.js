@@ -2,6 +2,7 @@ const express = require('express');
 const { User } = require('../models');
 const passport = require('passport');
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
+
 const router = express.Router();
 
 /* Category CRUD API
@@ -16,14 +17,17 @@ router.post('/insert', isLoggedIn, async (req, res, next) => {
         const { category_title, category_color } = req.body;
         console.log('카테고리 저장 요청', category_title, category_color);
         // SELECT category FROM User WHERE user_uid = 'user_uid';
-        const jsonAllCategory = await User.findOne({ attributes: ['category'], where: { user_uid: user_uid } });
-        const parseAllCategory = JSON.parse(jsonAllCategory);
+        const user = await User.findOne({
+            attributes: ['category'],
+            where: { user_uid: user_uid }
+        });
+        const parseAllCategory = JSON.parse(user.category);
         // 카테고리 개수 검사(10개 제한, 0 ~ 9)
         if (parseAllCategory.length >= 10) {
             return res.status(201).json({ msg: '카테고리 제한 개수를 초과하였습니다.' });
         }
         // 기본 카테고리 명 검사
-        if (category_title == parseAllCategory[0].category_title){
+        if (category_title == parseAllCategory[0].category_title) {
             return res.status(201).json({ msg: '기본 카테고리 이름으로 생성할 수 없습니다.' });
         }
         // 반복문을 돌려 카테고리 명이 중복되는지 검사
@@ -47,7 +51,7 @@ router.post('/insert', isLoggedIn, async (req, res, next) => {
         });
         // new category response
         console.log('newCategory', updateUser.category);
-        res.status(201).json(updateUser.category);
+        res.status(201).send(stringifyAllCategory);
     } catch (e) {
         console.error(e);
         return next(e);
@@ -60,10 +64,15 @@ router.get('/selectall', isLoggedIn, async (req, res, next) => {
         const user_uid = req.user.user_uid;
         console.log('모든 카테고리 데이터 요청')
         // SELECT category FROM User WHERE user_uid = 'user_uid';
-        const jsonAllCategory = await User.findOne({ attributes: ['category'], where: { user_uid: user_uid } });
+        const user = await User.findOne({ 
+            attributes: ['category'], 
+            where: { 
+                user_uid: user_uid 
+            } 
+        });
         // all category response
-        console.log('allCategory', jsonAllCategory);
-        res.status(201).send(jsonAllCategory);
+        console.log('allCategory', user.category);
+        res.status(201).json(user.category);
     } catch (e) {
         console.error(e);
         return next(e);
@@ -77,8 +86,13 @@ router.get('/selectone/:category_id', isLoggedIn, async (req, res, next) => {
         const category_id = req.params.category_id;
         console.log('특정 카테고리 데이터 요청');
         // SELECT category FROM User WHERE user_uid = 'user_uid';
-        const jsonAllCategory = await User.findOne({ attributes: ['category'], where: { user_uid: user_uid } });
-        const parseAllCategory = JSON.parse(jsonAllCategory);
+        const user = await User.findOne({
+            attributes: ['category'],
+            where: {
+                user_uid: user_uid
+            }
+        });
+        const parseAllCategory = JSON.parse(user.category);
         const stringifyOneCategory = JSON.stringify(parseAllCategory[category_id]);
         // one category response
         console.log('oneCategory', stringifyOneCategory);
@@ -92,6 +106,7 @@ router.get('/selectone/:category_id', isLoggedIn, async (req, res, next) => {
 // one category update
 router.post('/update', isLoggedIn, async (req, res, next) => {
     try {
+        const user_uid = req.user.user_uid;
         const { category_id, category_title, category_color } = req.body;
         console.log('선택한 카테고리 수정 요청');
         // 카테고리 번호 검사(기본값 수정 불가)
@@ -99,8 +114,13 @@ router.post('/update', isLoggedIn, async (req, res, next) => {
             return res.status(201).json({ msg: '기본 카테고리는 수정할 수 없습니다.' });
         }
         // SELECT category FROM User WHERE user_uid = 'user_uid';
-        const jsonAllCategory = await User.findOne({ attributes: ['category'], where: { user_uid: req.user.user_uid } });
-        const parseAllCategory = JSON.parse(jsonAllCategory);
+        const user = await User.findOne({
+            attributes: ['category'],
+            where: {
+                user_uid: user_uid
+            }
+        });
+        const parseAllCategory = JSON.parse(user.category);
         // 선택한 카테고리 수정 후 json array 변경
         parseAllCategory[category_id].category_title = category_title;
         parseAllCategory[category_id].category_color = category_color;
@@ -112,8 +132,8 @@ router.post('/update', isLoggedIn, async (req, res, next) => {
             where: { user_uid: user_uid },
         });
         // update category response
-        console.log('update category', updateUser.category);
-        res.status(201).json(updateUser.category);
+        console.log('update category', stringifyAllCategory);
+        res.status(201).send(stringifyAllCategory);
     } catch (e) {
         console.error(e);
         return next(e);
@@ -131,8 +151,13 @@ router.post('/deleteone/:category_id', isLoggedIn, async (req, res, next) => {
             return res.status(201).json({ msg: '기본 카테고리는 삭제할 수 없습니다.' });
         }
         // SELECT category FROM User WHERE user_uid = 'user_uid';
-        const jsonAllCategory = await User.findOne({ attributes: ['category'], where: { user_uid: user_uid } });
-        const parseAllCategory = JSON.parse(jsonAllCategory);
+        const user = await User.findOne({ 
+            attributes: ['category'], 
+            where: { 
+                user_uid: user_uid 
+            } 
+        });
+        const parseAllCategory = JSON.parse(user.category);
         // 선택한 카테고리 삭제 후 json array 변경
         parseAllCategory.splice(category_id, 1);
         const stringifyAllCategory = JSON.stringify(parseAllCategory);
@@ -143,8 +168,8 @@ router.post('/deleteone/:category_id', isLoggedIn, async (req, res, next) => {
             where: { user_uid: user_uid },
         });
         // update category response
-        console.log('update category', updateUser.category);
-        res.status(201).json(updateUser.category);
+        console.log('delete category', stringifyAllCategory);
+        res.status(201).send(stringifyAllCategory);
     } catch (e) {
         console.error(e);
         return next(e);
