@@ -65,7 +65,7 @@ router.post('/insert', isLoggedIn, async (req, res, next) => {
         // new category response
         const result = new Object();
         result.success = true;
-        result.data = updateUser.category;
+        result.data = parseAllCategory;
         result.message = '새로운 카테고리를 생성했습니다.';
         console.log('Category Insert', JSON.stringify(result));
         res.status(201).json(result);
@@ -87,10 +87,11 @@ router.get('/selectall', isLoggedIn, async (req, res, next) => {
                 user_uid: user_uid
             }
         });
+        const parseAllCategory = JSON.parse(user.category);
         // all category response
         const result = new Object();
         result.success = true;
-        result.data = user.category;
+        result.data = parseAllCategory;
         result.message = '사용자의 모든 카테고리 데이터를 가져왔습니다.';
         console.log('Category Select All', JSON.stringify(result));
         res.status(200).json(result); //ReferenceError: stringifyResult is not defined
@@ -117,11 +118,10 @@ router.get('/selectone/:category_id', isLoggedIn, async (req, res, next) => {
         // 반복문을 돌려 카테고리 id로 찾기
         for (var i = 1; i < parseAllCategory.length; i++) {
             if (category_id == parseAllCategory[i].category_id) {
-                const stringifyOneCategory = JSON.stringify(parseAllCategory[i]);
                 // one category response
                 const result = new Object();
                 result.success = true;
-                result.data = stringifyOneCategory;
+                result.data = parseAllCategory[i];
                 result.message = '사용자가 선택한 카테고리의 데이터를 가져왔습니다.';
                 console.log('Category Select One', JSON.stringify(result));
                 res.status(200).json(result);
@@ -163,7 +163,6 @@ router.post('/update/:category_id', isLoggedIn, async (req, res, next) => {
             }
         });
         const parseAllCategory = JSON.parse(user.category);
-
         // 반복문을 돌려 카테고리 id로 찾기
         for (var i = 1; i < parseAllCategory.length; i++) {
             if (category_id == parseAllCategory[i].category_id) {
@@ -180,7 +179,7 @@ router.post('/update/:category_id', isLoggedIn, async (req, res, next) => {
                 // update category response
                 const result = new Object();
                 result.success = true;
-                result.data = stringifyAllCategory;
+                result.data = parseAllCategory;
                 result.message = '사용자가 선택한 카테고리의 정보를 수정했습니다.';
                 console.log('Category Update One', JSON.stringify(result));
                 res.status(200).json(result);
@@ -237,7 +236,7 @@ router.delete('/deleteone/:category_id', isLoggedIn, async (req, res, next) => {
                 // delete category response
                 const result = new Object();
                 result.success = true;
-                result.data = stringifyAllCategory;
+                result.data = parseAllCategory;
                 result.message = '사용자가 선택한 카테고리의 정보를 삭제했습니다.';
                 console.log('Category Delete One', JSON.stringify(result));
                 return res.status(200).json(result);
