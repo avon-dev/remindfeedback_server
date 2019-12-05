@@ -6,6 +6,9 @@
     "host": "127.0.0.1",
     "port": "3307",
     "dialect": "mariadb",
+    "dialectOptions": {
+      "charset": "utf8mb4"
+    },
     "operatorsAliases": false
   },
   "test": {
@@ -14,6 +17,9 @@
     "database": "rf_db",
     "host": "127.0.0.1",
     "dialect": "mariadb",
+    "dialectOptions": {
+      "charset": "utf8mb4"
+    },
     "operatorsAliases": false
   },
   "production": {
@@ -21,6 +27,9 @@
     "password": "avon",
     "database": "rf_db",
     "host": "127.0.0.1",
-    "dialect": "mariadb"
+    "dialect": "mariadb",
+    "dialectOptions": {
+      "charset": "utf8mb4"
+    }
   }
 }
