@@ -21,24 +21,37 @@ router.post('/insert', isLoggedIn, async (req, res, next) => {
             attributes: ['category'],
             where: { user_uid: user_uid }
         });
+
         const parseAllCategory = JSON.parse(user.category);
         // 카테고리 개수 검사(10개 제한, 0 ~ 9)
         if (parseAllCategory.length >= 10) {
-            return res.status(201).json({ msg: '카테고리 제한 개수를 초과하였습니다.' });
+            const result = new Object();
+            result.success = false;
+            result.data = 'NONE';
+            result.message = '카테고리 제한 개수를 초과하였습니다.';
+            return res.status(403).json(result);
         }
         // 기본 카테고리 명 검사
         if (category_title == parseAllCategory[0].category_title) {
-            return res.status(201).json({ msg: '기본 카테고리 이름으로 생성할 수 없습니다.' });
+            const result = new Object();
+            result.success = false;
+            result.data = 'NONE';
+            result.message = '기본 카테고리 이름으로 생성할 수 없습니다.';
+            return res.status(403).json(result);
         }
         // 반복문을 돌려 카테고리 명이 중복되는지 검사
         for (var i = 1; i < parseAllCategory.length; i++) {
             if (category_title == parseAllCategory[i].category_title) {
-                return res.status(201).json({ msg: '이미 생성된 카테고리입니다.' });
+                const result = new Object();
+                result.success = false;
+                result.data = 'NONE';
+                result.message = '이미 생성된 카테고리입니다.';
+                return res.status(403).json(result);
             }
         }
         // 카테고리 명이 중복되지 않는 경우 json object 생성 & array 추가
         const newCategory = new Object();
-        newCategory.category_id = parseAllCategory[parseAllCategory.length-1].category_id+1;
+        newCategory.category_id = parseAllCategory[parseAllCategory.length - 1].category_id + 1;
         newCategory.category_title = category_title;
         newCategory.category_color = category_color;
         parseAllCategory.push(newCategory);
@@ -50,8 +63,12 @@ router.post('/insert', isLoggedIn, async (req, res, next) => {
             where: { user_uid: user_uid },
         });
         // new category response
-        console.log('newCategory', updateUser.category);
-        res.status(201).send(stringifyAllCategory);
+        const result = new Object();
+        result.success = true;
+        result.data = updateUser.category;
+        result.message = '새로운 카테고리를 생성했습니다.';
+        console.log('Category Insert', JSON.stringify(result));
+        res.status(201).json(stringifyResult);
     } catch (e) {
         console.error(e);
         return next(e);
@@ -64,15 +81,19 @@ router.get('/selectall', isLoggedIn, async (req, res, next) => {
         const user_uid = req.user.user_uid;
         console.log('모든 카테고리 데이터 요청')
         // SELECT category FROM User WHERE user_uid = 'user_uid';
-        const user = await User.findOne({ 
-            attributes: ['category'], 
-            where: { 
-                user_uid: user_uid 
-            } 
+        const user = await User.findOne({
+            attributes: ['category'],
+            where: {
+                user_uid: user_uid
+            }
         });
         // all category response
-        console.log('allCategory', user.category);
-        res.status(201).json(user.category);
+        const result = new Object();
+        result.success = true;
+        result.data = user.category;
+        result.message = '사용자의 모든 카테고리 데이터를 가져왔습니다.';
+        console.log('Category Select All', JSON.stringify(result));
+        res.status(201).json(stringifyResult);
     } catch (e) {
         console.error(e);
         return next(e);
@@ -98,15 +119,21 @@ router.get('/selectone/:category_id', isLoggedIn, async (req, res, next) => {
             if (category_id == parseAllCategory[i].category_id) {
                 const stringifyOneCategory = JSON.stringify(parseAllCategory[i]);
                 // one category response
-                console.log('oneCategory', stringifyOneCategory);
-                return res.status(201).send(stringifyOneCategory);
+                const result = new Object();
+                result.success = true;
+                result.data = stringifyOneCategory;
+                result.message = '사용자가 선택한 카테고리의 데이터를 가져왔습니다.';
+                console.log('Category Select One', JSON.stringify(result));
+                res.status(201).json(stringifyResult);
             }
         }
-        return res.status(404).json({ msg: '카테고리 id가 잘못되었습니다.' });
-        // const stringifyOneCategory = JSON.stringify(parseAllCategory[category_id]);
-        // // one category response
-        // console.log('oneCategory', stringifyOneCategory);
-        // res.status(201).send(stringifyOneCategory);
+        // error response
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = '카테고리의 ID가 잘못되었습니다.';
+        console.log('Category Select All', JSON.stringify(result));
+        return res.status(404).json(result);
     } catch (e) {
         console.error(e);
         return next(e);
@@ -122,7 +149,11 @@ router.post('/update/:category_id', isLoggedIn, async (req, res, next) => {
         console.log('선택한 카테고리 수정 요청');
         // 카테고리 번호 검사(기본값 수정 불가)
         if (category_id == 0) {
-            return res.status(201).json({ msg: '기본 카테고리는 수정할 수 없습니다.' });
+            const result = new Object();
+            result.success = false;
+            result.data = 'NONE';
+            result.message = '기본 카테고리는 수정할 수 없습니다.';
+            return res.status(403).json(result);
         }
         // SELECT category FROM User WHERE user_uid = 'user_uid';
         const user = await User.findOne({
@@ -147,11 +178,21 @@ router.post('/update/:category_id', isLoggedIn, async (req, res, next) => {
                     where: { user_uid: user_uid },
                 });
                 // update category response
-                console.log('update category', stringifyAllCategory);
-                return res.status(201).send(stringifyAllCategory);
+                const result = new Object();
+                result.success = true;
+                result.data = updateUser.category_id;
+                result.message = '사용자가 선택한 카테고리의 정보를 수정했습니다.';
+                console.log('Category Update One', JSON.stringify(result));
+                res.status(201).json(stringifyResult);
             }
         }
-        return res.status(404).json({ msg: '카테고리 id가 잘못되었습니다.' });
+        // error response
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = '카테고리의 ID가 잘못되었습니다.';
+        console.log('Category Update Error', JSON.stringify(result));
+        return res.status(404).json(result);
     } catch (e) {
         console.error(e);
         return next(e);
@@ -166,21 +207,20 @@ router.delete('/deleteone/:category_id', isLoggedIn, async (req, res, next) => {
         console.log('선택한 카테고리 삭제 요청');
         // 카테고리 번호 검사(기본값 삭제 불가)
         if (category_id == 0) {
-            return res.status(201).json({ msg: '기본 카테고리는 삭제할 수 없습니다.' });
+            const result = new Object();
+            result.success = false;
+            result.data = 'NONE';
+            result.message = '기본 카테고리는 삭제할 수 없습니다.';
+            return res.status(403).json(result);
         }
-        
         // SELECT category FROM User WHERE user_uid = 'user_uid';
-        const user = await User.findOne({ 
-            attributes: ['category'], 
-            where: { 
-                user_uid: user_uid 
-            } 
+        const user = await User.findOne({
+            attributes: ['category'],
+            where: {
+                user_uid: user_uid
+            }
         });
-
-        
         const parseAllCategory = JSON.parse(user.category);
-
-        
         // 반복문을 돌려 카테고리 id로 찾기
         for (var i = 1; i < parseAllCategory.length; i++) {
             if (category_id == parseAllCategory[i].category_id) {
@@ -194,12 +234,22 @@ router.delete('/deleteone/:category_id', isLoggedIn, async (req, res, next) => {
                 }, {
                     where: { user_uid: user_uid },
                 });
-                // update category response
-                console.log('delete category', stringifyAllCategory);
-                return res.status(201).send(stringifyAllCategory);
+                // delete category response
+                const result = new Object();
+                result.success = true;
+                result.data = updateUser.category;
+                result.message = '사용자가 선택한 카테고리의 정보를 삭제했습니다.';
+                console.log('Category Delete One', JSON.stringify(result));
+                res.status(201).json(stringifyResult);
             }
         }
-        return res.status(404).json({ msg: '카테고리 id가 잘못되었습니다.' });
+        // error response
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = '카테고리의 ID가 잘못되었습니다.';
+        console.log('Category Delete Error', JSON.stringify(result));
+        return res.status(404).json(result);
     } catch (e) {
         console.error(e);
         return next(e);
