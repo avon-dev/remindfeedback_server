@@ -68,7 +68,7 @@ router.post('/insert', isLoggedIn, async (req, res, next) => {
         result.data = updateUser.category;
         result.message = '새로운 카테고리를 생성했습니다.';
         console.log('Category Insert', JSON.stringify(result));
-        res.status(201).json(stringifyResult);
+        res.status(201).json(result);
     } catch (e) {
         console.error(e);
         return next(e);
@@ -93,7 +93,7 @@ router.get('/selectall', isLoggedIn, async (req, res, next) => {
         result.data = user.category;
         result.message = '사용자의 모든 카테고리 데이터를 가져왔습니다.';
         console.log('Category Select All', JSON.stringify(result));
-        res.status(201).json(stringifyResult);
+        res.status(200).json(result); //ReferenceError: stringifyResult is not defined
     } catch (e) {
         console.error(e);
         return next(e);
@@ -124,7 +124,7 @@ router.get('/selectone/:category_id', isLoggedIn, async (req, res, next) => {
                 result.data = stringifyOneCategory;
                 result.message = '사용자가 선택한 카테고리의 데이터를 가져왔습니다.';
                 console.log('Category Select One', JSON.stringify(result));
-                res.status(201).json(stringifyResult);
+                res.status(200).json(result);
             }
         }
         // error response
@@ -133,7 +133,7 @@ router.get('/selectone/:category_id', isLoggedIn, async (req, res, next) => {
         result.data = 'NONE';
         result.message = '카테고리의 ID가 잘못되었습니다.';
         console.log('Category Select All', JSON.stringify(result));
-        return res.status(404).json(result);
+        return res.status(403).json(result);
     } catch (e) {
         console.error(e);
         return next(e);
@@ -180,10 +180,10 @@ router.post('/update/:category_id', isLoggedIn, async (req, res, next) => {
                 // update category response
                 const result = new Object();
                 result.success = true;
-                result.data = updateUser.category_id;
+                result.data = stringifyAllCategory;
                 result.message = '사용자가 선택한 카테고리의 정보를 수정했습니다.';
                 console.log('Category Update One', JSON.stringify(result));
-                res.status(201).json(stringifyResult);
+                res.status(200).json(result);
             }
         }
         // error response
@@ -192,7 +192,7 @@ router.post('/update/:category_id', isLoggedIn, async (req, res, next) => {
         result.data = 'NONE';
         result.message = '카테고리의 ID가 잘못되었습니다.';
         console.log('Category Update Error', JSON.stringify(result));
-        return res.status(404).json(result);
+        return res.status(403).json(result);
     } catch (e) {
         console.error(e);
         return next(e);
@@ -237,10 +237,10 @@ router.delete('/deleteone/:category_id', isLoggedIn, async (req, res, next) => {
                 // delete category response
                 const result = new Object();
                 result.success = true;
-                result.data = updateUser.category;
+                result.data = stringifyAllCategory;
                 result.message = '사용자가 선택한 카테고리의 정보를 삭제했습니다.';
                 console.log('Category Delete One', JSON.stringify(result));
-                res.status(201).json(stringifyResult);
+                return res.status(200).json(result);
             }
         }
         // error response
@@ -249,7 +249,7 @@ router.delete('/deleteone/:category_id', isLoggedIn, async (req, res, next) => {
         result.data = 'NONE';
         result.message = '카테고리의 ID가 잘못되었습니다.';
         console.log('Category Delete Error', JSON.stringify(result));
-        return res.status(404).json(result);
+        return res.status(403).json(result);
     } catch (e) {
         console.error(e);
         return next(e);
