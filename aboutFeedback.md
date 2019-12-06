@@ -188,7 +188,7 @@
     **Required:**
     
     * `adviser=[string]` 조언자 uid, (현재는 null보내기 바람 친구기능구현시 수정예정)
-    * `category=[string]` 주제 id, (현재는 null보내기 바람 주제기능구현시 수정예정)
+    * `category=[integer]` 주제 id,
     * `title=[string]` 피드백 제목, null[x]
     * `write_date=[date]` 피드백 받은 날짜, null[x]
 
@@ -217,8 +217,7 @@
   }
   ```
 
-
-
+=======
 ----
 **Update Feedback All**
 ----
@@ -271,10 +270,6 @@
       "write_date": "2019-12-25T18:25:43.000Z",
   }
   ```
-
-
-
-
 ----
 **Update Feedback adviser**
 ----
