@@ -1,5 +1,5 @@
 const express = require('express');
-const { User } = require('../models');
+const { Feedback, User } = require('../models');
 const passport = require('passport');
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
 
@@ -76,15 +76,15 @@ router.post('/insert', isLoggedIn, async (req, res, next) => {
 });
 
 // all category select
-router.get('/selectall', isLoggedIn, async (req, res, next) => {
+router.get('/selectall', async (req, res, next) => {
     try {
-        const user_uid = req.user.user_uid;
+        // const user_uid = req.user.user_uid;
         console.log('모든 카테고리 데이터 요청')
         // SELECT category FROM User WHERE user_uid = 'user_uid';
         const user = await User.findOne({
             attributes: ['category'],
             where: {
-                user_uid: user_uid
+                email: 'test1@naver.com'
             }
         });
         const parseAllCategory = JSON.parse(user.category);
@@ -223,6 +223,15 @@ router.delete('/deleteone/:category_id', isLoggedIn, async (req, res, next) => {
         // 반복문을 돌려 카테고리 id로 찾기
         for (var i = 1; i < parseAllCategory.length; i++) {
             if (category_id == parseAllCategory[i].category_id) {
+                // 피드백 내부 카테고리 필드 기본값 업데이트
+                const updateFeedback = await Feedback.update({
+                    category: 0,
+                }, {
+                    where: {
+                        user_uid: user_uid,
+                        category: category_id
+                    },
+                });
                 // 선택한 카테고리 삭제 후 json array 변경
                 parseAllCategory.splice(i, 1);
                 const stringifyAllCategory = JSON.stringify(parseAllCategory);
