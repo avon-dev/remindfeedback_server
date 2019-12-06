@@ -4,7 +4,12 @@ exports.isLoggedIn = (req, res, next) => {
       if (req.isAuthenticated()) {
         next();
       } else {
-        res.status(403).send(false);
+        let result ={
+          success: false,
+          data: '',
+          massage: '로그인 요망'
+        }
+        res.status(403).send(result);
       }
     };
     
