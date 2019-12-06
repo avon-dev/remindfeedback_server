@@ -16,6 +16,7 @@ require('dotenv').config(); //.env 설정
 const authRouter = require('./routes/auth');
 const userRouter = require('./routes/users');
 const feedbackRouter = require('./routes/feedback');
+const categoryRouter = require('./routes/category');
 
 const prod = process.env.NODE_ENV === 'production';
 
@@ -70,6 +71,7 @@ app.get('/', (req, res) => {
 app.use('/auth', authRouter);
 app.use('/users', userRouter);
 app.use('/feedback', feedbackRouter);
+app.use('/category', categoryRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

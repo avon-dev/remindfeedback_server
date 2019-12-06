@@ -1,4 +1,12 @@
 //user 테이블 정보 담기
+const defaultObject = new Object(); // 새로운 Object
+const defaultArray = new Array(); // 새로운 Array
+defaultObject.category_id = 0;
+defaultObject.category_title = "Default";
+defaultObject.category_color = "#000000";
+defaultArray.push(defaultObject);
+const stringifyCategory = JSON.stringify(defaultArray);
+
 module.exports = (sequelize, DataTypes) => (
     sequelize.define('user', {
         user_uid: {
@@ -20,6 +28,11 @@ module.exports = (sequelize, DataTypes) => (
             type: DataTypes.STRING,
             allowNull: true, //카카오일시 필수가 아니어도되니 false
         }, 
+        category: {
+            type: DataTypes.TEXT, // JSON 형식은 Sequelize가 지원하지 않음
+            allowNull: false,
+            defaultValue: stringifyCategory,
+        },
         portrait: {
             type: DataTypes.STRING,
             allowNull: false,
