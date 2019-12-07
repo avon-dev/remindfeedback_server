@@ -179,7 +179,7 @@ router.post('/update/:category_id', isLoggedIn, async (req, res, next) => {
                 // update category response
                 const result = new Object();
                 result.success = true;
-                result.data = category_id;
+                result.data = parseAllCategory[i];
                 result.message = '사용자가 선택한 카테고리의 정보를 수정했습니다.';
                 console.log('Category Update One', JSON.stringify(result));
                 return res.status(200).json(result);
