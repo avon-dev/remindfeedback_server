@@ -28,9 +28,16 @@ fs
 //TABLE 객체선언
 db.User = require('./user')(sequelize, Sequelize);
 db.Feedback = require('./feedback')(sequelize, Sequelize);
+db.Board = require('./board')(sequelize, Sequelize);
 
 //TABLE 관계 맺기
-
+db.Feedback.hasMany(db.Board, {
+  foreignKey: 'fk_feedbackId', sourceKey: 'id',
+  onDelete: 'CASCADE'
+});
+db.Board.belongsTo(db.Feedback, {
+  foreignKey: 'fk_feedbackId', targetKey: 'id'
+});
 
 
 

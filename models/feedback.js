@@ -15,11 +15,21 @@ module.exports = (sequelize, DataTypes) => (
         }, 
         title: {
             type: DataTypes.STRING(100),
-            allowNull: true, //카카오일시 필수가 아니어도되니 false
+            allowNull: true,
         }, 
         write_date: {
             type: DataTypes.DATE,
             allowNull: false
+        },
+        complete: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false,
+        },        
+        confirm: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
         }
     }, {
         timestamps: true, //생성일, 수정일 기록
