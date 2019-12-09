@@ -82,13 +82,6 @@ router.get('/all/:start', isLoggedIn, async (req, res, next) => {
             offset: start,
             limit: 10,
         })
-        //유저의 각각 피드백에 카테고리 내용 추가
-        await feedbackList.myFeedback.map((contact)=> {
-            findCategory(contact.category, feedbackList.category).then((data) => {
-                // console.log(data);
-                contact.category=data
-            });
-        })
         //유저가 조언자인 피드백 목록
         feedbackList.yourFeedback = await Feedback.findAll({
             attributes: ['id','adviser_uid','category','title','write_date'],

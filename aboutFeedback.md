@@ -45,7 +45,7 @@
       -- `id` 피드백 인덱스
       -- `user_uid` 피드백 생성 유저 uid
       -- `adviser` 조언자uid
-      -- `category` 주제
+      -- `category` 주제 ID
       -- `title` 피드백 제목
       -- `write_date` 피드백 받은 날짜
       <br/>
@@ -217,7 +217,6 @@
   }
   ```
 
-=======
 ----
 **Update Feedback All**
 ----
