@@ -20,12 +20,17 @@ router.post('/create', isLoggedIn, async (req, res, next) => {
         const { adviser, category, title, write_date} = req.body;
         console.log('피드백 생성', adviser, category, title, write_date);
 
-        const exFeedback = await Feedback.create({
+        const user = await User.findOne({where:{user_uid: req.user.user_uid}});
+        let exFeedback = await Feedback.create({
             user_uid: req.user.user_uid,
             adviser_uid: adviser,
             category,
             title,
             write_date,
+        });
+        const categoryList = await JSON.parse(user.category);
+        await findCategory(exFeedback.category, categoryList).then((data) => {
+            exFeedback.category=data
         });
         let result = {
             success: true,
@@ -211,7 +216,13 @@ router.put('/update/:feedback_id', isLoggedIn, async (req, res, next) => {
             adviser_uid:tempFeedback.adviser_uid, category:tempFeedback.category, title:tempFeedback.title, write_date:tempFeedback.write_date
         }, {where: {id:feedback_id}})
         //response
-        const data = await Feedback.findOne({where:{id:update}})
+        let data = await Feedback.findOne({where:{id:feedback_id}})
+        //category 정보 넣기
+        const user = await User.findOne({where:{user_uid: req.user.user_uid}});
+        const categoryList = await JSON.parse(user.category);
+        await findCategory(data.category, categoryList).then((datachange) => {
+            data.category=datachange
+        });
         let result = {
             success: true,
             data,
