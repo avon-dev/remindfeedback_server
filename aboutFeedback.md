@@ -224,7 +224,7 @@
 
 * **URL**
 
-  http://54.180.118.35/feedback/update/:feedback_id
+  http://54.180.118.35/feedback/update/feedback_id
 
 * **Method:**
 
@@ -241,7 +241,7 @@
     **Required:**
     
     * `adviser=[string]` 조언자 uid, (현재는 null보내기 바람 친구기능구현시 수정예정)
-    * `category=[string]` 주제 id, (현재는 null보내기 바람 주제기능구현시 수정예정)
+    * `category=[string]` 주제 id, 
     * `title=[string]` 피드백 제목, null[x]
     * `write_date=[date]` 피드백 받은 날짜, null[x]
 
@@ -276,7 +276,7 @@
 
 * **URL**
 
-  http://54.180.118.35/feedback/adviser/:feedback_id
+  http://54.180.118.35/feedback/adviser/feedback_id
 
 * **Method:**
 
@@ -327,7 +327,7 @@
 
 * **URL**
 
-  http://54.180.118.35/feedback/category/:feedback_id
+  http://54.180.118.35/feedback/category/feedback_id
 
 * **Method:**
 
@@ -378,7 +378,7 @@
 
 * **URL**
 
-  http://54.180.118.35/feedback/title/:feedback_id
+  http://54.180.118.35/feedback/title/feedback_id
 
 * **Method:**
 
@@ -429,7 +429,7 @@
 
 * **URL**
 
-  http://54.180.118.35/feedback/:feedback_id
+  http://54.180.118.35/feedback/feedback_id
 
 * **Method:**
 
@@ -444,11 +444,7 @@
 * **Data Params**
 
     **Required:**
-    
-    * `adviser=[string]` 조언자 uid, (현재는 null보내기 바람 친구기능구현시 수정예정)
-    * `category=[string]` 주제 id, (현재는 null보내기 바람 주제기능구현시 수정예정)
-    * `title=[string]` 피드백 제목, null[x]
-    * `write_date=[date]` 피드백 받은 날짜, null[x]
+    NONE
 
     <!--필요한 form field 명시 + 설명-->
 
