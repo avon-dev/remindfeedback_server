@@ -78,13 +78,13 @@ router.post('/insert', isLoggedIn, async (req, res, next) => {
 // all category select
 router.get('/selectall', async (req, res, next) => {
     try {
-        // const user_uid = req.user.user_uid;
+        const user_uid = req.user.user_uid;
         console.log('모든 카테고리 데이터 요청')
         // SELECT category FROM User WHERE user_uid = 'user_uid';
         const user = await User.findOne({
             attributes: ['category'],
             where: {
-                email: 'test1@naver.com'
+                user_uid: user_uid
             }
         });
         const parseAllCategory = JSON.parse(user.category);
@@ -179,7 +179,7 @@ router.post('/update/:category_id', isLoggedIn, async (req, res, next) => {
                 // update category response
                 const result = new Object();
                 result.success = true;
-                result.data = category_id;
+                result.data = parseAllCategory[i];
                 result.message = '사용자가 선택한 카테고리의 정보를 수정했습니다.';
                 console.log('Category Update One', JSON.stringify(result));
                 return res.status(200).json(result);
