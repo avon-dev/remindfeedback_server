@@ -430,6 +430,54 @@
   ```
 
 
+----
+**Update Feedback write Date**
+----
+피드백 받은 날짜 수정
+
+* **URL**
+
+  http://54.180.118.35/feedback/write_date/feedback_id
+
+* **Method:**
+
+  `PATCH`
+  
+*  **URL Params**
+
+   **Required:**
+ 
+    * `feedback_id` 피드백 ID
+
+* **Data Params**
+
+    **Required:**
+    
+    * `write_date=[date]` 피드백 받은 날짜
+
+    <!--필요한 form field 명시 + 설명-->
+
+
+* **Success Response:**
+
+  * **Code:** 203 
+    **Content:** 사용자가 수정한 피드백 데이터
+ <br />
+
+* **Sample request JSON data:**
+  ```json
+  {
+    "feedback_id" : 9,
+    "headers": {
+      "Content-Type": "application/json",
+    },
+    "cookie": {
+      "connect.sid": "s%3AfxZgKcirzD_d0zAHVTEnf9DQu9FVI2rO.Ijf7scJ%2Buj6YtprVUB6Vcuf1QVNXDIR64MP43366CaQ",
+    },
+    "write_date": "2019-12-25",
+  }
+  ```
+
 
 
 ----

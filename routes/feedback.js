@@ -228,10 +228,10 @@ router.patch('/adviser/:feedback_id', isLoggedIn, async (req, res, next) => {
         const feedback_id = req.params.feedback_id;
         const { adviser } = req.body; 
         console.log('feedback adviser 수정', adviser);
-        const update = await Feedback.update({
+        await Feedback.update({
             adviser_uid:adviser
         }, {where: {id:feedback_id}})
-        const data = await Feedback.findOne({where:{id:update}})
+        const data = await Feedback.findOne({where:{id:feedback_id}})
         let result = {
             success: true,
             data,
@@ -255,10 +255,10 @@ router.patch('/category/:feedback_id', isLoggedIn, async (req, res, next) => {
         const feedback_id = req.params.feedback_id;
         const { category } = req.body; 
         console.log('feedback category 수정', category);
-        const update = await Feedback.update({
+        await Feedback.update({
             category: category
         }, {where: {id:feedback_id}})
-        const data = await Feedback.findOne({where: {id:update}})
+        const data = await Feedback.findOne({where: {id:feedback_id}})
         let result = {
             success: true,
             data: data,
@@ -282,9 +282,37 @@ router.patch('/title/:feedback_id', isLoggedIn, async (req, res, next) => {
         const feedback_id = req.params.feedback_id;
         const { title } = req.body; 
         console.log('feedback title 수정', title);
-        const data = await Feedback.update({
+        await Feedback.update({
             title
         }, {where: {id:feedback_id}})
+        const data = await Feedback.findOne({where: {id:feedback_id}})
+        let result = {
+            success: true,
+            data,
+            message: 'feedback update 성공'
+        }
+        res.status(203).json(result);
+    } catch(e){
+        let result = {
+            success: false,
+            data: '',
+            message: e
+        }
+        res.status(500).json(result);
+        console.error(e);
+        return next(e);
+    }
+});
+
+router.patch('/write_date/:feedback_id', isLoggedIn, async (req, res, next) => {
+    try{
+        const feedback_id = req.params.feedback_id;
+        const { write_date } = req.body; 
+        console.log('feedback title 수정', write_date);
+        await Feedback.update({
+            write_date
+        }, {where: {id:feedback_id}})
+        const data = await Feedback.findOne({where: {id:feedback_id}})
         let result = {
             success: true,
             data,
@@ -310,7 +338,7 @@ router.delete('/:feedback_id', isLoggedIn, async (req, res, next) => {
         await Feedback.destroy({where: {id:feedback_id}});
         let result = {
             success: true,
-            data: '',
+            data: {id:feedback_id},
             message: 'feedback delete 성공'
         }
         res.status(204).json(result);
