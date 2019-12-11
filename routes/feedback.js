@@ -336,12 +336,13 @@ router.delete('/:feedback_id', isLoggedIn, async (req, res, next) => {
         const feedback_id = req.params.feedback_id;
         console.log('feedback 삭제', feedback_id);
         await Feedback.destroy({where: {id:feedback_id}});
+        let id = feedback_id;
         let result = {
             success: true,
-            data: {id:feedback_id},
+            data: {id},
             message: 'feedback delete 성공'
         }
-        res.status(204).json(result);
+        res.status(203).json(result);
     } catch(e){
         let result = {
             success: false,

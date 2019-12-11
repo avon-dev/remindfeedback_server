@@ -509,8 +509,8 @@
 
 * **Success Response:**
 
-  * **Code:** 204 
-    **Content:** 성공여부
+  * **Code:** 203 
+    **Content:** 성공여부 및 삭제된 피드백 id
  <br />
 
 * **Sample request JSON data:**
