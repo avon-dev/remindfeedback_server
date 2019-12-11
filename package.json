@@ -9,6 +9,7 @@
     "start": "cross-env NODE_ENV=production PORT=80 pm2 start app.js"
   },
   "dependencies": {
+    "aws-sdk": "^2.587.0",
     "bcrypt": "^3.0.6",
     "connect-flash": "^0.1.1",
     "cookie-parser": "~1.4.4",
@@ -25,6 +26,7 @@
     "jsonwebtoken": "^8.5.1",
     "mariadb": "^2.1.3",
     "morgan": "~1.9.1",
+    "multer-s3": "^2.9.0",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "path": "^0.12.7",
