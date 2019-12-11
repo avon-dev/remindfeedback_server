@@ -8,7 +8,7 @@
 
 * **URL**
 
-  http://54.180.118.35/feedback/all/:start
+  http://54.180.118.35/feedback/all/lastid
 
 * **Method:**
 
@@ -16,9 +16,10 @@
   
 *  **URL Params**
 
-    **start:**
-    
-    * `start` 몇번째 개수 부터 데이터를 반환받을지에 대한 정보 (10단위로 맞춰주세요 0, 10, 20..)
+    **lastid:**
+    * `lastid` 몇번째 id 부터 데이터를 반환받을지에 대한 정보
+    *  초기 값은 0
+    *  반환되는 배열의 마지막 feedback ID 값을 req 에 담기
 
     **cookie:**
     
@@ -48,12 +49,14 @@
       -- `category` 주제 ID
       -- `title` 피드백 제목
       -- `write_date` 피드백 받은 날짜
+      -- `createdAt` 피드백 수정 날짜
+      -- `deletedAt` 피드백 삭제 날짜
       <br/>
 
   * **Sample request JSON data:**
   ```json
   {
-    "start": 0,
+    "lastid": 0,
     "cookie": {
       "connect.sid": "s%3AfxZgKcirzD_d0zAHVTEnf9DQu9FVI2rO.Ijf7scJ%2Buj6YtprVUB6Vcuf1QVNXDIR64MP43366CaQ",
     }
@@ -65,7 +68,7 @@
 ----
 * **URL**
 
-  http://54.180.118.35/feedback/my/:start
+  http://54.180.118.35/feedback/my/lastid
 
 * **Method:**
 
@@ -73,10 +76,11 @@
   
 *  **URL Params**
 
-    **start:**
+    **lastid:**
     
-    * `start` 몇번째 개수 부터 데이터를 반환받을지에 대한 정보 (10단위로 맞춰주세요 0, 10, 20..)
-
+    * `lastid` 몇번째 id 부터 데이터를 반환받을지에 대한 정보
+    *  초기 값은 0
+    *  반환되는 배열의 마지막 feedback ID 값을 req 에 담기
     **cookie:**
     
     * `connect.sid` 로그인 시 발급된 cookie 정보
@@ -99,12 +103,14 @@
       - `category` 주제
       - `title` 피드백 제목
       - `write_date` 피드백 받은 날짜
+      - `createdAt` 피드백 수정 날짜
+      - `deletedAt` 피드백 삭제 날짜
       <br/>
 
   * **Sample request JSON data:**
   ```json
   {
-    "start": 0,
+    "lastid": 0,
     "cookie": {
       "connect.sid": "s%3AfxZgKcirzD_d0zAHVTEnf9DQu9FVI2rO.Ijf7scJ%2Buj6YtprVUB6Vcuf1QVNXDIR64MP43366CaQ",
     }
@@ -117,7 +123,7 @@
 ----
 * **URL**
 
-  http://54.180.118.35/feedback/your/:start
+  http://54.180.118.35/feedback/your/lastid
 
 * **Method:**
 
@@ -125,9 +131,11 @@
   
 *  **URL Params**
 
-    **start:**
+    **lastid:**
     
-    * `start` 몇번째 개수 부터 데이터를 반환받을지에 대한 정보 (10단위로 맞춰주세요 0, 10, 20..)
+    * `lastid` 몇번째 id 부터 데이터를 반환받을지에 대한 정보
+    *  초기 값은 0
+    *  반환되는 배열의 마지막 feedback ID 값을 req 에 담기
 
     **cookie:**
     
@@ -148,15 +156,17 @@
       - `id` 피드백 인덱스
       - `user_uid` 피드백 생성 유저 uid
       - `adviser_uid` 조언자 uid
-      - `category` 주제
+      - `category` 주제 ID
       - `title` 피드백 제목
       - `write_date` 피드백 받은 날짜
+      - `createdAt` 피드백 수정 날짜
+      - `deletedAt` 피드백 삭제 날짜
       <br/>
 
   * **Sample request JSON data:**
   ```json
   {
-    "start": 0,
+    "lastid": 0,
     "cookie": {
       "connect.sid": "s%3AfxZgKcirzD_d0zAHVTEnf9DQu9FVI2rO.Ijf7scJ%2Buj6YtprVUB6Vcuf1QVNXDIR64MP43366CaQ",
     }
@@ -224,7 +234,7 @@
 
 * **URL**
 
-  http://54.180.118.35/feedback/update/:feedback_id
+  http://54.180.118.35/feedback/update/feedback_id
 
 * **Method:**
 
@@ -241,7 +251,7 @@
     **Required:**
     
     * `adviser=[string]` 조언자 uid, (현재는 null보내기 바람 친구기능구현시 수정예정)
-    * `category=[string]` 주제 id, (현재는 null보내기 바람 주제기능구현시 수정예정)
+    * `category=[string]` 주제 id, 
     * `title=[string]` 피드백 제목, null[x]
     * `write_date=[date]` 피드백 받은 날짜, null[x]
 
@@ -276,7 +286,7 @@
 
 * **URL**
 
-  http://54.180.118.35/feedback/adviser/:feedback_id
+  http://54.180.118.35/feedback/adviser/feedback_id
 
 * **Method:**
 
@@ -327,7 +337,7 @@
 
 * **URL**
 
-  http://54.180.118.35/feedback/category/:feedback_id
+  http://54.180.118.35/feedback/category/feedback_id
 
 * **Method:**
 
@@ -378,7 +388,7 @@
 
 * **URL**
 
-  http://54.180.118.35/feedback/title/:feedback_id
+  http://54.180.118.35/feedback/title/feedback_id
 
 * **Method:**
 
@@ -429,7 +439,7 @@
 
 * **URL**
 
-  http://54.180.118.35/feedback/:feedback_id
+  http://54.180.118.35/feedback/feedback_id
 
 * **Method:**
 
@@ -444,11 +454,7 @@
 * **Data Params**
 
     **Required:**
-    
-    * `adviser=[string]` 조언자 uid, (현재는 null보내기 바람 친구기능구현시 수정예정)
-    * `category=[string]` 주제 id, (현재는 null보내기 바람 주제기능구현시 수정예정)
-    * `title=[string]` 피드백 제목, null[x]
-    * `write_date=[date]` 피드백 받은 날짜, null[x]
+    NONE
 
     <!--필요한 form field 명시 + 설명-->
 
