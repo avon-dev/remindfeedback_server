@@ -22,6 +22,17 @@ const storage = multer.diskStorage({
   });
   
 // single image upload multer 객체
-const upload = multer({ storage: storage });
- 
-module.exports = upload;
+exports.upload = multer({ storage: storage });
+
+exports.fileDelete = (filename)=>{
+    fs.exists(`public/uploads/${filename}`, function (exists) { //파일 있는지 확인
+         console.log(exists ? "파일 있음" : "파일 없음");
+         if(exists){ // 파일 있으면 삭제
+            fs.unlink(`public/uploads/${filename}`, (err)=>{
+                console.log(filename);
+                if(err) return console.log(err);
+                console.log(`${filename} 파일 삭제 완료`);
+            })
+         }
+        });
+};
