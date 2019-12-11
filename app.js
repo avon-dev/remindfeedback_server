@@ -17,6 +17,7 @@ const authRouter = require('./routes/auth');
 const userRouter = require('./routes/users');
 const feedbackRouter = require('./routes/feedback');
 const categoryRouter = require('./routes/category');
+const mypageRouter = require('./routes/mypage');
 
 const prod = process.env.NODE_ENV === 'production';
 
@@ -45,6 +46,7 @@ if (prod) {
 }
 
 app.use('/', express.static('public'));
+app.use('/mypage', express.static('public/uploads'));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -72,6 +74,7 @@ app.use('/auth', authRouter);
 app.use('/users', userRouter);
 app.use('/feedback', feedbackRouter);
 app.use('/category', categoryRouter);
+app.use('/mypage', mypageRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
