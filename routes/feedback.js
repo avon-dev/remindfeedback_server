@@ -210,7 +210,7 @@ router.put('/update/:feedback_id', isLoggedIn, async (req, res, next) => {
             data,
             message: 'feedback update 성공'
         }
-        res.status(203).json(result);
+        res.status(200).json(result);
     } catch(e){
         let result = {
             success: false,
@@ -237,7 +237,7 @@ router.patch('/adviser/:feedback_id', isLoggedIn, async (req, res, next) => {
             data,
             message: 'feedback update 성공'
         }
-        res.status(203).json(result);
+        res.status(200).json(result);
     } catch(e){
         let result = {
             success: false,
@@ -264,7 +264,7 @@ router.patch('/category/:feedback_id', isLoggedIn, async (req, res, next) => {
             data: data,
             message: 'feedback update 성공'
         }
-        res.status(203).json(result);
+        res.status(200).json(result);
     } catch(e){
         let result = {
             success: false,
@@ -291,7 +291,7 @@ router.patch('/title/:feedback_id', isLoggedIn, async (req, res, next) => {
             data,
             message: 'feedback update 성공'
         }
-        res.status(203).json(result);
+        res.status(200).json(result);
     } catch(e){
         let result = {
             success: false,
@@ -318,7 +318,7 @@ router.patch('/write_date/:feedback_id', isLoggedIn, async (req, res, next) => {
             data,
             message: 'feedback update 성공'
         }
-        res.status(203).json(result);
+        res.status(200).json(result);
     } catch(e){
         let result = {
             success: false,
@@ -342,7 +342,7 @@ router.delete('/:feedback_id', isLoggedIn, async (req, res, next) => {
             data: {id},
             message: 'feedback delete 성공'
         }
-        res.status(203).json(result);
+        res.status(200).json(result);
     } catch(e){
         let result = {
             success: false,
