@@ -1,6 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const { User, Feedback } = require('../models');
+const { User, Feedback, Sequelize: { Op } } = require('../models');
 const passport = require('passport');
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares'); 
 const router = express.Router();
@@ -27,6 +27,7 @@ router.post('/create', isLoggedIn, async (req, res, next) => {
             title,
             write_date,
         });
+
         let result = {
             success: true,
             data: '',
@@ -55,11 +56,14 @@ router.post('/create', isLoggedIn, async (req, res, next) => {
 
 /* getfeedback API
  */
-router.get('/all/:start', isLoggedIn, async (req, res, next) => {
+router.get('/all/:lastid', isLoggedIn, async (req, res, next) => {
     try{
         const user_uid= req.user.user_uid;
-        const start = parseInt(req.params.start);
-        console.log('AllFeedback 요청', start);
+        let lastid = parseInt(req.params.lastid);
+        console.log('AllFeedback 요청', lastid);
+        if(lastid === 0){
+            lastid = 9999;
+        }
         let feedbackList = {
             myFeedback: '',
             yourFeedback: '',
@@ -75,25 +79,14 @@ router.get('/all/:start', isLoggedIn, async (req, res, next) => {
         feedbackList.category = await JSON.parse(feedbackList.user.category);
         //유저가 만든 피드백 목록
         feedbackList.myFeedback = await Feedback.findAll({
-            attributes: ['id','adviser_uid','category','title','write_date'],
-            where: {user_uid},
-            order: [['write_date', 'DESC']],
-            offset: start,
+            where: {user_uid, id: { [Op.lt]:lastid }},
+            order: [['createdAt', 'DESC']],
             limit: 10,
-        })
-        //유저의 각각 피드백에 카테고리 내용 추가
-        await feedbackList.myFeedback.map((contact)=> {
-            findCategory(contact.category, feedbackList.category).then((data) => {
-                // console.log(data);
-                contact.category=data
-            });
         })
         //유저가 조언자인 피드백 목록
         feedbackList.yourFeedback = await Feedback.findAll({
-            attributes: ['id','adviser_uid','category','title','write_date'],
-            where: {adviser_uid:user_uid},
-            order: [['write_date', 'DESC']],
-            offset: start,
+            where: {adviser_uid:user_uid,  id: { [Op.lt]:lastid }},
+            order: [['createdAt', 'DESC']],
             limit: 10,
         })
         let result = {
@@ -114,24 +107,25 @@ router.get('/all/:start', isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.get('/my/:start', isLoggedIn, async (req, res, next) => {
+router.get('/my/:lastid', isLoggedIn, async (req, res, next) => {
     try{
         let result = {
             success: true,
             data: '',
             message: "내가 만든 피드백 목록"
         }
-        const start = parseInt(req.params.start);
-        console.log('myFeedback 요청', start);
+        let lastid = parseInt(req.params.lastid);
+        console.log('myFeedback 요청', lastid);
+        if(lastid === 0){
+            lastid = 9999;
+        }
         const user = await User.findOne({
             where:{user_uid:req.user.user_uid}
         })
         const category = JSON.parse(user.category)
         result.data = await Feedback.findAll({
-            attributes: ['id','adviser_uid','category','title','write_date'],
-            where: {user_uid: req.user.user_uid},
+            where: {user_uid: req.user.user_uid, id: { [Op.lt]:lastid}},
             order: [['write_date', 'DESC']],
-            offset: start,
             limit: 10,
         });
         await result.data.map((contact)=>{
@@ -153,14 +147,13 @@ router.get('/my/:start', isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.get('/your/:start', isLoggedIn, async (req, res, next) => {
+router.get('/your/:lastid', isLoggedIn, async (req, res, next) => {
     try{
-        const start = parseInt(req.params.start);
-        console.log('yourFeedback 요청', start);
+        let lastid = parseInt(req.params.lastid);
+        console.log('yourFeedback 요청', lastid);
         const yourFeedback = await Feedback.findAll({
-            where: {adviser_uid: req.user.user_uid},
+            where: {adviser_uid: req.user.user_uid, id: { [Op.lt]:lastid}},
             order: [['write_date', 'DESC']],
-            offset: start,
             limit: 10,
         });
         let result = {
@@ -211,7 +204,7 @@ router.put('/update/:feedback_id', isLoggedIn, async (req, res, next) => {
             adviser_uid:tempFeedback.adviser_uid, category:tempFeedback.category, title:tempFeedback.title, write_date:tempFeedback.write_date
         }, {where: {id:feedback_id}})
         //response
-        const data = await Feedback.findOne({where:{id:update}})
+        let data = await Feedback.findOne({where:{id:feedback_id}})
         let result = {
             success: true,
             data,
@@ -235,10 +228,10 @@ router.patch('/adviser/:feedback_id', isLoggedIn, async (req, res, next) => {
         const feedback_id = req.params.feedback_id;
         const { adviser } = req.body; 
         console.log('feedback adviser 수정', adviser);
-        const update = await Feedback.update({
+        await Feedback.update({
             adviser_uid:adviser
         }, {where: {id:feedback_id}})
-        const data = await Feedback.findOne({where:{id:update}})
+        const data = await Feedback.findOne({where:{id:feedback_id}})
         let result = {
             success: true,
             data,
@@ -262,10 +255,10 @@ router.patch('/category/:feedback_id', isLoggedIn, async (req, res, next) => {
         const feedback_id = req.params.feedback_id;
         const { category } = req.body; 
         console.log('feedback category 수정', category);
-        const update = await Feedback.update({
+        await Feedback.update({
             category: category
         }, {where: {id:feedback_id}})
-        const data = await Feedback.findOne({where: {id:update}})
+        const data = await Feedback.findOne({where: {id:feedback_id}})
         let result = {
             success: true,
             data: data,
@@ -289,9 +282,37 @@ router.patch('/title/:feedback_id', isLoggedIn, async (req, res, next) => {
         const feedback_id = req.params.feedback_id;
         const { title } = req.body; 
         console.log('feedback title 수정', title);
-        const data = await Feedback.update({
+        await Feedback.update({
             title
         }, {where: {id:feedback_id}})
+        const data = await Feedback.findOne({where: {id:feedback_id}})
+        let result = {
+            success: true,
+            data,
+            message: 'feedback update 성공'
+        }
+        res.status(203).json(result);
+    } catch(e){
+        let result = {
+            success: false,
+            data: '',
+            message: e
+        }
+        res.status(500).json(result);
+        console.error(e);
+        return next(e);
+    }
+});
+
+router.patch('/write_date/:feedback_id', isLoggedIn, async (req, res, next) => {
+    try{
+        const feedback_id = req.params.feedback_id;
+        const { write_date } = req.body; 
+        console.log('feedback title 수정', write_date);
+        await Feedback.update({
+            write_date
+        }, {where: {id:feedback_id}})
+        const data = await Feedback.findOne({where: {id:feedback_id}})
         let result = {
             success: true,
             data,
@@ -315,12 +336,13 @@ router.delete('/:feedback_id', isLoggedIn, async (req, res, next) => {
         const feedback_id = req.params.feedback_id;
         console.log('feedback 삭제', feedback_id);
         await Feedback.destroy({where: {id:feedback_id}});
+        let id = feedback_id;
         let result = {
             success: true,
-            data: '',
+            data: {id},
             message: 'feedback delete 성공'
         }
-        res.status(204).json(result);
+        res.status(203).json(result);
     } catch(e){
         let result = {
             success: false,
