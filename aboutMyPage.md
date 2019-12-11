@@ -30,6 +30,10 @@
   * `message=[string]` 요청 성공 혹은 실패에 대한 세부 내용, null[x]
   <!--회원정보 JSON 형태 + 변수 설명 -->
 
+  * **portrait 사진 url:**
+  http://localhost:8000/mypage/파일명<br>
+  http://54.180.118.35/mypage
+
 
 **Show MyPage**
 ----

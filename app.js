@@ -46,7 +46,7 @@ if (prod) {
 }
 
 app.use('/', express.static('public'));
-app.use('/users', express.static('public/uploads'));
+app.use('/mypage', express.static('public/uploads'));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
