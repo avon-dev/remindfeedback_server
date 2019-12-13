@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
         cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
     },
     limits: { //크기 제한
-        fileSize: 5*1024*1024
+        fileSize: 50*1024*1024 // 테스트를 위해 5mb로 상향 조정
     },
   });
   
