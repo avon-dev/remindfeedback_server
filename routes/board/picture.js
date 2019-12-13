@@ -3,6 +3,8 @@ const { Board } = require('../../models');
 const { isLoggedIn, isNotLoggedIn } = require('../middlewares'); 
 const AWS = require('aws-sdk');
 const multerS3 = require('multer-s3');
+const multer = require('multer');
+const path = require('path');
 
 const router = express.Router();
 
@@ -21,19 +23,24 @@ const upload = multer({ //멀터를 사용하면 upload 객체를 받을 수 있
             cb(null, `picture/${+new Date()}${path.basename(file.originalname)}`); //picture 폴더의 시간+파일이름
         }
     }),
-    limits: { fileSize: 5000 * 1024 * 1024 }, //파일 사이즈 (500mb)
+    limits: { fileSize: 50 * 1024 * 1024 }, //파일 사이즈 (5mb)
 });
 
 router.post('/create', isLoggedIn, upload.array('pictures'), async (req, res, next) => {
     try{
         const { feedback_id, board_title, board_content } = req.body;
-        req.files.map(v => v.location);
-        console.log('피드백 생성', feedback_id, board_title, board_content);
+        let files = [];
+        console.log(req.files)
+        req.files.map((v, i) => files[i] = v.key);
+        console.log('게시글사진 생성', feedback_id, board_title, board_content);
 
         const exBoard = await Board.create({
             board_title,
             board_content,
             fk_feedbackId: feedback_id,
+            board_file1: files[0],
+            board_file2: files[1],
+            board_file3: files[2],
         });
         let result = {
             success: true,
@@ -48,7 +55,6 @@ router.post('/create', isLoggedIn, upload.array('pictures'), async (req, res, ne
             result.message = '게시글이 생성되지 않았습니다.';
             return res.status(201).json(result);
         }
-
     } catch(e){
         let result = {
             success: false,
@@ -61,7 +67,7 @@ router.post('/create', isLoggedIn, upload.array('pictures'), async (req, res, ne
     }
 });
 
-router.put('/update/:board_id', isLoggedIn, async (req, res, next) => {
+router.put('/update/:board_id', isLoggedIn, upload.array('pictures'), async (req, res, next) => {
     try{
         const board_id = req.params.board_id;
         const { board_title, board_content } = req.body; 

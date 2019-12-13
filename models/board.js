@@ -13,10 +13,18 @@ module.exports = (sequelize, DataTypes) => (
             type: DataTypes.STRING,
             allowNull: true,
         }, 
-        board_file: {
+        board_file1: {
             type: DataTypes.STRING,
             allowNull: true
-        },      
+        },
+        board_file2: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        board_file3: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },  
         confirm: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
