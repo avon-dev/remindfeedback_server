@@ -61,7 +61,12 @@ router.put('/update', isLoggedIn, upload.single('portrait'), async (req, res, ne
     try {
         const user_uid = req.user.user_uid;
         const { nickname , introduction } = req.body;
-        const portrait = req.file;
+        let portrait;
+        if(req.file) {
+            portrait = req.file.filename;
+        }else{
+            portrait = "";
+        }
         console.log('마이페이지 수정 요청');
 
         // 닉네임 검사 (필수값)
@@ -84,7 +89,7 @@ router.put('/update', isLoggedIn, upload.single('portrait'), async (req, res, ne
         // 유저 정보 업데이트        
         const updateUser = await User.update({
             nickname,
-            portrait: portrait.filename,
+            portrait,
             introduction,
         }, {
             where: { user_uid: user_uid },
@@ -187,7 +192,12 @@ router.patch('/update/introduction', isLoggedIn, async (req, res, next) => {
 router.patch('/update/portrait', isLoggedIn,upload.single('portrait'), async (req, res, next) => {
     try {
         const user_uid = req.user.user_uid;
-        const portrait = req.file;
+        let portrait;
+        if(req.file) {
+            portrait = req.file.filename;
+        }else{
+            portrait = "";
+        }
         
         console.log(`마이페이지 portrait ${portrait.filename} 수정 요청`);
 
@@ -203,7 +213,7 @@ router.patch('/update/portrait', isLoggedIn,upload.single('portrait'), async (re
         });
         // 사진 파일명 업데이트
         const updateUser = await User.update({
-            portrait: portrait.filename
+            portrait
         }, {
             where: { user_uid: user_uid },
         });
