@@ -10,27 +10,6 @@ let result = {
     message: ""
 }
 
-router.delete('/deleteFile', isLoggedIn, async (req, res, next)=>{
-    try{
-        const user_uid = req.user.user_uid;
-        console.log('프로필사진 삭제');
-        // SELECT category FROM User WHERE user_uid = 'user_uid';
-        const user = await User.findOne({
-            attributes: ['email','nickname','portrait','introduction'], // 이메일, 닉네임, 프로필사진 주소, 소개글
-            where: {
-                user_uid: user_uid
-            }
-        });
-        fileDelete(user.portrait);
-        return res.status(200).json("파일 삭제완료");
-    }catch(e){
-        res.status(500).json("파일 삭제실패");
-        console.error(e);
-        return next(e);
-    }
-});
-
-
 /* Select One User. */
 router.get('/', isLoggedIn, async (req, res, next) => {
     try {
@@ -60,11 +39,8 @@ router.get('/', isLoggedIn, async (req, res, next) => {
 router.put('/update', isLoggedIn, upload.single('portrait'), async (req, res, next) => {
     try {
         const user_uid = req.user.user_uid;
-        const nickname = req.body.nickname;
+        const { nickname, introduction } = req.body;
         let portrait = "";
-        if(req.file) portrait = req.file.filename;
-        let introduction = "";
-        if(req.body.introduction) introduction = req.body.introduction;
         console.log('마이페이지 수정 요청');
 
         // 닉네임 검사 (필수값)
@@ -81,8 +57,13 @@ router.put('/update', isLoggedIn, upload.single('portrait'), async (req, res, ne
                 user_uid: user_uid
             }
         })
-        .then(user =>{ // 기존 파일 삭제
-            if(user.portrait){ fileDelete(user.portrait)}
+        .then(user =>{ 
+            if(req.file){ // 클라이언트가 보낸 새 파일 있을 때
+                fileDelete(user.portrait) // 기존 파일 경로 삭제: fileDelete는 파일 찾아보고 있을 때만 삭제함
+                portrait = req.file.filename;
+            }else{ // 클라이언트가 보낸 파일 없으면 기존 파일명 사용
+                portrait = user.portrait;
+            }
         });
         // 유저 정보 업데이트        
         const updateUser = await User.update({
@@ -158,8 +139,7 @@ router.patch('/update/nickname', isLoggedIn, async (req, res, next) => {
 router.patch('/update/introduction', isLoggedIn, async (req, res, next) => {
     try {
         const user_uid = req.user.user_uid;
-        let introduction = "";
-        if(req.body.introduction) introduction = req.body.introduction;
+        const introduction = req.body.introduction;
         
         console.log(`마이페이지 introduction ${introduction} 수정 요청`);
         // 상태메시지 업데이트
@@ -188,13 +168,14 @@ router.patch('/update/introduction', isLoggedIn, async (req, res, next) => {
 });
 
 /* Update One User's portrait */
-router.patch('/update/portrait', isLoggedIn,upload.single('portrait'), async (req, res, next) => {
+// 파일 없을 때 500에러 발생
+router.patch('/update/portrait', isLoggedIn, upload.single('portrait'), async (req, res, next) => {
     try {
+        if(!req.file) console.log(`파일 없음`); 
         const user_uid = req.user.user_uid;
         let portrait = "";
-        if(req.file) portrait = req.file.filename;
-        
-        console.log(`마이페이지 portrait ${portrait.filename} 수정 요청`);
+
+        console.log(`마이페이지 portrait 수정 요청`);
 
         // 기존 유저 정보 조회
         const exUser = await User.findOne({
@@ -203,12 +184,18 @@ router.patch('/update/portrait', isLoggedIn,upload.single('portrait'), async (re
                 user_uid: user_uid
             }
         })
-        .then(user =>{ // 사진 경로 있으면 기존 파일 삭제
-            if(user.portrait){ fileDelete(user.portrait)}
+        .then(user =>{ // 
+            if(req.file){ // 클라이언트가 보낸 새 파일 있을 때
+                fileDelete(user.portrait) // 기존 파일 경로 삭제: fileDelete는 파일 찾아보고 있을 때만 삭제함
+                portrait = req.file.filename;
+            }else{ // 클라이언트가 보낸 파일 없으면 기존 파일명 사용
+                portrait = user.portrait;
+            }
         });
+        console.log(`마이페이지 portrait = ${portrait}`);
         // 사진 파일명 업데이트
         const updateUser = await User.update({
-            portrait
+            portrait,
         }, {
             where: { user_uid: user_uid },
         });
@@ -224,7 +211,47 @@ router.patch('/update/portrait', isLoggedIn,upload.single('portrait'), async (re
         res.status(200).json(result);
     } catch (e) {
         result.success = false;
-        result.message = "마이페이지 portrait 실패"
+        result.message = "마이페이지 portrait 수정 실패"
+        res.status(500).json(result);
+        console.error(e);
+        return next(e);
+    }
+});
+
+/* Delete One User's portrait */
+router.delete('/delete/portrait', isLoggedIn, async (req, res, next) => {
+    try {
+        const user_uid = req.user.user_uid;
+
+        // 기존 유저 정보 조회
+        const exUser = await User.findOne({
+            attributes: ['portrait'], // 이메일, 닉네임, 프로필사진 주소, 소개글
+            where: {
+                user_uid: user_uid
+            }
+        })
+        .then(user =>{ // 사진 경로 있으면 기존 파일 삭제
+            if(user.portrait){fileDelete(user.portrait)}
+        });
+        // 사진 파일명 업데이트
+        const updateUser = await User.update({
+            portrait:""
+        }, {
+            where: { user_uid: user_uid },
+        });
+        // 업데이트 된 값 반환
+        result.data = await User.findOne({
+            attributes: ['email','nickname','portrait','introduction'], // 이메일, 닉네임, 프로필사진 주소, 소개글
+            where: {
+                user_uid: user_uid
+            }
+        });
+        result.message = "마이페이지 portrait 삭제 성공";
+        console.log(`Delete One User's portrait`, JSON.stringify(result));
+        res.status(200).json(result);
+    } catch (e) {
+        result.success = false;
+        result.message = "마이페이지 portrait 삭제 실패"
         res.status(500).json(result);
         console.error(e);
         return next(e);

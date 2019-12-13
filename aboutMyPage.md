@@ -77,6 +77,16 @@
  
 * **Error Response:**
 
+  * **Code:** 500 SERVER ERROR <br />
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "마이페이지 조회 실패"
+    }
+    ```
+
   * **Code:** 404 NOT FOUND <br />
     **Content:** 
     ```json
@@ -170,6 +180,16 @@
     }
     ```
 
+  * **Code:** 500 SERVER ERROR <br />
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "마이페이지 수정 실패"
+    }
+    ```
+
   * **Code:** 404 NOT FOUND <br />
     **Content:** 
     ```json
@@ -259,6 +279,16 @@
     }
     ```
 
+  * **Code:** 500 SERVER ERROR <br />
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "마이페이지 nickname 수정 실패"
+    }
+    ```
+
   * **Code:** 404 NOT FOUND <br />
     **Content:** 
     ```json
@@ -341,6 +371,16 @@
  
 * **Error Response:**
 
+  * **Code:** 500 SERVER ERROR <br />
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "마이페이지 introduction 수정 실패"
+    }
+    ```
+
   * **Code:** 404 NOT FOUND <br />
     **Content:** 
     ```json
@@ -380,7 +420,7 @@
   **Modify MyPage( portrait only)**
 ----
   Receive **multipart/form-data** of a single user's **portrait** from client, modify and return json data of the the user. <br>
-  클라이언트로부터 **multipart/form-data** 형식의 유저 **프로필 사진** 정보를 받아 수정 후 수정된 유저 객체를 json 형태로 반환.
+  클라이언트로부터 **multipart/form-data** 형식의 유저 **프로필 사진** 정보를 받아 수정 후 수정된 유저 객체를 json 형태로 반환. *현재 파일 객체가 없으면 에러 발생 (추후 수정)*
 
 * **URL**
 
@@ -423,6 +463,16 @@
  
 * **Error Response:**
 
+  * **Code:** 500 SERVER ERROR <br />
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "마이페이지 portrait 수정 실패"
+    }
+    ```
+
   * **Code:** 404 NOT FOUND <br />
     **Content:** 
     ```json
@@ -453,6 +503,96 @@
       url: "/mypage/update/portrait",
       dataType: "json",
       type : "PATCH",
+      success : function(r) {
+        console.log(r);
+      }
+    });
+  ```
+
+
+    **Delete portrait only**
+----
+  Delete single user's **portrait** from client, nd return json data of the the user. <br>
+  유저 **프로필 사진** 정보 및 파일 삭제 후 수정된 유저 객체를 json 형태로 반환.
+
+* **URL**
+
+  /delete/portrait
+
+* **Method:**
+
+  `DELETE`
+  
+*  **URL Params**
+
+   **Required:**
+ 
+   None
+
+* **Data Params**
+
+    **Required:**
+    None
+
+* **Success Response:**
+
+  * **Code:** 200 <br />
+    **Content:** 기존 사진 파일 삭제 후 업데이트 된 유저 정보 json으로 리턴
+    ```json
+    {
+        "success": true,
+        "data": {
+            "email": "marge@naver.com",
+            "nickname": "marge222",
+            "portrait": "", //portrait 변수에  ""공백 들어감
+            "introduction": "I am marge344"
+        },
+        "message": "마이페이지 portrait 삭제 성공"
+    }
+    ```
+ 
+* **Error Response:**
+
+  * **Code:** 500 SERVER ERROR <br />
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "마이페이지 portrait 삭제 실패"
+    }
+    ```
+
+  * **Code:** 404 NOT FOUND <br />
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "ERROR[404 NOT FOUND]"
+    }
+    ```
+    
+  OR
+
+  * **Code:** 401 UNAUTHORIZED <br />
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "ERROR[401 UNAUTHORIZED] You are unauthorized to make this request."
+    }
+    ```
+
+
+* **Sample Call:**
+
+  ```javascript
+    $.ajax({
+      url: "/mypage/delete/portrait",
+      dataType: "json",
+      type : "DELETE",
       success : function(r) {
         console.log(r);
       }

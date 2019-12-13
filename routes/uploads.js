@@ -29,7 +29,6 @@ exports.fileDelete = (filename)=>{
          console.log(exists ? "파일 있음" : "파일 없음");
          if(exists){ // 파일 있으면 삭제
             fs.unlink(`public/uploads/${filename}`, (err)=>{
-                console.log(filename);
                 if(err) return console.log(err);
                 console.log(`${filename} 파일 삭제 완료`);
             })
