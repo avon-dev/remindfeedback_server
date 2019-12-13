@@ -60,13 +60,11 @@ router.get('/', isLoggedIn, async (req, res, next) => {
 router.put('/update', isLoggedIn, upload.single('portrait'), async (req, res, next) => {
     try {
         const user_uid = req.user.user_uid;
-        const { nickname , introduction } = req.body;
-        let portrait;
-        if(req.file) {
-            portrait = req.file.filename;
-        }else{
-            portrait = "";
-        }
+        const nickname = req.body.nickname;
+        let portrait = "";
+        if(req.file) portrait = req.file.filename;
+        let introduction = "";
+        if(req.body.introduction) introduction = req.body.introduction;
         console.log('마이페이지 수정 요청');
 
         // 닉네임 검사 (필수값)
@@ -160,7 +158,8 @@ router.patch('/update/nickname', isLoggedIn, async (req, res, next) => {
 router.patch('/update/introduction', isLoggedIn, async (req, res, next) => {
     try {
         const user_uid = req.user.user_uid;
-        const introduction = req.body.introduction;
+        let introduction = "";
+        if(req.body.introduction) introduction = req.body.introduction;
         
         console.log(`마이페이지 introduction ${introduction} 수정 요청`);
         // 상태메시지 업데이트
@@ -192,12 +191,8 @@ router.patch('/update/introduction', isLoggedIn, async (req, res, next) => {
 router.patch('/update/portrait', isLoggedIn,upload.single('portrait'), async (req, res, next) => {
     try {
         const user_uid = req.user.user_uid;
-        let portrait;
-        if(req.file) {
-            portrait = req.file.filename;
-        }else{
-            portrait = "";
-        }
+        let portrait = "";
+        if(req.file) portrait = req.file.filename;
         
         console.log(`마이페이지 portrait ${portrait.filename} 수정 요청`);
 
