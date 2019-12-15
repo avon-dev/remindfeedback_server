@@ -33,10 +33,11 @@ db.Board = require('./board')(sequelize, Sequelize);
 //TABLE 관계 맺기
 db.Feedback.hasMany(db.Board, {
   foreignKey: 'fk_feedbackId', sourceKey: 'id',
-  onDelete: 'CASCADE'
+  onDelete: 'CASCADE',
 });
 db.Board.belongsTo(db.Feedback, {
-  foreignKey: 'fk_feedbackId', targetKey: 'id'
+  foreignKey: 'fk_feedbackId', targetKey: 'id',
+  onDelete: 'CASCADE'
 });
 
 
