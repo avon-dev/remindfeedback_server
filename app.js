@@ -17,9 +17,13 @@ const authRouter = require('./routes/auth');
 const userRouter = require('./routes/users');
 const feedbackRouter = require('./routes/feedback');
 const categoryRouter = require('./routes/category');
+<<<<<<< HEAD
 const boardRouter = require('./routes/board/all');
 const boardTextRouter = require('./routes/board/text');
 const boardPictureRouter = require('./routes/board/picture');
+=======
+const mypageRouter = require('./routes/mypage');
+>>>>>>> 79e48ffed9534ff610c5264f35e87d393641fd99
 
 const prod = process.env.NODE_ENV === 'production';
 
@@ -48,6 +52,7 @@ if (prod) {
 }
 
 app.use('/', express.static('public'));
+app.use('/mypage', express.static('public/uploads'));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -75,9 +80,13 @@ app.use('/auth', authRouter);
 app.use('/users', userRouter);
 app.use('/feedback', feedbackRouter);
 app.use('/category', categoryRouter);
+<<<<<<< HEAD
 app.use('/board', boardRouter);
 app.use('/board/text', boardTextRouter);
 app.use('/board/picture', boardPictureRouter);
+=======
+app.use('/mypage', mypageRouter);
+>>>>>>> 79e48ffed9534ff610c5264f35e87d393641fd99
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

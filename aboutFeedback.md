@@ -208,7 +208,7 @@
 * **Success Response:**
 
   * **Code:** 201 
-    **Content:** 사용자가 만든 피드백 데이터 전체
+    **Content:** 사용자가 만든 피드백 데이터
  <br />
 
 * **Sample request JSON data:**
@@ -230,7 +230,7 @@
 ----
 **Update Feedback All**
 ----
-피드백 생성
+피드백 수정
 
 * **URL**
 
@@ -260,8 +260,8 @@
 
 * **Success Response:**
 
-  * **Code:** 202 
-    **Content:** 사용자가 만든 피드백 데이터 전체
+  * **Code:** 200 
+    **Content:** 사용자가 수정한 피드백 데이터
  <br />
 
 * **Sample request JSON data:**
@@ -309,7 +309,7 @@
 
 * **Success Response:**
 
-  * **Code:** 203 
+  * **Code:** 200
     **Content:** 사용자가 수정한 피드백 데이터
  <br />
 
@@ -360,7 +360,7 @@
 
 * **Success Response:**
 
-  * **Code:** 203 
+  * **Code:** 200 
     **Content:** 사용자가 수정한 피드백 데이터
  <br />
 
@@ -411,7 +411,7 @@
 
 * **Success Response:**
 
-  * **Code:** 203 
+  * **Code:** 200 
     **Content:** 사용자가 수정한 피드백 데이터
  <br />
 
@@ -460,7 +460,7 @@
 
 * **Success Response:**
 
-  * **Code:** 203 
+  * **Code:** 200
     **Content:** 사용자가 수정한 피드백 데이터
  <br />
 
@@ -483,7 +483,7 @@
 ----
 **Delete Feedback**
 ----
-피드백 생성
+피드백 삭제
 
 * **URL**
 
@@ -509,7 +509,7 @@
 
 * **Success Response:**
 
-  * **Code:** 203 
+  * **Code:** 200
     **Content:** 성공여부 및 삭제된 피드백 id
  <br />
 

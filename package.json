@@ -9,7 +9,11 @@
     "start": "cross-env NODE_ENV=production PORT=80 pm2 start app.js"
   },
   "dependencies": {
+<<<<<<< HEAD
     "aws-sdk": "^2.587.0",
+=======
+    "aws-sdk": "^2.589.0",
+>>>>>>> 79e48ffed9534ff610c5264f35e87d393641fd99
     "bcrypt": "^3.0.6",
     "connect-flash": "^0.1.1",
     "cookie-parser": "~1.4.4",

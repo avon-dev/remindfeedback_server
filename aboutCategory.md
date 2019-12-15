@@ -5,7 +5,8 @@
   로그인 후 쿠키 정보를 이용한 인증 필요
 
 * **API call:**
-  localhost:8000/category
+  http://localhost:8000/category
+  http://54.180.118.35/category
 
 * **Sample JSON data:**
   ```json
