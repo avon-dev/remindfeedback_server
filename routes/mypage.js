@@ -61,7 +61,7 @@ router.put('/update', isLoggedIn, upload_s3.single('portrait'), async (req, res,
         .then(user =>{ 
             if(req.file){ // 클라이언트가 보낸 새 파일 있을 때
                 fileDelete(user.portrait) // 기존 파일 경로 삭제: fileDelete는 파일 찾아보고 있을 때만 삭제함
-                portrait = req.file.filename;
+                portrait = req.file.key;
             }else{ // 클라이언트가 보낸 파일 없으면 기존 파일명 사용
                 portrait = user.portrait;
             }
@@ -243,7 +243,7 @@ router.patch('/update/portrait', isLoggedIn, upload_s3.single('portrait'), async
         .then(user =>{ // 
             if(req.file){ // 클라이언트가 보낸 새 파일 있을 때
                 fileDelete(user.portrait) // 기존 파일 경로 삭제: fileDelete는 파일 찾아보고 있을 때만 삭제함
-                portrait = req.file.filename;
+                portrait = req.file.key;
             }else{ // 클라이언트가 보낸 파일 없으면 기존 파일명 사용
                 portrait = user.portrait;
             }
