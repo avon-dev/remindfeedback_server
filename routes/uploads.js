@@ -81,7 +81,7 @@ exports.deleteS3Obj = (key)=>{
             console.log(`파일 찾기 오류: ${err}`);
             result.success = false;
             result.message = `파일 찾기 오류: ${err}`
-            return res.status(403).json(result);
+            res.status(403).json(result);
         }
         console.log("파일 있음");
         s3.deleteObject(params, (err, data)=>{
@@ -89,13 +89,13 @@ exports.deleteS3Obj = (key)=>{
                 console.log(`파일 삭제 오류: ${err}`);
                 result.success = false;
                 result.message = `파일 삭제 오류: ${err}`
-                return res.status(403).json(result);
+                res.status(403).json(result);
             }
             result.success = true;
             result.data = data;
             result.message = "파일 삭제 완료";
             console.log("파일 삭제 완료")
-            return res.status(200).json(result);
+            res.status(200).json(result);
         });
     });
 };

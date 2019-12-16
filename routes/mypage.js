@@ -86,7 +86,7 @@ router.put('/update', isLoggedIn, upload_s3.single('portrait'), async (req, res,
         result.success = true;
         result.message = "마이페이지 수정 성공"
         console.log('Update One User', JSON.stringify(result));
-        res.status(200).json(result);
+        return res.status(200).json(result);
     } catch (e) {
         result.success = false;
         result.message = "마이페이지 수정 실패"
