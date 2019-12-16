@@ -87,15 +87,8 @@ exports.deleteS3Obj = (key)=>{
         s3.deleteObject(params, (err, data)=>{
             if(err) { 
                 console.log(`파일 삭제 오류: ${err}`);
-                result.success = false;
-                result.message = `파일 삭제 오류: ${err}`
-                res.status(403).json(result);
             }
-            result.success = true;
-            result.data = data;
-            result.message = "파일 삭제 완료";
             console.log("파일 삭제 완료")
-            res.status(200).json(result);
         });
     });
 };
