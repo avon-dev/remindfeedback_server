@@ -64,31 +64,14 @@ exports.deleteS3Obj = (key)=>{
         Key: key
     };
     const s3 = new AWS.S3();
-    // try{
-    //     await s3.headObject(params).promise()
-    //     console.log("파일 있음")
-    //     try{
-    //         await s3.deleteObject(params).promise()
-    //         console.log("파일 삭제 완료")
-    //     }catch(e){
-    //         console.log(`파일 삭제 오류: ${err}`)
-    //     }
-    // }catch(e){
-    //     console.log(`파일 없음`)
-    // }
     s3.headObject(params, (err, data)=>{
-        if(err) { 
-            console.log(`파일 찾기 오류: ${err}`);
-            result.success = false;
-            result.message = `파일 찾기 오류: ${err}`
-            res.status(403).json(result);
-        }
-        console.log("파일 있음");
+        if(err) console.log(`파일 찾기 오류: ${err}`);
+        console.log(`파일 있음: ${data}`);
         s3.deleteObject(params, (err, data)=>{
             if(err) { 
                 console.log(`파일 삭제 오류: ${err}`);
             }
-            console.log("파일 삭제 완료")
+            console.log(`파일 삭제 완료: ${data}`);
         });
     });
 };
