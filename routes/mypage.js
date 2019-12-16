@@ -2,7 +2,7 @@ const express = require('express');
 const { User } = require('../models');
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
 const router = express.Router();
-const {upload, upload_s3, fileDelete} = require('./uploads');
+const {deleteS3Obj, upload, upload_s3, fileDelete} = require('./uploads');
 
 let result = {
     success: true,
@@ -60,7 +60,7 @@ router.put('/update', isLoggedIn, upload_s3.single('portrait'), async (req, res,
         })
         .then(user =>{ 
             if(req.file){ // 클라이언트가 보낸 새 파일 있을 때
-                fileDelete(user.portrait) // 기존 파일 경로 삭제: fileDelete는 파일 찾아보고 있을 때만 삭제함
+                deleteS3Obj(user.portrait) // 기존 파일 경로 삭제: fileDelete는 파일 찾아보고 있을 때만 삭제함
                 portrait = req.file.key;
             }else{ // 클라이언트가 보낸 파일 없으면 기존 파일명 사용
                 portrait = user.portrait;
@@ -288,7 +288,8 @@ router.delete('/delete/portrait', isLoggedIn, async (req, res, next) => {
             }
         })
         .then(user =>{ // 사진 경로 있으면 기존 파일 삭제
-            if(user.portrait){fileDelete(user.portrait)}
+            //if(user.portrait){fileDelete(user.portrait)}
+            if(user.portrait){deleteS3Obj(user.portrait)}
         });
         // 사진 파일명 업데이트
         const updateUser = await User.update({
