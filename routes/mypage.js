@@ -22,6 +22,7 @@ router.get('/', isLoggedIn, async (req, res, next) => {
                 user_uid: user_uid
             }
         });
+        result.success = true;
         result.message="마이페이지 조회 성공"
         console.log('select one user.', JSON.stringify(result));
         return res.status(200).json(result);
@@ -82,6 +83,7 @@ router.put('/update', isLoggedIn, upload.single('portrait'), async (req, res, ne
                 user_uid: user_uid
             }
         });
+        result.success = true;
         result.message = "마이페이지 수정 성공"
         console.log('Update One User', JSON.stringify(result));
         res.status(200).json(result);
@@ -123,6 +125,7 @@ router.patch('/update/nickname', isLoggedIn, async (req, res, next) => {
                 user_uid: user_uid
             }
         });
+        result.success = true;
         result.message = "마이페이지 nickname 수정 성공";
         console.log(`Update One User's nickname`, JSON.stringify(result));
         res.status(200).json(result);
@@ -155,6 +158,7 @@ router.patch('/update/introduction', isLoggedIn, async (req, res, next) => {
                 user_uid: user_uid
             }
         });
+        result.success = true;
         result.message = "마이페이지 introduction 수정 성공";
         console.log(`Update One User's introduction`, JSON.stringify(result));
         res.status(200).json(result);
@@ -206,6 +210,7 @@ router.patch('/update/portrait', isLoggedIn, upload.single('portrait'), async (r
                 user_uid: user_uid
             }
         });
+        result.success = true;
         result.message = "마이페이지 portrait 수정 성공";
         console.log(`Update One User's portrait`, JSON.stringify(result));
         res.status(200).json(result);
@@ -246,6 +251,7 @@ router.delete('/delete/portrait', isLoggedIn, async (req, res, next) => {
                 user_uid: user_uid
             }
         });
+        result.success = true;
         result.message = "마이페이지 portrait 삭제 성공";
         console.log(`Delete One User's portrait`, JSON.stringify(result));
         res.status(200).json(result);
