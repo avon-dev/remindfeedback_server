@@ -2,7 +2,7 @@ const express = require('express');
 const { User } = require('../models');
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
 const router = express.Router();
-const {upload, fileDelete} = require('./uploads');
+const {upload, upload_s3, fileDelete} = require('./uploads');
 
 let result = {
     success: true,
@@ -192,6 +192,58 @@ router.patch('/update/portrait', isLoggedIn, upload.single('portrait'), async (r
             if(req.file){ // 클라이언트가 보낸 새 파일 있을 때
                 fileDelete(user.portrait) // 기존 파일 경로 삭제: fileDelete는 파일 찾아보고 있을 때만 삭제함
                 portrait = req.file.filename;
+            }else{ // 클라이언트가 보낸 파일 없으면 기존 파일명 사용
+                portrait = user.portrait;
+            }
+        });
+        console.log(`마이페이지 portrait = ${portrait}`);
+        // 사진 파일명 업데이트
+        const updateUser = await User.update({
+            portrait,
+        }, {
+            where: { user_uid: user_uid },
+        });
+        // 업데이트 된 값 반환
+        result.data = await User.findOne({
+            attributes: ['email','nickname','portrait','introduction'], // 이메일, 닉네임, 프로필사진 주소, 소개글
+            where: {
+                user_uid: user_uid
+            }
+        });
+        result.success = true;
+        result.message = "마이페이지 portrait 수정 성공";
+        console.log(`Update One User's portrait`, JSON.stringify(result));
+        res.status(200).json(result);
+    } catch (e) {
+        result.success = false;
+        result.message = "마이페이지 portrait 수정 실패"
+        res.status(500).json(result);
+        console.error(e);
+        return next(e);
+    }
+});
+
+/* Update One User's portrait */
+// AWS S3 업로드
+router.patch('/update/portrait/test', isLoggedIn, upload_s3.single('portrait'), async (req, res, next) => {
+    try {
+        if(!req.file) console.log(`파일 없음`); 
+        const user_uid = req.user.user_uid;
+        let portrait = "";
+
+        console.log(`마이페이지 portrait 수정 요청`);
+
+        // 기존 유저 정보 조회
+        const exUser = await User.findOne({
+            attributes: ['portrait'], // 이메일, 닉네임, 프로필사진 주소, 소개글
+            where: {
+                user_uid: user_uid
+            }
+        })
+        .then(user =>{ // 
+            if(req.file){ // 클라이언트가 보낸 새 파일 있을 때
+                fileDelete(user.portrait) // 기존 파일 경로 삭제: fileDelete는 파일 찾아보고 있을 때만 삭제함
+                portrait = req.file.location;
             }else{ // 클라이언트가 보낸 파일 없으면 기존 파일명 사용
                 portrait = user.portrait;
             }
