@@ -32,7 +32,7 @@
 
   * **portrait 사진 url:**
   http://localhost:8000/mypage/파일명<br>
-  http://54.180.118.35/mypage
+  https://remindfeedback.s3.ap-northeast-2.amazonaws.com/파일명<br>
 
 
 **Show MyPage**
