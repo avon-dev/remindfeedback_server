@@ -12,6 +12,7 @@ router.post('/create', isLoggedIn, async (req, res, next) => {
         const exBoard = await Board.create({
             board_title,
             board_content,
+            board_category: 0,
             fk_feedbackId: feedback_id,
         });
         let result = {
@@ -69,7 +70,7 @@ router.put('/update/:board_id', isLoggedIn, async (req, res, next) => {
             data,
             message: 'board text update 성공'
         }
-        res.status(203).json(result);
+        res.status(200).json(result);
     } catch(e){
         let result = {
             success: false,
@@ -82,81 +83,6 @@ router.put('/update/:board_id', isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.patch('/board_title/:board_id', isLoggedIn, async (req, res, next) => {
-    try{
-        const board_id = req.params.board_id;
-        const { board_title } = req.body; 
-        console.log('board board_title 수정', board_title);
-        const update = await Board.update({
-            board_title
-        }, {where: {id:board_id}})
-        const data = await Board.findOne({where:{id:board_id}})
-        let result = {
-            success: true,
-            data,
-            message: 'board update 성공'
-        }
-        res.status(203).json(result);
-    } catch(e){
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
-        return next(e);
-    }
-});
 
-router.patch('/board_content/:board_id', isLoggedIn, async (req, res, next) => {
-    try{
-        const board_id = req.params.board_id;
-        const { board_content } = req.body; 
-        console.log('board board_content 수정', board_content);
-        const update = await Board.update({
-            board_content
-        }, {where: {id:board_id}})
-        const data = await Board.findOne({where:{id:board_id}})
-        let result = {
-            success: true,
-            data,
-            message: 'board update 성공'
-        }
-        res.status(203).json(result);
-    } catch(e){
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
-        return next(e);
-    }
-});
-
-router.delete('/:board_id', isLoggedIn, async (req, res, next) => {
-    try{
-        const board_id = req.params.board_id;
-        console.log('board 삭제', board_id);
-        await Board.destroy({where: {id:board_id}});
-        let result = {
-            success: true,
-            data: '',
-            message: 'Board delete 성공'
-        }
-        res.status(204).json(result);
-    } catch(e){
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
-        return next(e);
-    }
-});
 
 module.exports = router;
