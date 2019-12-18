@@ -22,10 +22,10 @@ const upload = multer({ //멀터를 사용하면 upload 객체를 받을 수 있
         s3: new AWS.S3(),
         bucket: 'remindfeedback',
         key(req, file, cb) {
-            cb(null, `picture/${+new Date()}${path.basename(file.originalname)}`); //picture 폴더의 시간+파일이름
+            cb(null, `video/${+new Date()}${path.basename(file.originalname)}`); //picture 폴더의 시간+파일이름
         }
     }),
-    limits: { fileSize: 50 * 1024 * 1024 }, //파일 사이즈 (5mb)
+    limits: { fileSize: 500 * 1024 * 1024 }, //파일 사이즈 (50mb)
 });
 
 const filedelete = (deleteItems) => {
@@ -42,25 +42,20 @@ const filedelete = (deleteItems) => {
     })
 }
 
-router.post('/create', isLoggedIn, upload.fields([{ name: 'file1' }, { name: 'file2' }, { name: 'file3' }]), async (req, res, next) => {
+router.post('/create', isLoggedIn, upload.single('videofile'), async (req, res, next) => {
     try{
         const { feedback_id, board_title, board_content } = req.body;
-        console.log(req.files)
-        // req.files.map((v, i) => files[i] = v.key);
-        console.log('게시물 사진 생성', feedback_id, board_title, board_content);
-        let file1, file2, file3;
-        if(req.files.file1)file1 = await req.files.file1[0].key;
-        if(req.files.file2)file2 = await req.files.file2[0].key;
-        if(req.files.file3)file3 = await req.files.file3[0].key;
+        console.log(req.file)
+        console.log('게시물 영상 생성', feedback_id, board_title, board_content);
+        let file;
+        if(req.file)file = await req.file.key;
 
         const exBoard = await Board.create({
             board_title,
             board_content,
-            board_category: 1,
+            board_category: 2,
             fk_feedbackId: feedback_id,
-            board_file1: file1,
-            board_file2: file2,
-            board_file3: file3,
+            board_file1: file,
         });
         let result = {
             success: true,
@@ -87,11 +82,11 @@ router.post('/create', isLoggedIn, upload.fields([{ name: 'file1' }, { name: 'fi
     }
 });
 
-router.put('/update/:board_id', isLoggedIn, upload.fields([{ name: 'file1' }, { name: 'file2' }, { name: 'file3' }]), async (req, res, next) => {
+router.put('/update/:board_id', isLoggedIn, upload.single('videofile'), async (req, res, next) => {
     try{
         const board_id = req.params.board_id;
-        const { board_title, board_content, updatefile1, updatefile2, updatefile3 } = req.body; 
-        console.log('board picture put 요청', board_title, board_content, updatefile1, updatefile2, updatefile3);
+        const { board_title, board_content, updatefile1 } = req.body; 
+        console.log('board video put 요청', board_id, board_title, board_content, updatefile1);
         const beforeBoard = await Board.findOne({
             where: {id:board_id},
         });
@@ -106,22 +101,10 @@ router.put('/update/:board_id', isLoggedIn, upload.fields([{ name: 'file1' }, { 
         
         let deleteItems = [];
         tempBoard.board_file1 = await beforeBoard.board_file1;
-        tempBoard.board_file2 = await beforeBoard.board_file2;
-        tempBoard.board_file3 = await beforeBoard.board_file3;
         if(updatefile1){
             deleteItems.push({Key:beforeBoard.board_file1})
-            if(req.files.file1)tempBoard.board_file1 = await req.files.file1[0].key
+            if(req.file)tempBoard.board_file1 = await req.file.key
             else{tempBoard.board_file1 = null}
-        }
-        if(updatefile2){
-            deleteItems.push({Key:beforeBoard.board_file2})
-            if(req.files.file2)tempBoard.board_file2 = await req.files.file2[0].key
-            else{tempBoard.board_file2 = null}
-        }
-        if(updatefile3){
-            deleteItems.push({Key:beforeBoard.board_file3})
-            if(req.files.file3)tempBoard.board_file3 = await req.files.file3[0].key
-            else{tempBoard.board_file3 = null}
         }
         await filedelete(deleteItems);
         //업데이트
@@ -136,7 +119,7 @@ router.put('/update/:board_id', isLoggedIn, upload.fields([{ name: 'file1' }, { 
         let result = {
             success: true,
             data,
-            message: 'board picture update 성공'
+            message: 'board video update 성공'
         }
         res.status(200).json(result);
     } catch(e){
@@ -151,11 +134,11 @@ router.put('/update/:board_id', isLoggedIn, upload.fields([{ name: 'file1' }, { 
     }
 });
 
-router.patch('/files/:board_id', isLoggedIn, upload.fields([{ name: 'file1' }, { name: 'file2' }, { name: 'file3' }]), async (req, res, next) => {
+router.patch('/file/:board_id', isLoggedIn, upload.single('videofile'), async (req, res, next) => {
     try{
         const board_id = req.params.board_id;
-        const { updatefile1, updatefile2, updatefile3 } = req.body; 
-        console.log('board picture put 요청', board_id, updatefile1, updatefile2, updatefile3);
+        const { updatefile1 } = req.body; 
+        console.log('board video put 요청', board_id, updatefile1);
         const beforeBoard = await Board.findOne({
             where: {id:board_id},
         });
@@ -163,36 +146,22 @@ router.patch('/files/:board_id', isLoggedIn, upload.fields([{ name: 'file1' }, {
 
         let deleteItems = [];
         tempBoard.board_file1 = await beforeBoard.board_file1;
-        tempBoard.board_file2 = await beforeBoard.board_file2;
-        tempBoard.board_file3 = await beforeBoard.board_file3;
         if(updatefile1){
             deleteItems.push({Key:beforeBoard.board_file1})
-            if(req.files.file1)tempBoard.board_file1 = await req.files.file1[0].key
+            if(req.file)tempBoard.board_file1 = await req.file.key
             else{tempBoard.board_file1 = null}
-        }
-        if(updatefile2){
-            deleteItems.push({Key:beforeBoard.board_file2})
-            if(req.files.file2)tempBoard.board_file2 = await req.files.file2[0].key
-            else{tempBoard.board_file2 = null}
-        }
-        if(updatefile3){
-            deleteItems.push({Key:beforeBoard.board_file3})
-            if(req.files.file3)tempBoard.board_file3 = await req.files.file3[0].key
-            else{tempBoard.board_file3 = null}
         }
         await filedelete(deleteItems);
         //업데이트
         await Board.update({
             board_file1: tempBoard.board_file1,
-            board_file2: tempBoard.board_file2,
-            board_file3: tempBoard.board_file3
         }, {where: {id:board_id}})
         //response
         const data = await Board.findOne({where:{id:board_id}})
         let result = {
             success: true,
             data,
-            message: 'board picture update 성공'
+            message: 'board video update 성공'
         }
         res.status(200).json(result);
     } catch(e){

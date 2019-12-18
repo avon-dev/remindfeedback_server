@@ -61,7 +61,7 @@
 
 * **URL**
 
-  http://54.180.118.35/board/text/update/board_id
+  http://54.180.118.35/board/text/update/(board_id)
 
 * **Method:**
 
