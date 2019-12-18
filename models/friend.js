@@ -15,11 +15,11 @@ module.exports = (sequelize, DataTypes) => (
         }, 
         friend_uid: {
             type: DataTypes.STRING,
-            allowNull: true,
+            allowNull: false,
         }, 
         type: {
             type: DataTypes.INTEGER, 
-            allowNull: true,
+            allowNull: false,
         }
     }, {
         timestamps: true, //생성일, 수정일 기록
