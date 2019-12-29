@@ -200,10 +200,34 @@ router.post('/create', isLoggedIn, async function (req, res, next) {
     }
 });
 
-// friend select(친구 선택)
+// friend select all(모든 친구 목록)
 router.get('/selectall', isLoggedIn, async function (req, res, next) {
     try {
+        const Op = Sequelize.Op;
+
         const user_uid = req.user.user_uid;
+        // let query = 'SELECT * FROM user WHERE user_uid=ANY(SELECT friend FROM friend WHERE user=:user_uid UNION SELECT user FROM friend WHERE friend=:user_uid)';
+
+        // 모든 친구 검색
+        // SELECT * FROM user WHERE user_uid=ANY(SELECT friend FROM friend WHERE user=:user_uid UNION SELECT user FROM friend WHERE friend=:user_uid);
+        await User.findAll({
+            include: [{
+                model: friend
+            }],
+            where : {
+                user_uid: {
+                    [Op.any] : [Sequelize.literal('SELECT friend FROM friend WHERE user=:user_uid UNION SELECT user FROM friend WHERE friend=:user_uid')]
+                },
+                replacements: {
+                    user_uid: user_uid
+                }
+            }
+        }).then((friend_uid) => {
+            console.log(friend_uid);
+        }).catch(error => {
+            console.log(error);
+        });
+
     } catch (e) {
         console.error(e);
         return next(e);
@@ -213,6 +237,7 @@ router.get('/selectall', isLoggedIn, async function (req, res, next) {
 // friend block(친구 차단)
 router.post('/block', isLoggedIn, async function (req, res, next) {
     try {
+        const Op = Sequelize.Op;
         const user_uid = req.user.user_uid;
         const email = req.body.email;
 
@@ -220,7 +245,7 @@ router.post('/block', isLoggedIn, async function (req, res, next) {
 
         // 친구 uid 검색
         // SELECT uuid FROM user WHERE email='email';
-        await friend_uid.findOne({
+        await User.findOne({
             attributes: ['uuid'],
             where: {
                 email: email
@@ -363,6 +388,7 @@ router.post('/block', isLoggedIn, async function (req, res, next) {
 // friend unblock(친구 차단 해제)
 router.post('/unblock', isLoggedIn, async function (req, res, next) {
     try {
+        const Op = Sequelize.OP;
         const user_uid = req.user.user_uid;
         const email = req.body.email;
 
