@@ -25,8 +25,8 @@ if (config.use_env_variable) {
  * - parameter user_id : 로그인 한 회원 uuid
  * - parameter friend_id : 친구 추가할 회원 uuid
  */
-// friend search (친구 검색)
-router.post('/search', isLoggedIn, async function (req, res, next) {
+// Search Friend (친구 검색)
+router.get('/search', isLoggedIn, async function (req, res, next) {
     try {
         const user_uid = req.user.user_uid;
         const user_email = req.user.email;
@@ -37,7 +37,7 @@ router.post('/search', isLoggedIn, async function (req, res, next) {
             const result = new Object();
             result.success = false;
             result.data = 'NONE'
-            result.message = '사용자를 찾을 수 없습니다. 나 자신은 영원한 인생의 친구입니다.';
+            result.message = '[SEARCH] 나 자신은 인생의 영원한 친구입니다.';
             console.log(result);
             return res.status(403).send(result);
         }
@@ -141,7 +141,7 @@ router.post('/search', isLoggedIn, async function (req, res, next) {
                     const result = new Object();
                     result.success = true;
                     result.data = searchData;
-                    result.message = '[SEARCH] 서로 차단한 사용자입니다.';
+                    result.message = '[SEARCH] 서로 차단한 상태입니다.';
                     console.log(result);
                     return res.status(200).send(result);
                 }
@@ -165,9 +165,9 @@ router.post('/search', isLoggedIn, async function (req, res, next) {
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
-            result.message = '[SEARCH] 추가할 사용자를 찾을 수 없습니다. 친구의 이메일을 다시 한 번 확인해주세요.';
+            result.message = '[SEARCH] 사용자를 찾을 수 없습니다.';
             console.log(result);
-            return res.status(403).send(result);
+            return res.status(404).send(result);
         });
     } catch (e) {
         console.error(e);
@@ -175,7 +175,7 @@ router.post('/search', isLoggedIn, async function (req, res, next) {
     }
 });
 
-// friend create(친구 추가)
+// Create Friend(친구 추가)
 router.post('/create', isLoggedIn, async function (req, res, next) {
     try {
         const user_uid = req.user.user_uid;
@@ -189,7 +189,7 @@ router.post('/create', isLoggedIn, async function (req, res, next) {
             const result = new Object();
             result.success = false;
             result.data = 'NONE'
-            result.message = '[CREATE] 나 자신을 추가할 수 없습니다. 나 자신은 영원한 인생의 친구입니다.';
+            result.message = '[CREATE] 나 자신을 추가할 수 없습니다. 나 자신은 인생의 영원한 친구입니다.';
             console.log(result);
             return res.status(403).send(result);
         }
@@ -202,11 +202,6 @@ router.post('/create', isLoggedIn, async function (req, res, next) {
                 email: email
             }
         }).then((user) => {
-            // 사용자 테이블에서 사용자 검색을 성공한 경우
-            console.log('[CREATE] 사용자 검색 성공');
-            console.log('나의 UUID : ' + user_uid);
-            console.log('친구 UUID : ' + user.user_uid);
-
             // 친구 테이블에 친구요청 데이터가 있는지 검색
             // SELECT type FROM friend WHERE user_uid IN(user_uid, friend_uid) AND friend_uid IN(user_uid, friend_uid);
             Friend.findOne({
@@ -251,13 +246,13 @@ router.post('/create', isLoggedIn, async function (req, res, next) {
                                 }]
                             },
                             returning: true
-                        }).then((create) => {
+                        }).then(() => {
                             // 친구 추가를 성공한 경우
                             console.log('[CREATE] 친구 추가 성공');
 
                             const result = new Object();
                             result.success = true;
-                            result.data = create.type;
+                            result.data = 2;
                             result.message = '[CREATE] ' + user.nickname + '의 친구 요청을 수락해서 친구가 되었습니다.';
                             console.log(result);
                             return res.status(201).send(result);
@@ -268,7 +263,7 @@ router.post('/create', isLoggedIn, async function (req, res, next) {
                             const result = new Object();
                             result.success = false;
                             result.data = 'NONE';
-                            result.message = '[CREATE] 친구 추가를 실패했습니다. 다시 한 번 시도해주세요.';
+                            result.message = '[CREATE] 친구 요청 수락을 실패했습니다.';
                             console.log(result);
                             return res.status(500).send(result);
                         });
@@ -279,7 +274,7 @@ router.post('/create', isLoggedIn, async function (req, res, next) {
                         const result = new Object();
                         result.success = false;
                         result.data = 'NONE';
-                        result.message = '[CREATE] 친구 추가를 실패했습니다. 서로 친구이거나 차단한 사용자입니다.';
+                        result.message = '[CREATE] 서로 친구이거나 차단한 상태입니다.';
                         console.log(result);
                         return res.status(403).send(result);
                     }
@@ -311,7 +306,7 @@ router.post('/create', isLoggedIn, async function (req, res, next) {
                     const result = new Object();
                     result.success = false;
                     result.data = 'NONE';
-                    result.message = '[CREATE] 친구 추가를 실패했습니다. 다시 한 번 시도해주세요.';
+                    result.message = '[CREATE] 친구 요청을 실패했습니다.';
                     console.log(result);
                     return res.status(500).send(result);
                 });
@@ -323,7 +318,7 @@ router.post('/create', isLoggedIn, async function (req, res, next) {
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
-            result.message = '[CREATE] 추가할 사용자를 찾을 수 없습니다. 친구의 이메일을 다시 한 번 확인해주세요.';
+            result.message = '[CREATE] 사용자를 찾을 수 없습니다.';
             console.log(result);
             return res.status(404).send(result);
         });
@@ -334,8 +329,8 @@ router.post('/create', isLoggedIn, async function (req, res, next) {
 });
 
 // 친구 관계를 확인하고 요청한 친구인지, 차단한 친구인지 걸러낸 후 서로 친구인 관계만 리턴
-// friend select all(모든 친구 목록)
-router.get('/selectall/friend', isLoggedIn, async function (req, res, next) {
+// Read All Friend(모든 친구 목록)
+router.get('/allfriend', isLoggedIn, async function (req, res, next) {
     try {
         const user_uid = req.user.user_uid;
         let query =
@@ -358,25 +353,25 @@ router.get('/selectall/friend', isLoggedIn, async function (req, res, next) {
             raw: true
         }).then((friendList) => {
             // 정상적으로 친구 목록을 불러온 경우
-            console.log('[SELECT ALL] 친구 목록 불러오기 성공');
+            console.log('[ALL FRIEND] 친구 목록 불러오기 성공');
 
             // 친구 목록을 그대로 리턴
             const result = new Object();
             result.success = true;
             result.data = friendList;
-            result.message = '[SELECT ALL] 친구 목록을 성공적으로 가져왔습니다.';
+            result.message = '[ALL FRIEND] 친구 목록을 성공적으로 가져왔습니다.';
             console.log(result);
             return res.status(200).send(result);
         }).catch(error => {
             // 친구 목록을 불러오지 못한 경우 에러 처리
-            console.log('[SELECT ALL] 친구 목록 불러오기 실패', error);
+            console.log('[ALL FRIEND] 친구 목록 불러오기 실패', error);
 
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
-            result.message = '[SELECT ALL] 친구 목록을 가져오지 못했습니다.';
+            result.message = '[ALL FRIEND] 친구 목록을 가져오지 못했습니다.';
             console.log(result);
-            return res.status(403).send(result);
+            return res.status(500).send(result);
         });
     } catch (e) {
         console.error(e);
@@ -385,7 +380,7 @@ router.get('/selectall/friend', isLoggedIn, async function (req, res, next) {
 });
 
 // friend block(친구 차단)
-router.post('/block', isLoggedIn, async function (req, res, next) {
+router.put('/block', isLoggedIn, async function (req, res, next) {
     try {
         const user_uid = req.user.user_uid;
         const user_email = req.user.email;
@@ -398,7 +393,7 @@ router.post('/block', isLoggedIn, async function (req, res, next) {
             const result = new Object();
             result.success = false;
             result.data = 'NONE'
-            result.message = '[BLOCK] 스스로를 차단할 수 없습니다.';
+            result.message = '[BLOCK] 스스로를 차단할 수 없습니다. 나 자신은 인생의 영원한 친구입니다.';
             console.log(result);
             return res.status(403).send(result);
         }
@@ -428,8 +423,6 @@ router.post('/block', isLoggedIn, async function (req, res, next) {
                 // 친구 테이블에서 type 찾아오는 걸 성공한 경우
                 console.log('[BLOCK] 친구 관계 찾기 성공');
 
-                console.log(friend.type);
-
                 // 친구 관계에 따라 수정 내용 변경
                 if (friend.type == 5) {
                     // 이미 서로 차단한 상태인 경우
@@ -438,7 +431,7 @@ router.post('/block', isLoggedIn, async function (req, res, next) {
                     const result = new Object();
                     result.success = false;
                     result.data = 'NONE';
-                    result.message = '이미 서로 차단한 상태입니다.';
+                    result.message = '[BLOCK] 이미 차단한 사용자입니다.';
                     console.log(result);
                     return res.status(403).send(result);
                 } else {
@@ -462,7 +455,7 @@ router.post('/block', isLoggedIn, async function (req, res, next) {
                         const result = new Object();
                         result.success = false;
                         result.data = 'NONE';
-                        result.message = '친구가 아니므로 차단할 수 없습니다.';
+                        result.message = '[BLOCK] 친구가 아니므로 차단할 수 없습니다.';
                         console.log(result);
                         return res.status(403).send(result);
                     } else if (friend.type == 2) {
@@ -513,15 +506,14 @@ router.post('/block', isLoggedIn, async function (req, res, next) {
                                 user_uid: user.user_uid,
                                 friend_uid: user_uid
                             }]
-                        },
-                        returning: true
-                    }).then((block) => {
+                        }
+                    }).then(() => {
                         // 친구 차단을 성공한 경우
                         console.log('[BLOCK] 친구 차단 성공');
 
                         const result = new Object();
                         result.success = true;
-                        result.data = block.dataValues;
+                        result.data = updateInfo.type;
                         result.message = '[BLOCK] 성공적으로 ' + user.nickname + '를 차단하였습니다.';
                         console.log(result);
                         return res.status(200).send(result);
@@ -532,7 +524,7 @@ router.post('/block', isLoggedIn, async function (req, res, next) {
                         const result = new Object();
                         result.success = false;
                         result.data = 'NONE';
-                        result.message = '[BLOCK] 친구 차단을 실패했습니다. 다시 한 번 시도해주세요.';
+                        result.message = '[BLOCK] 친구 차단을 실패했습니다.';
                         console.log(result);
                         return res.status(500).send(result);
                     });
@@ -544,9 +536,9 @@ router.post('/block', isLoggedIn, async function (req, res, next) {
                 const result = new Object();
                 result.success = false;
                 result.data = 'NONE';
-                result.message = '[BLOCK] 친구 정보를 가져오는 걸 실패했습니다. 다시 한 번 시도해주세요.';
+                result.message = '[BLOCK] 친구를 찾을 수 없습니다.';
                 console.log(result);
-                return res.status(500).send(result);
+                return res.status(404).send(result);
             });
         }).catch(error => {
             // 친구 UUID 검색에 실패한 경우
@@ -555,7 +547,7 @@ router.post('/block', isLoggedIn, async function (req, res, next) {
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
-            result.message = '[BLOCK] 사용자를 찾을 수 없습니다. 이메일을 다시 한 번 확인해주세요.';
+            result.message = '[BLOCK] 사용자를 찾을 수 없습니다.';
             console.log(result);
             return res.status(404).send(result);
         });
@@ -566,7 +558,7 @@ router.post('/block', isLoggedIn, async function (req, res, next) {
 });
 
 // friend unblock(친구 차단 해제)
-router.post('/unblock', isLoggedIn, async function (req, res, next) {
+router.put('/unblock', isLoggedIn, async function (req, res, next) {
     try {
         const user_uid = req.user.user_uid;
         const user_email = req.user.email;
@@ -579,7 +571,7 @@ router.post('/unblock', isLoggedIn, async function (req, res, next) {
             const result = new Object();
             result.success = false;
             result.data = 'NONE'
-            result.message = '[UNBLOCK] 나 자신을 차단 해제할 수 없습니다.';
+            result.message = '[UNBLOCK] 스스로를 차단 해제할 수 없습니다. 나 자신은 인생의 영원한 친구입니다.';
             console.log(result);
             return res.status(403).send(result);
         }
@@ -687,15 +679,14 @@ router.post('/unblock', isLoggedIn, async function (req, res, next) {
                                 user_uid: user.user_uid,
                                 friend_uid: user_uid
                             }]
-                        },
-                        returning: true
-                    }).then((block) => {
+                        }
+                    }).then(() => {
                         // 친구 차단 해제를 성공한 경우
                         console.log('[UNBLOCK] 친구 차단 해제 성공');
 
                         const result = new Object();
                         result.success = true;
-                        result.data = block.dataValues;
+                        result.data = updateInfo.type;
                         result.message = '[UNBLOCK] 성공적으로 ' + user.nickname + '의 차단을 해제하였습니다.';
                         console.log(result);
                         return res.status(200).send(result);
@@ -706,7 +697,7 @@ router.post('/unblock', isLoggedIn, async function (req, res, next) {
                         const result = new Object();
                         result.success = false;
                         result.data = 'NONE';
-                        result.message = '[UNBLOCK] 친구 차단 해제를 실패했습니다. 다시 한 번 시도해주세요.';
+                        result.message = '[UNBLOCK] 친구 차단 해제를 실패했습니다.';
                         console.log(result);
                         return res.status(500).send(result);
                     });
@@ -718,9 +709,9 @@ router.post('/unblock', isLoggedIn, async function (req, res, next) {
                 const result = new Object();
                 result.success = false;
                 result.data = 'NONE';
-                result.message = '[UNBLOCK] 친구 정보를 가져오는 걸 실패했습니다. 다시 한 번 시도해주세요.';
+                result.message = '[UNBLOCK] 친구를 찾을 수 없습니다.';
                 console.log(result);
-                return res.status(500).send(result);
+                return res.status(404).send(result);
             });
         }).catch(error => {
             // 친구 UUID 검색에 실패한 경우
@@ -729,7 +720,7 @@ router.post('/unblock', isLoggedIn, async function (req, res, next) {
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
-            result.message = '[UNBLOCK] 사용자를 찾을 수 없습니다. 이메일을 다시 한 번 확인해주세요.';
+            result.message = '[UNBLOCK] 사용자를 찾을 수 없습니다.';
             console.log(result);
             return res.status(404).send(result);
         });
@@ -743,6 +734,12 @@ router.post('/unblock', isLoggedIn, async function (req, res, next) {
 // friend delete(친구 삭제)
 router.delete('/delete', isLoggedIn, async function (req, res, next) {
     try {
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = '[DELETE] 아직 미구현 된 기능입니다.';
+        console.log(result);
+        return res.status(404).send(result);
     } catch (e) {
         console.error(e);
         return next(e);
