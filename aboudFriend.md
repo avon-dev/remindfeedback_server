@@ -1,4 +1,4 @@
-## About Category
+## About Friend
 ----
   <_친구(friend) 정보에 접근하는 방법 (친구 검색, 생성, 확인, 차단, 차단 해제)_>
 * **전제**
