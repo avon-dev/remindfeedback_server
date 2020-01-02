@@ -14,16 +14,20 @@
 ----
   회원 한 명의 검색 데이터를 Json 형식으로 반환.
 
-* **URL**
+* **URL:**
+
     `/search`
 
 * **Method:**
+
     `GET`
   
 * **URL Params**
+
     `NONE`
 
 * **Data Params**
+
     `email=[string]` 검색할 사용자 이메일, NULL[X]
 
 * **Success Response:**
@@ -154,15 +158,19 @@
   친구 요청 및 수락.
 
 * **URL**
+
     `/create`
 
 * **Method:**
+
     `POST`
   
 * **URL Params**
+
     `NONE`
 
 * **Data Params**
+
     `email=[string]` 추가할 사용자 이메일, NULL[X]
 
 * **Success Response:**
@@ -252,15 +260,19 @@
   친구 목록 불러오기.
 
 * **URL**
+
     `/allfriend`
 
 * **Method:**
+ 
     `GET`
   
 * **URL Params**
-    `NONE`
+
+   `NONE`
 
 * **Data Params**
+ 
     `NONE`
 
 * **Success Response:**
@@ -313,15 +325,19 @@
   친구 차단.
 
 * **URL**
+ 
     `/block`
 
 * **Method:**
+ 
     `PUT`
   
 * **URL Params**
+ 
     `NONE`
 
 * **Data Params**
+ 
     `email=[string]` 차단할 사용자 이메일, NULL[X]
 
 * **Success Response:**
@@ -425,15 +441,19 @@
   친구 차단 해제.
 
 * **URL**
+ 
     `/unblock`
 
 * **Method:**
+ 
     `PUT`
   
 * **URL Params**
+ 
     `NONE`
 
 * **Data Params**
+ 
     `email=[string]` 차단 해제할 사용자 이메일, NULL[X]
 
 * **Success Response:**
