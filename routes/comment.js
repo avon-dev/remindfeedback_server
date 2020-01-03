@@ -203,10 +203,17 @@ router.delete('/delete/:comment_id', isLoggedIn, async (req, res, next)=>{
             // 댓글 주인만 삭제 가능
             if(comment){
                 if(comment.fk_user_uid==user_uid){
+                    const deletedCom = new Object();
+                    deletedCom.board_id = comment.fk_board_id;
+                    deletedCom.comment_id = comment_id;
+
                     Comment.destroy({
                         where: {id: comment_id}
                     });
-                    result.data = comment_id; //삭제된 댓글 id 반환
+
+                    console.log(deletedCom);
+
+                    result.data = deletedCom; //삭제된 댓글 id, 게시물 id 반환
                     result.success = true;
                     result.message = "댓글 삭제 성공";
                     console.log(`Delete One User's comment`, JSON.stringify(result));

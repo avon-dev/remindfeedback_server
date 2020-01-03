@@ -1,10 +1,10 @@
 ## About Comment
 
   <_댓글 조회, 생성, 수정, 삭제_>
-  * **전제**
+  * **전제:**
   로그인 후 쿠키 정보를 이용한 인증 필요
 
-* **API call:**
+* **API call:**<br>
   http://localhost:8000/comment<br>
   http://54.180.118.35/comment
 
@@ -95,25 +95,24 @@ Create a comment to a single post.
 * **Success Response:**
 
   * **Code:** 201 
-    **Content:** 사용자가 생성한 댓글 객체 반환
- <br />
+    **Content:** 사용자가 생성한 댓글 객체 반환<br/>
 
-* **Sample request JSON data:**
-  ```json
-  {
-      "success": true,
-      "data": {
-          "confirm": false,
-          "id": 6,
-          "fk_board_id": "3",
-          "fk_user_uid": "$2b$12$RCxSlT27FkieRFlulGF1uuE64BzKWVcF9r/SrssGRoD.wr8wjqrk6",
-          "comment_content": "3333-4444",
-          "updatedAt": "2019-12-31T12:32:20.722Z",
-          "createdAt": "2019-12-31T12:32:20.722Z"
-      },
-      "message": "댓글 생성 완료"
-  }
-  ```
+    * **Sample request JSON data:**
+    ```json
+    {
+        "success": true,
+        "data": {
+            "confirm": false,
+            "id": 6,
+            "fk_board_id": "3",
+            "fk_user_uid": "$2b$12$RCxSlT27FkieRFlulGF1uuE64BzKWVcF9r/SrssGRoD.wr8wjqrk6",
+            "comment_content": "3333-4444",
+            "updatedAt": "2019-12-31T12:32:20.722Z",
+            "createdAt": "2019-12-31T12:32:20.722Z"
+        },
+        "message": "댓글 생성 완료"
+    }
+    ```
 
 * **Error Response:**
 
@@ -158,60 +157,72 @@ Show all comments of a single post. Return full data of the comments and user's 
 * **Success Response:**
 
   * **Code:** 200
-    **Content:** 해당 게시물의 모든 댓글 불러오기
- <br />
+    **Content:** 해당 게시물의 모든 댓글 불러오기<br/>
 
-* **Sample request JSON data:**
-  ```json
-  {
-      "success": true,
-      "data": [
-          {
-              "id": 3,
-              "comment_content": "3333-111",
-              "confirm": false,
-              "createdAt": "2019-12-31T07:07:06.000Z",
-              "updatedAt": "2019-12-31T07:07:06.000Z",
-              "deletedAt": null,
-              "fk_user_uid": "$2b$12$RCxSlT27FkieRFlulGF1uuE64BzKWVcF9r/SrssGRoD.wr8wjqrk6",
-              "fk_board_id": 3,
-              "user": {
-                  "nickname": "marge_222",
-                  "portrait": "1576479564662round_logo_512px_dark.png"
-              }
-          },
-          {
-              "id": 4,
-              "comment_content": "3333-222",
-              "confirm": false,
-              "createdAt": "2019-12-31T07:07:24.000Z",
-              "updatedAt": "2019-12-31T07:07:24.000Z",
-              "deletedAt": null,
-              "fk_user_uid": "$2b$12$RCxSlT27FkieRFlulGF1uuE64BzKWVcF9r/SrssGRoD.wr8wjqrk6",
-              "fk_board_id": 3,
-              "user": {
-                  "nickname": "marge_222",
-                  "portrait": "1576479564662round_logo_512px_dark.png"
-              }
-          },
-          {
-              "id": 5,
-              "comment_content": "3333-333",
-              "confirm": false,
-              "createdAt": "2019-12-31T07:07:28.000Z",
-              "updatedAt": "2019-12-31T07:07:28.000Z",
-              "deletedAt": null,
-              "fk_user_uid": "$2b$12$RCxSlT27FkieRFlulGF1uuE64BzKWVcF9r/SrssGRoD.wr8wjqrk6",
-              "fk_board_id": 3,
-              "user": {
-                  "nickname": "marge_222",
-                  "portrait": "1576479564662round_logo_512px_dark.png"
-              }
-          }
-      ],
-      "message": "해당 게시물의 전체 댓글 조회 성공"
-  }
-  ```
+    * **Sample request JSON data:**
+    ```json
+    {
+        "success": true,
+        "data": [
+            {
+                "id": 3,
+                "comment_content": "3333-111",
+                "confirm": false,
+                "createdAt": "2019-12-31T07:07:06.000Z",
+                "updatedAt": "2019-12-31T07:07:06.000Z",
+                "deletedAt": null,
+                "fk_user_uid": "$2b$12$RCxSlT27FkieRFlulGF1uuE64BzKWVcF9r/SrssGRoD.wr8wjqrk6",
+                "fk_board_id": 3,
+                "user": {
+                    "nickname": "marge_222",
+                    "portrait": "1576479564662round_logo_512px_dark.png"
+                }
+            },
+            {
+                "id": 4,
+                "comment_content": "3333-222",
+                "confirm": false,
+                "createdAt": "2019-12-31T07:07:24.000Z",
+                "updatedAt": "2019-12-31T07:07:24.000Z",
+                "deletedAt": null,
+                "fk_user_uid": "$2b$12$RCxSlT27FkieRFlulGF1uuE64BzKWVcF9r/SrssGRoD.wr8wjqrk6",
+                "fk_board_id": 3,
+                "user": {
+                    "nickname": "marge_222",
+                    "portrait": "1576479564662round_logo_512px_dark.png"
+                }
+            },
+            {
+                "id": 5,
+                "comment_content": "3333-333",
+                "confirm": false,
+                "createdAt": "2019-12-31T07:07:28.000Z",
+                "updatedAt": "2019-12-31T07:07:28.000Z",
+                "deletedAt": null,
+                "fk_user_uid": "$2b$12$RCxSlT27FkieRFlulGF1uuE64BzKWVcF9r/SrssGRoD.wr8wjqrk6",
+                "fk_board_id": 3,
+                "user": {
+                    "nickname": "marge_222",
+                    "portrait": "1576479564662round_logo_512px_dark.png"
+                }
+            }
+        ],
+        "message": "해당 게시물의 전체 댓글 조회 성공"
+    }
+    ```
+
+  * **Code:** 200
+    **Content:** 조회 요청했으나 댓글이 하나도 없을 때<br/>
+
+    * **Sample request JSON data:**
+    ```json
+        {
+            "success": true,
+            "data": "",
+            "message": "해당 게시물에 댓글이 없습니다."
+        }
+    ```
+
 
 ---
 **Show one comment.**
@@ -245,47 +256,33 @@ Return full data of a single comment and user(commenter)'s nickname, portrait.
 * **Success Response:**
 
   * **Code:** 200
-    **Content:** 조회 요청한 댓글 객체 반환
- <br />
+    **Content:** 조회 요청한 댓글 객체 반환<br/>
+    **Sample request JSON data:**
+    ```json
+        {
+            "success": true,
+            "data": {
+                "id": 5,
+                "comment_content": "3333-333",
+                "confirm": false,
+                "createdAt": "2019-12-31T07:07:28.000Z",
+                "updatedAt": "2019-12-31T07:07:28.000Z",
+                "deletedAt": null,
+                "fk_user_uid": "$2b$12$RCxSlT27FkieRFlulGF1uuE64BzKWVcF9r/SrssGRoD.wr8wjqrk6",
+                "fk_board_id": 3,
+                "user": {
+                    "nickname": "marge_222",
+                    "portrait": "1576479564662round_logo_512px_dark.png"
+                }
+            },
+            "message": "댓글 조회 성공"
+        }
+    ```
 
-* **Sample request JSON data:**
-  ```json
-    {
-        "success": true,
-        "data": {
-            "id": 5,
-            "comment_content": "3333-333",
-            "confirm": false,
-            "createdAt": "2019-12-31T07:07:28.000Z",
-            "updatedAt": "2019-12-31T07:07:28.000Z",
-            "deletedAt": null,
-            "fk_user_uid": "$2b$12$RCxSlT27FkieRFlulGF1uuE64BzKWVcF9r/SrssGRoD.wr8wjqrk6",
-            "fk_board_id": 3,
-            "user": {
-                "nickname": "marge_222",
-                "portrait": "1576479564662round_logo_512px_dark.png"
-            }
-        },
-        "message": "댓글 조회 성공"
-    }
-  ```
-
-  * **Code:** 200
-    **Content:** 조회 요청했으나 댓글이 하나도 없을 때
- <br />
-
-* **Sample request JSON data:**
-  ```json
-    {
-        "success": true,
-        "data": "",
-        "message": "해당 게시물에 댓글이 없습니다."
-    }
-  ```
 
 
 * **Error Response:**
-  * **Code:** 404 FORBIDDEN : 존재하지 않는 댓글을 조회하려고 할 때 <br />
+  * **Code:** 404 FORBIDDEN : 존재하지 않는 댓글을 조회하려고 할 때<br/>
     **Content:** 
      ```json
     {
@@ -328,24 +325,23 @@ Update a single comment of the loggedin user and return the modified comment in 
 
   * **Code:** 200
     **Content:** 수정된 댓글 객체 반환<br>
-
-* **Sample request JSON data:**
-  ```json
-    {
-        "success": true,
-        "data": {
-            "id": 7,
-            "comment_content": "edit_homer",
-            "confirm": false,
-            "createdAt": "2020-01-01T06:14:46.000Z",
-            "updatedAt": "2020-01-01T06:16:34.262Z",
-            "deletedAt": null,
-            "fk_user_uid": "$2b$12$lUfAwWAZ73QNVqM7w3Iy.O//l3Mas0l7WEtsBJp3yuAqv2kitOeSS",
-            "fk_board_id": 3
-        },
-        "message": "댓글 수정 성공"
-    }
-  ```
+    * **Sample request JSON data:**
+    ```json
+        {
+            "success": true,
+            "data": {
+                "id": 7,
+                "comment_content": "edit_homer",
+                "confirm": false,
+                "createdAt": "2020-01-01T06:14:46.000Z",
+                "updatedAt": "2020-01-01T06:16:34.262Z",
+                "deletedAt": null,
+                "fk_user_uid": "$2b$12$lUfAwWAZ73QNVqM7w3Iy.O//l3Mas0l7WEtsBJp3yuAqv2kitOeSS",
+                "fk_board_id": 3
+            },
+            "message": "댓글 수정 성공"
+        }
+    ```
 
 * **Error Response:**
 
@@ -412,17 +408,18 @@ Delete a single comment of the loggedin user and return the deleted comment_id a
 * **Success Response:**
 
   * **Code:** 200
-    **Content:** 삭제된 댓글 번호 및 성공 메시지 반환
- <br />
-
-* **Sample request JSON data:**
-  ```json
-    {
-        "success": true,
-        "data": "8",
-        "message": "댓글 삭제 성공"
-    }
-  ```
+    **Content:** 삭제된 댓글 번호, 해당 댓글이 포함된 게시물 번호 및 성공 메시지 반환<br>
+    * **Sample request JSON data:**
+    ```json
+        {
+            "success": true,
+            "data": {
+                "board_id": 4,
+                "comment_id": "5"
+            },
+            "message": "댓글 삭제 성공"
+        }
+    ```
 
 * **Error Response:**
 
