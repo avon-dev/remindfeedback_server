@@ -44,12 +44,12 @@ db.User.hasMany(db.Comment, {
   foreignKey: 'fk_user_uid', sourceKey: 'user_uid',
   onDelete: 'CASCADE'
 });
+db.Comment.belongsTo(db.User, {
+  foreignKey: 'fk_user_uid', sourceKey: 'user_uid',
+});
 db.Board.hasMany(db.Comment, {
   foreignKey: 'fk_board_id', sourceKey: 'id',
   onDelete: 'CASCADE'
-});
-db.Comment.belongsTo(db.User, {
-  foreignKey: 'fk_user_uid', sourceKey: 'user_uid',
 });
 db.Comment.belongsTo(db.Board, {
   foreignKey: 'fk_board_id', sourceKey: 'id',
