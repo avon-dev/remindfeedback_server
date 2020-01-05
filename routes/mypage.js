@@ -10,7 +10,10 @@ let result = {
     message: ""
 }
 
-/* Select One User. */
+/**
+* Select One User.
+* @returns {json} json data of response result.
+*/
 router.get('/', isLoggedIn, async (req, res, next) => {
     try {
         const user_uid = req.user.user_uid;
@@ -36,7 +39,13 @@ router.get('/', isLoggedIn, async (req, res, next) => {
     }
 });
 
-/* Update One User's every data. */
+/**
+* Update One User's every data.
+* @param {String} nickname user nickname
+* @param {String} introduction user introduction
+* @param {file} portrait user profile picture
+* @returns {json} json data of response result.
+*/
 router.put('/update', isLoggedIn, upload_s3.single('portrait'), async (req, res, next) => {
     try {
         const user_uid = req.user.user_uid;
@@ -98,7 +107,11 @@ router.put('/update', isLoggedIn, upload_s3.single('portrait'), async (req, res,
 });
 
 
-/* Update One User's nickname */
+/**
+* Update One User's nickname.
+* @param {String} nickname user nickname
+* @returns {json} json data of response result.
+*/
 router.patch('/update/nickname', isLoggedIn, async (req, res, next) => {
     try {
         const user_uid = req.user.user_uid;
@@ -139,7 +152,12 @@ router.patch('/update/nickname', isLoggedIn, async (req, res, next) => {
     }
 });
 
-/* Update One User's introduction */
+
+/**
+* Update One User's introduction.
+* @param {String} introduction user introduction
+* @returns {json} json data of response result.
+*/
 router.patch('/update/introduction', isLoggedIn, async (req, res, next) => {
     try {
         const user_uid = req.user.user_uid;
@@ -172,60 +190,14 @@ router.patch('/update/introduction', isLoggedIn, async (req, res, next) => {
     }
 });
 
-/* Update One User's portrait */
-// 파일 없을 때 500에러 발생
-// router.patch('/update/portrait', isLoggedIn, upload.single('portrait'), async (req, res, next) => {
-//     try {
-//         if(!req.file) console.log(`파일 없음`); 
-//         const user_uid = req.user.user_uid;
-//         let portrait = "";
 
-//         console.log(`마이페이지 portrait 수정 요청`);
-
-//         // 기존 유저 정보 조회
-//         const exUser = await User.findOne({
-//             attributes: ['portrait'], // 이메일, 닉네임, 프로필사진 주소, 소개글
-//             where: {
-//                 user_uid: user_uid
-//             }
-//         })
-//         .then(user =>{ // 
-//             if(req.file){ // 클라이언트가 보낸 새 파일 있을 때
-//                 fileDelete(user.portrait) // 기존 파일 경로 삭제: fileDelete는 파일 찾아보고 있을 때만 삭제함
-//                 portrait = req.file.filename;
-//             }else{ // 클라이언트가 보낸 파일 없으면 기존 파일명 사용
-//                 portrait = user.portrait;
-//             }
-//         });
-//         console.log(`마이페이지 portrait = ${portrait}`);
-//         // 사진 파일명 업데이트
-//         const updateUser = await User.update({
-//             portrait,
-//         }, {
-//             where: { user_uid: user_uid },
-//         });
-//         // 업데이트 된 값 반환
-//         result.data = await User.findOne({
-//             attributes: ['email','nickname','portrait','introduction'], // 이메일, 닉네임, 프로필사진 주소, 소개글
-//             where: {
-//                 user_uid: user_uid
-//             }
-//         });
-//         result.success = true;
-//         result.message = "마이페이지 portrait 수정 성공";
-//         console.log(`Update One User's portrait`, JSON.stringify(result));
-//         res.status(200).json(result);
-//     } catch (e) {
-//         result.success = false;
-//         result.message = "마이페이지 portrait 수정 실패"
-//         res.status(500).json(result);
-//         console.error(e);
-//         return next(e);
-//     }
-// });
-
-/* Update One User's portrait */
-// AWS S3 업로드
+/**
+* Update One User's portrait. (AWS S3 upload)
+* @param {String} nickname user nickname
+* @param {String} introduction user introduction
+* @param {file} portrait user profile picture
+* @returns {json} json data of response result.
+*/
 router.patch('/update/portrait', isLoggedIn, upload_s3.single('portrait'), async (req, res, next) => {
     try {
         if(!req.file) console.log(`보낸 파일 없음`); 
@@ -276,7 +248,10 @@ router.patch('/update/portrait', isLoggedIn, upload_s3.single('portrait'), async
     }
 });
 
-/* Delete One User's portrait */
+/**
+* Delete One User's portrait.
+* @returns {json} json data of response result.
+*/
 router.delete('/delete/portrait', isLoggedIn, async (req, res, next) => {
     try {
         const user_uid = req.user.user_uid;
