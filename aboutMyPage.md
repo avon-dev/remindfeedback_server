@@ -31,7 +31,6 @@
   <!--회원정보 JSON 형태 + 변수 설명 -->
 
   * **portrait 사진 url:**
-  http://localhost:8000/mypage/파일명<br>
   https://remindfeedback.s3.ap-northeast-2.amazonaws.com/파일명<br>
 
 

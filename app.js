@@ -22,6 +22,7 @@ const boardTextRouter = require('./routes/board/text');
 const boardPictureRouter = require('./routes/board/picture');
 const mypageRouter = require('./routes/mypage');
 const friendRouter = require('./routes/friend');
+const commentRouter = require('./routes/comment');
 
 const prod = process.env.NODE_ENV === 'production';
 
@@ -83,6 +84,7 @@ app.use('/board/text', boardTextRouter);
 app.use('/board/picture', boardPictureRouter);
 app.use('/mypage', mypageRouter);
 app.use('/friend', friendRouter);
+app.use('/comment', commentRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
