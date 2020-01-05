@@ -29,6 +29,7 @@ fs
 db.User = require('./user')(sequelize, Sequelize);
 db.Feedback = require('./feedback')(sequelize, Sequelize);
 db.Board = require('./board')(sequelize, Sequelize);
+db.Friend = require('./friend')(sequelize, Sequelize);
 
 //TABLE 관계 맺기
 db.Feedback.hasMany(db.Board, {
@@ -37,6 +38,10 @@ db.Feedback.hasMany(db.Board, {
 });
 db.Board.belongsTo(db.Feedback, {
   foreignKey: 'fk_feedbackId', targetKey: 'id',
+  onDelete: 'CASCADE'
+});
+db.User.hasMany(db.Friend, {
+  foreignKey:'fk_friendId', targetKey: 'id',
   onDelete: 'CASCADE'
 });
 
