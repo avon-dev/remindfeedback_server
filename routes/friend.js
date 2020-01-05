@@ -582,11 +582,11 @@ router.get('/allrequest/receive', isLoggedIn, async function (req, res, next) {
         let query =
             'SELECT u.user_uid, u.email, u.nickname, u.portrait, u.introduction, f.type ' +
             'FROM users AS u, (' +
-            'SELECT friend_uid, type ' +
+            'SELECT user_uid, type ' +
             'FROM friends ' +
-            'WHERE friend_uid=:user_uid AND type = 1 ' +
+            'WHERE friend_uid=:user_uid AND type=1' +
             ') AS f ' +
-            'WHERE u.user_uid=f.friend_uid ' +
+            'WHERE u.user_uid=f.user_uid ' +
             'ORDER BY u.nickname ASC';
         await sequelize.query(query, {
             replacements: {
