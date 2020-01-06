@@ -122,9 +122,31 @@ Create a comment to a single post.
     {
         "success": false,
         "data": "NONE",
-        "message": "댓글 생성 실패: 댓글 내용(comment_content)는 반드시 입력해야 합니다."
+        "message": "[403 FORBIDDEN] 댓글 생성 실패: 댓글 내용(comment_content)는 반드시 입력해야 합니다."
     }
     ```
+
+  * **Code:** 401 UNAUTHORIZED : 게시물 작성자 혹은 조언자가 아닌 사람이 댓글 작성 시도할 때(권한 없음) <br />
+    **Content:** 
+     ```json
+    {
+        "success": false,
+        "data": "",
+        "message": "[401 UNAUTHORIZED] 댓글 작성 실패: 게시물 주인 및 조언자만 댓글을 작성할 수 있습니다."
+    }
+    ```
+
+  * **Code:** 404 NOT FOUND : 존재하지 않는 게시물에 댓글 작성 시도할 때 <br />
+    **Content:** 
+     ```json
+    {
+        "success": false,
+        "data": "",
+        "message": "[404 NOT FOUND] 댓글 작성 실패: 존재하지 않는 게시물입니다."
+    }
+    ```
+
+
 
 ---
 **Show all comments of a single post**
@@ -279,16 +301,14 @@ Return full data of a single comment and user(commenter)'s nickname, portrait.
         }
     ```
 
-
-
 * **Error Response:**
-  * **Code:** 404 FORBIDDEN : 존재하지 않는 댓글을 조회하려고 할 때<br/>
+  * **Code:** 404 NOT FOUND : 존재하지 않는 댓글을 조회하려고 할 때<br/>
     **Content:** 
      ```json
     {
         "success": false,
         "data": "",
-        "message": "댓글 조회 실패: 존재하지 않는 댓글입니다."
+        "message": "[404 NOT FOUND] 댓글 조회 실패: 존재하지 않는 댓글입니다."
     }
     ```
 
@@ -351,27 +371,27 @@ Update a single comment of the loggedin user and return the modified comment in 
     {
         "success": false,
         "data": "NONE",
-        "message": "댓글 수정 실패: 댓글 내용(comment_content)는 반드시 입력해야 합니다."
+        "message": "[403 FORBIDDEN] 댓글 수정 실패: 댓글 내용(comment_content)는 반드시 입력해야 합니다."
     }
     ```
 
-  * **Code:** 401 FORBIDDEN : 본인의 댓글이 아닌 것을 수정하려고 할 때 <br />
+  * **Code:** 401 UNAUTHORIZED : 본인의 댓글이 아닌 것을 수정하려고 할 때 <br />
     **Content:** 
      ```json
     {
         "success": false,
         "data": "NONE",
-        "message": "댓글 수정 실패: 본인의 댓글만 수정할 수 있습니다."
+        "message": "[401 UNAUTHORIZED] 댓글 수정 실패: 본인의 댓글만 수정할 수 있습니다."
     }
     ```
 
-  * **Code:** 404 FORBIDDEN : 존재하지 않는 댓글을 수정하려고 할 때 <br />
+  * **Code:** 404 NOT FOUND : 존재하지 않는 댓글을 수정하려고 할 때 <br />
     **Content:** 
      ```json
     {
         "success": false,
         "data": "NONE",
-        "message": "댓글 수정 실패: 존재하지 않는 댓글입니다."
+        "message": "[404 NOT FOUND] 댓글 수정 실패: 존재하지 않는 댓글입니다."
     }
     ```
 
@@ -423,23 +443,23 @@ Delete a single comment of the loggedin user and return the deleted comment_id a
 
 * **Error Response:**
 
-  * **Code:** 401 FORBIDDEN : 본인의 댓글이 아닌 것을 삭제하려고 할 때 <br />
+  * **Code:** 401 UNAUTHORIZED : 본인의 댓글이 아닌 것을 삭제하려고 할 때 <br />
     **Content:** 
      ```json
     {
         "success": false,
         "data": "NONE",
-        "message": "댓글 삭제 실패: 본인의 댓글만 삭제할 수 있습니다."
+        "message": "[401 UNAUTHORIZED] 댓글 삭제 실패: 본인의 댓글만 삭제할 수 있습니다."
     }
     ```
 
-  * **Code:** 404 FORBIDDEN : 존재하지 않는 댓글을 삭제하려고 할 때 <br />
+  * **Code:** 404 NOT FOUND : 존재하지 않는 댓글을 삭제하려고 할 때 <br />
     **Content:** 
      ```json
     {
         "success": false,
         "data": "NONE",
-        "message": "댓글 삭제 실패: 이미 삭제된 댓글입니다."
+        "message": "[404 NOT FOUND] 댓글 삭제 실패: 존재하지 않는 댓글입니다."
     }
     ```
 
