@@ -1,5 +1,5 @@
 const express = require('express');
-const { User, Board, Comment } = require('../models');
+const { User, Feedback, Board, Comment } = require('../models');
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
 const router = express.Router();
 
@@ -14,7 +14,7 @@ let result = { // response form
  * - parameter friend_id : 친구 추가할 회원 uuid
  */
 router.get('/selectall/:board_id', async(req, res, next)=>{
-    const board_id = req.params.board_id;
+    const board_id = parseInt(req.params.board_id);
     console.log(`해당 게시물의 전체 댓글 조회 요청 = ${board_id}`);
     result.data = '';
     try{
@@ -55,7 +55,7 @@ router.get('/selectall/:board_id', async(req, res, next)=>{
  * - parameter friend_id : 친구 추가할 회원 uuid
  */
 router.get('/selectone/:comment_id', async(req, res, next)=>{
-    const comment_id = req.params.comment_id;
+    const comment_id = parseInt(req.params.comment_id);
     console.log(`댓글 조회 요청 = ${comment_id}`);
     result.data = '';
     try{
@@ -93,7 +93,8 @@ router.get('/selectone/:comment_id', async(req, res, next)=>{
 router.post('/create', isLoggedIn, async (req, res, next)=>{
     try{
         const user_uid = req.user.user_uid;
-        const {board_id, comment_content} = req.body;
+        const comment_content = req.body.comment_content;
+        const board_id = parseInt(req.body.board_id);
         result.data = '';
         if(!comment_content) {
             result.success = false;
@@ -104,22 +105,42 @@ router.post('/create', isLoggedIn, async (req, res, next)=>{
         // board_id값은 들어오는데 
         //{ Error: (conn=161, no: 1364, SQLState: HY000) Field 'board_id' doesn't have a default value 에러 발생
 
-        const newComment = await Comment.create({
-            fk_board_id: board_id,
-            fk_user_uid: user_uid,
-            comment_content,
-        });
-        if(newComment){
-            result.data = newComment;
-            result.success = true;
-            result.message = '댓글 생성 완료';
-            return res.status(201).json(result);
-        }else{
+        const exBoard = await Board.findOne({
+            where:{id: board_id},
+            include: [{
+                model: Feedback,
+                attributes: ['user_uid','adviser_uid'],
+            }]
+        }).then(async board=>{
+            console.log(`로그인 uid=${user_uid}, 주인 uid= ${board.user_uid}, 조언자uid=${board.adviser_uid}`);
+            if(board){
+                if(user_uid!=board.feedback.user_uid && user_uid!=board.feedback.adviser_uid){
+                    result.success = false;
+                    result.message = "댓글 작성 실패: 게시물 주인 및 조언자만 댓글을 작성할 수 있습니다.";
+                    console.log(`댓글 작성 실패: 댓글 작성 권한 없음`, JSON.stringify(result));
+                    return res.status(401).json(result);
+                }
+                const newComment = await Comment.create({
+                    fk_board_id: board_id,
+                    fk_user_uid: user_uid,
+                    comment_content,
+                });
+                if(newComment){
+                    result.data = newComment;
+                    result.success = true;
+                    result.message = '댓글 생성 완료';
+                    return res.status(201).json(result);
+                }else{
+                    result.success = false;
+                    result.message = '댓글 생성 실패';
+                    return res.status(403).json(result);
+                }
+            }
             result.success = false;
-            result.message = '댓글 생성 실패';
-            return res.status(403).json(result);
-        }
-
+            result.message = "댓글 작성 실패: 존재하지 않는 게시물입니다.";
+            console.log(`댓글 생성 실패: 존재하지 않는 게시물`, JSON.stringify(result));
+            return res.status(404).json(result);
+        });
     }catch(e){
         result.success = false;
         result.message = e;
@@ -136,7 +157,7 @@ router.post('/create', isLoggedIn, async (req, res, next)=>{
  */
 router.put('/update/:comment_id', isLoggedIn, async (req, res, next)=>{
     const user_uid = req.user.user_uid;
-    const comment_id = req.params.comment_id;
+    const comment_id = parseInt(req.params.comment_id);
     const comment_content = req.body.comment_content;
     result.data = '';
     if(!comment_content) {
@@ -148,7 +169,11 @@ router.put('/update/:comment_id', isLoggedIn, async (req, res, next)=>{
 
     try{
         await Comment.findOne({
-            where: {id: comment_id}
+            where: {id: comment_id},
+            include: [{
+                model: User,
+                attributes: ['nickname', 'portrait'],
+            }]
         }).then(comment=>{
             if(comment){
                 if(comment.fk_user_uid==user_uid){ // 댓글 주인만 수정 가능
@@ -192,7 +217,7 @@ router.put('/update/:comment_id', isLoggedIn, async (req, res, next)=>{
  */
 router.delete('/delete/:comment_id', isLoggedIn, async (req, res, next)=>{
     const user_uid = req.user.user_uid;
-    const comment_id = req.params.comment_id;
+    const comment_id = parseInt(req.params.comment_id);
     result.data = '';
 
     console.log(`기존 댓글 삭제 요청 들어옴= ${comment_id}`);
@@ -203,10 +228,17 @@ router.delete('/delete/:comment_id', isLoggedIn, async (req, res, next)=>{
             // 댓글 주인만 삭제 가능
             if(comment){
                 if(comment.fk_user_uid==user_uid){
+                    const deletedCom = new Object();
+                    deletedCom.board_id = comment.fk_board_id;
+                    deletedCom.comment_id = comment_id;
+
                     Comment.destroy({
                         where: {id: comment_id}
                     });
-                    result.data = comment_id; //삭제된 댓글 id 반환
+
+                    console.log(deletedCom);
+
+                    result.data = deletedCom; //삭제된 댓글 id, 게시물 id 반환
                     result.success = true;
                     result.message = "댓글 삭제 성공";
                     console.log(`Delete One User's comment`, JSON.stringify(result));
@@ -219,7 +251,7 @@ router.delete('/delete/:comment_id', isLoggedIn, async (req, res, next)=>{
                 }
             }else{
                 result.success = false;
-                result.message = "댓글 삭제 실패: 이미 삭제된 댓글입니다.";
+                result.message = "댓글 삭제 실패: 존재하지 않는 댓글입니다.";
                 console.log(`댓글 삭제 실패: 존재하지 않는 댓글`, JSON.stringify(result));
                 return res.status(404).json(result);
             }
