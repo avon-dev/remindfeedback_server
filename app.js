@@ -59,6 +59,18 @@ if (cluster.isMaster) {
   var cookieParser = require('cookie-parser');
   var morgan = require('morgan');
 
+  // 마스터, 워커 ID 설정
+  var worker_id = cluster.worker.id;
+  var master_id;
+
+   //마스터에게 master_id 요청
+   process.send({worker_id: worker_id, cmd:'MASTER_ID'});
+   process.on('message', function (msg){
+       if (msg.cmd === 'MASTER_ID') {
+           master_id = msg.master_id;
+       }
+   });
+
   const session = require('express-session');
   const flash = require('connect-flash');
   const passport = require('passport');
@@ -129,9 +141,19 @@ if (cluster.isMaster) {
   app.get('/favicon.ico', (req, res) => {
     res.status(204);
   })
-  app.get('/', (req, res) => {
+  app.get('/', (req, res) => { 
     res.send('remindfeedback 백엔드 정상 동작!');
   });
+  
+  // Worker 테스트 주소
+  app.get('/worker', function (req, res) {
+    res.send('안녕하세요 저는<br>['+master_id+']서버의<br>워커 ['+ cluster.worker.id+'] 입니다.');
+  });
+  app.get("/workerKiller", function (req, res) {
+    cluster.worker.kill();
+    res.send('워커킬러 호출됨');
+  });
+  
   app.use('/auth', authRouter);
   app.use('/users', userRouter);
   app.use('/feedback', feedbackRouter);
