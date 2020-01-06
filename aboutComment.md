@@ -270,6 +270,21 @@ Return full data of a single comment and user(commenter)'s nickname, portrait.
     }
   ```
 
+  * **Code:** 200
+    **Content:** 조회 요청했으나 댓글이 하나도 없을 때
+ <br />
+
+* **Sample request JSON data:**
+  ```json
+    {
+        "success": true,
+        "data": "",
+        "message": "해당 게시물에 댓글이 없습니다."
+    }
+  ```
+
+
+* **Error Response:**
   * **Code:** 404 FORBIDDEN : 존재하지 않는 댓글을 조회하려고 할 때 <br />
     **Content:** 
      ```json

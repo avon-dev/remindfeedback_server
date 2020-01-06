@@ -26,9 +26,14 @@ router.get('/selectall/:board_id', async(req, res, next)=>{
             }]
         }).then(comments=>{
             if(comments){
-                result.data = comments;
+                if(comments[0]){
+                    result.message = "해당 게시물의 전체 댓글 조회 성공";
+                    result.data = comments;
+                }else{
+                    result.message = "해당 게시물에 댓글이 없습니다.";
+                    result.data = '';
+                }
                 result.success = true;
-                result.message = "해당 게시물의 전체 댓글 조회 성공";
                 return res.status(200).json(result);
             }else{
                 result.success = false;
