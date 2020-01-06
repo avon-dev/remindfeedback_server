@@ -22,7 +22,7 @@ const upload = multer({ //멀터를 사용하면 upload 객체를 받을 수 있
         s3: new AWS.S3(),
         bucket: 'remindfeedback',
         key(req, file, cb) {
-            cb(null, `recode/${+new Date()}${path.basename(file.originalname)}`); //picture 폴더의 시간+파일이름
+            cb(null, `recode/${+new Date()}${path.basename(file.originalname)}`); //recode 폴더의 시간+파일이름
         }
     }),
     limits: { fileSize: 500 * 1024 * 1024 }, //파일 사이즈 (50mb)

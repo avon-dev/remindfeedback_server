@@ -22,7 +22,7 @@ const upload = multer({ //멀터를 사용하면 upload 객체를 받을 수 있
         s3: new AWS.S3(),
         bucket: 'remindfeedback',
         key(req, file, cb) {
-            cb(null, `video/${+new Date()}${path.basename(file.originalname)}`); //picture 폴더의 시간+파일이름
+            cb(null, `video/${+new Date()}${path.basename(file.originalname)}`); //video 폴더의 시간+파일이름
         }
     }),
     limits: { fileSize: 500 * 1024 * 1024 }, //파일 사이즈 (50mb)
@@ -102,7 +102,8 @@ router.put('/update/:board_id', isLoggedIn, upload.single('videofile'), async (r
         let deleteItems = [];
         tempBoard.board_file1 = await beforeBoard.board_file1;
         if(updatefile1){
-            deleteItems.push({Key:beforeBoard.board_file1})
+            if(!beforeBoard.board_file1)
+            deleteItems.push({Key:beforeBoard.board_file1});
             if(req.file)tempBoard.board_file1 = await req.file.key
             else{tempBoard.board_file1 = null}
         }
