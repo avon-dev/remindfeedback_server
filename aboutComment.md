@@ -110,7 +110,7 @@ Create a comment to a single post.
             "updatedAt": "2019-12-31T12:32:20.722Z",
             "createdAt": "2019-12-31T12:32:20.722Z"
         },
-        "message": "댓글 생성 완료"
+        "message": "[201 CREATED] 댓글 생성 완료"
     }
     ```
 
@@ -229,7 +229,7 @@ Show all comments of a single post. Return full data of the comments and user's 
                 }
             }
         ],
-        "message": "해당 게시물의 전체 댓글 조회 성공"
+        "message": "[200 OK] 해당 게시물의 전체 댓글 조회 성공"
     }
     ```
 
@@ -241,8 +241,19 @@ Show all comments of a single post. Return full data of the comments and user's 
         {
             "success": true,
             "data": "",
-            "message": "해당 게시물에 댓글이 없습니다."
+            "message": "[200 OK] 해당 게시물에 댓글이 없습니다."
         }
+    ```
+
+* **Error Response:**
+  * **Code:** 404 NOT FOUND : 존재하지 않는 게시물의 댓글들을 조회하려고 할 때<br/>
+    **Content:** 
+     ```json
+    {
+        "success": false,
+        "data": "",
+        "message": "[404 NOT FOUND] 존재하지 않는 게시물의 댓글은 조회할 수 없습니다."
+    }
     ```
 
 
@@ -297,7 +308,7 @@ Return full data of a single comment and user(commenter)'s nickname, portrait.
                     "portrait": "1576479564662round_logo_512px_dark.png"
                 }
             },
-            "message": "댓글 조회 성공"
+            "message": "[200 OK] 댓글 조회 성공"
         }
     ```
 
@@ -359,7 +370,7 @@ Update a single comment of the loggedin user and return the modified comment in 
                 "fk_user_uid": "$2b$12$lUfAwWAZ73QNVqM7w3Iy.O//l3Mas0l7WEtsBJp3yuAqv2kitOeSS",
                 "fk_board_id": 3
             },
-            "message": "댓글 수정 성공"
+            "message": "[200 OK] 댓글 수정 성공"
         }
     ```
 
@@ -437,7 +448,7 @@ Delete a single comment of the loggedin user and return the deleted comment_id a
                 "board_id": 4,
                 "comment_id": "5"
             },
-            "message": "댓글 삭제 성공"
+            "message": "[200 OK] 댓글 삭제 성공"
         }
     ```
 
