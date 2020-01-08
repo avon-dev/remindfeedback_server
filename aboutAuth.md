@@ -234,3 +234,43 @@
       }
   }
   ```
+
+**Unregister**
+----
+  로그인 된 유저의 사용자정보 조회 후 프로필 사진 및 User테이블 destroy 후 성공 메시지 반환
+
+* **URL**
+
+  http://54.180.118.35/auth/unregister
+
+* **Method:**
+
+  `DELETE`
+  
+*  **URL Params**
+
+   **Required:**
+ 
+   None
+
+* **Data Params**
+
+    **Required:**
+    
+    None
+   
+* **Success Response:**
+
+  * **Code:** 200 <br />
+    **Content:** 회원 한 명의 모든 정보 삭제
+        <!--회원정보 JSON 그대로 들어감-->
+ 
+
+* **Sample JSON data:**
+  ```json
+  {
+    "success": true,
+    "data": 0,
+    "message": "[200 OK] 회원 탈퇴 성공"
+  }
+  ```
