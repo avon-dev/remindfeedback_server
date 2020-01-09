@@ -1,32 +1,39 @@
 const express = require('express');
-const { Board, Sequelize: { Op } } = require('../../models');
+const { Feedback, Board, Sequelize: { Op } } = require('../../models');
 const { isLoggedIn } = require('../middlewares'); 
-const AWS = require('aws-sdk');
 const router = express.Router();
+const {deleteS3Obj, upload_s3_test} = require('../S3');
 
-AWS.config.update({
-    //서울리전
-    region: 'ap-northeast-2',
-    accessKeyId: process.env.S3_ACCESS_KEY_ID,
-    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
-})
+router.get('/selectone/:board_id', async(req, res, next)=>{
+    let board_id = parseInt(req.params.board_id);
+    let result = {
+        success: true,
+        data: '',
+        message: ""
+    }
+    try{
+        const exBoard = await Board.findAll({
+            where: {id: board_id},
+            include:[{
+                model: Feedback,
+                attributes: ['user_uid', 'adviser_uid']
+            }]
+        }).then(board=>{
+            result.data = board;
+            return res.status(200).json(result);
+        })
 
-const S3 = new AWS.S3();
-
-
-const filedelete = (deleteItems) => {
-    console.log(deleteItems);
-    let params = {
-        Bucket: 'remindfeedback',
-        Delete: {
-            Objects: deleteItems,
+    }catch(e){
+        let result = {
+            success: false,
+            data: '',
+            message: e
         }
-    };
-    S3.deleteObjects(params, function(err, data) {
-        if (err) console.log(err)
-        else console.log("Successfully deleted remindfeedback");
-    })
-}
+        res.status(500).json(result);
+        console.error(e);
+        return next(e);
+    }
+})
 
 /* getfeedback API
  */
@@ -85,7 +92,7 @@ router.delete('/:board_id', isLoggedIn, async (req, res, next) => {
         if(beforeBoard.board_file3){
             await deleteItems.push({Key:beforeBoard.board_file3})
         }
-        await filedelete(deleteItems);
+        await deleteS3Obj(deleteItems);
         
         await Board.destroy({
             where: {id: board_id},

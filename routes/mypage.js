@@ -2,13 +2,16 @@ const express = require('express');
 const { User } = require('../models');
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
 const router = express.Router();
-const {deleteS3Obj, upload, upload_s3, fileDelete} = require('./uploads');
+const {deleteS3Obj, upload_s3_test} = require('./S3');
 
 let result = {
     success: true,
     data: '',
     message: ""
 }
+
+let type = 'portrait';
+let fileSize = 50 * 1024 * 1024;
 
 /**
 * Select One User.
@@ -46,7 +49,7 @@ router.get('/', isLoggedIn, async (req, res, next) => {
 * @param {file} portrait user profile picture
 * @returns {json} json data of response result.
 */
-router.put('/update', isLoggedIn, upload_s3.single('portrait'), async (req, res, next) => {
+router.put('/update', isLoggedIn, upload_s3_test(type, fileSize).single('portrait'), async (req, res, next) => {
     try {
         const user_uid = req.user.user_uid;
         const { nickname, introduction } = req.body;
@@ -69,7 +72,9 @@ router.put('/update', isLoggedIn, upload_s3.single('portrait'), async (req, res,
         })
         .then(user =>{ 
             if(req.file){ // 클라이언트가 보낸 새 파일 있을 때
-                deleteS3Obj(user.portrait) // 기존 파일 경로 삭제: fileDelete는 파일 찾아보고 있을 때만 삭제함
+                let deleteItems = [];
+                deleteItems.push({Key:user.portrait })
+                deleteS3Obj(deleteItems) // 기존 파일 경로 삭제: fileDelete는 파일 찾아보고 있을 때만 삭제함
                 portrait = req.file.key;
             }else{ // 클라이언트가 보낸 파일 없으면 기존 파일명 사용
                 console.log(`보낸 파일 없음`);
@@ -198,7 +203,7 @@ router.patch('/update/introduction', isLoggedIn, async (req, res, next) => {
 * @param {file} portrait user profile picture
 * @returns {json} json data of response result.
 */
-router.patch('/update/portrait', isLoggedIn, upload_s3.single('portrait'), async (req, res, next) => {
+router.patch('/update/portrait', isLoggedIn, upload_s3_test(type, fileSize).single('portrait'), async (req, res, next) => {
     try {
         if(!req.file) console.log(`보낸 파일 없음`); 
         const user_uid = req.user.user_uid;
@@ -215,7 +220,9 @@ router.patch('/update/portrait', isLoggedIn, upload_s3.single('portrait'), async
         })
         .then(user =>{ // 
             if(req.file){ // 클라이언트가 보낸 새 파일 있을 때
-                deleteS3Obj(user.portrait) // 기존 파일 경로 삭제: fileDelete는 파일 찾아보고 있을 때만 삭제함
+                let deleteItems = [];
+                deleteItems.push({Key:user.portrait })
+                deleteS3Obj(deleteItems) // 기존 파일 경로 삭제: fileDelete는 파일 찾아보고 있을 때만 삭제함
                 portrait = req.file.key;
             }else{ // 클라이언트가 보낸 파일 없으면 기존 파일명 사용
                 portrait = user.portrait;
