@@ -1,7 +1,7 @@
 const express = require('express');
 const { Board } = require('../../models');
 const { isLoggedIn, isNotLoggedIn } = require('../middlewares'); 
-const {deleteS3Obj, upload_s3_test} = require('../uploads');
+const {deleteS3Obj, upload_s3_test} = require('../S3');
 
 const router = express.Router();
 

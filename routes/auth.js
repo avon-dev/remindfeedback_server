@@ -4,7 +4,7 @@ const { User } = require('../models');
 const passport = require('passport');
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares'); 
 const router = express.Router();
-const {deleteS3Obj, upload_s3} = require('./uploads');
+const {deleteS3Obj, upload_s3} = require('./S3');
 
 let result = { // response form
     success: true,
