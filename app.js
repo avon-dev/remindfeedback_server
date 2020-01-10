@@ -88,7 +88,7 @@ if (cluster.isMaster) {
   const boardTextRouter = require('./routes/board/text');
   const boardPictureRouter = require('./routes/board/picture');
   const boardVideoRouter = require('./routes/board/video');
-  const boardRecodeRouter = require('./routes/board/recode');
+  const boardRecordRouter = require('./routes/board/record');
   const mypageRouter = require('./routes/mypage');
   const friendRouter = require('./routes/friend');
   const commentRouter = require('./routes/comment');
@@ -162,7 +162,7 @@ if (cluster.isMaster) {
   app.use('/board/text', boardTextRouter);
   app.use('/board/picture', boardPictureRouter);
   app.use('/board/video', boardVideoRouter);
-  app.use('/board/recode', boardRecodeRouter);
+  app.use('/board/record', boardRecordRouter);
   app.use('/mypage', mypageRouter);
   app.use('/friend', friendRouter);
   app.use('/comment', commentRouter);

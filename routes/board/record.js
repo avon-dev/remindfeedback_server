@@ -5,10 +5,10 @@ const {deleteS3Obj, upload_s3_test} = require('../S3');
 
 const router = express.Router();
 
-let type = 'recode';
+let type = 'record';
 let fileSize = 500 * 1024 * 1024;
 
-router.post('/create', isLoggedIn, upload_s3_test(type, fileSize).single('recodefile'), async (req, res, next) => {
+router.post('/create', isLoggedIn, upload_s3_test(type, fileSize).single('recordfile'), async (req, res, next) => {
     try{
         const { feedback_id, board_title, board_content } = req.body;
         console.log(req.file)
@@ -48,11 +48,11 @@ router.post('/create', isLoggedIn, upload_s3_test(type, fileSize).single('recode
     }
 });
 
-router.put('/update/:board_id', isLoggedIn, upload_s3_test(type, fileSize).single('recodefile'), async (req, res, next) => {
+router.put('/update/:board_id', isLoggedIn, upload_s3_test(type, fileSize).single('recordfile'), async (req, res, next) => {
     try{
         const board_id = req.params.board_id;
         const { board_title, board_content, updatefile1 } = req.body; 
-        console.log('board recode put 요청', board_id, board_title, board_content, updatefile1);
+        console.log('board record put 요청', board_id, board_title, board_content, updatefile1);
         const beforeBoard = await Board.findOne({
             where: {id:board_id},
         });
@@ -85,7 +85,7 @@ router.put('/update/:board_id', isLoggedIn, upload_s3_test(type, fileSize).singl
         let result = {
             success: true,
             data,
-            message: 'board recode update 성공'
+            message: 'board record update 성공'
         }
         res.status(200).json(result);
     } catch(e){
@@ -100,11 +100,11 @@ router.put('/update/:board_id', isLoggedIn, upload_s3_test(type, fileSize).singl
     }
 });
 
-router.patch('/file/:board_id', isLoggedIn, upload_s3_test(type, fileSize).single('recodefile'), async (req, res, next) => {
+router.patch('/file/:board_id', isLoggedIn, upload_s3_test(type, fileSize).single('recordfile'), async (req, res, next) => {
     try{
         const board_id = req.params.board_id;
         const { updatefile1 } = req.body; 
-        console.log('board recode put 요청', board_id, updatefile1);
+        console.log('board record put 요청', board_id, updatefile1);
         const beforeBoard = await Board.findOne({
             where: {id:board_id},
         });
