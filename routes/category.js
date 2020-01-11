@@ -76,7 +76,7 @@ router.post('/insert', isLoggedIn, async (req, res, next) => {
 });
 
 // all category select
-router.get('/selectall', async (req, res, next) => {
+router.get('/selectall', isLoggedIn, async (req, res, next) => {
     try {
         const user_uid = req.user.user_uid;
         console.log('모든 카테고리 데이터 요청')
