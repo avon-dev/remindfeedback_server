@@ -4,6 +4,13 @@ const { User } = require('../models');
 const passport = require('passport');
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares'); 
 const router = express.Router();
+const {deleteS3Obj, upload_s3} = require('./uploads');
+
+let result = { // response form
+    success: true,
+    data: '',
+    message: ""
+}
 
 /* Sign Up API
  * - parameter email
@@ -35,6 +42,40 @@ router.post('/signup', async (req, res, next) => {
         console.log('newUser',newUser.nickname);
         res.status(201).json(newUser);
     } catch(e){
+        console.error(e);
+        return next(e);
+    }
+});
+
+router.delete('/unregister',isLoggedIn, async (req, res, next)=>{
+    try{
+        const user_uid = req.user.user_uid;
+        // 기존 유저 정보 조회
+        const exUser = await User.findOne({
+            attributes: ['portrait'], // 이메일, 닉네임, 프로필사진 주소, 소개글
+            where: {
+                user_uid: user_uid
+            }
+        })
+        .then(user =>{ // 사진 경로 있으면 기존 파일 삭제
+            //if(user.portrait){fileDelete(user.portrait)}
+            if(user.portrait){deleteS3Obj(user.portrait)}
+        });
+
+        await User.destroy({
+            where: {user_uid: user_uid}
+        });
+        result.data = await User.destroy({
+            where: {user_uid: user_uid}
+        }); // 유저 삭제 내역 반환
+        result.success = true;
+        result.message = "[200 OK] 회원 탈퇴 성공";
+        console.log(`Delete One User's all information.`, JSON.stringify(result));
+        return res.status(200).json(result);
+    }catch(e){
+        result.success = false;
+        result.message = e;
+        res.status(500).json(result);
         console.error(e);
         return next(e);
     }

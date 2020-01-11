@@ -8,7 +8,7 @@
 
 * **URL**
 
-  http://54.180.118.35/board/feedbackid/lastid
+  http://54.180.118.35/board/(feedbackid)/(lastid)
 
 * **Method:**
 
@@ -70,7 +70,7 @@
 
 * **URL**
 
-  http://54.180.118.35/board/board_id
+  http://54.180.118.35/board/(board_id)
 
 * **Method:**
 
@@ -118,7 +118,7 @@
 
 * **URL**
 
-  http://54.180.118.35/board/board_title/board_id
+  http://54.180.118.35/board/board_title/(board_id)
 
 * **Method:**
 
@@ -168,7 +168,7 @@
 
 * **URL**
 
-  http://54.180.118.35/board/board_content/board_id
+  http://54.180.118.35/board/board_content/(board_id)
 
 * **Method:**
 

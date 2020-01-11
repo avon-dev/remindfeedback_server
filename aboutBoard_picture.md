@@ -67,7 +67,7 @@
 
 * **URL**
 
-  http://54.180.118.35/board/picture/update/board_id
+  http://54.180.118.35/board/picture/update/(board_id)
 
 * **Method:**
 
@@ -158,7 +158,7 @@
 
 * **URL**
 
-  http://54.180.118.35/board/picture/files/board_id
+  http://54.180.118.35/board/picture/files/(board_id)
 
 * **Method:**
 
