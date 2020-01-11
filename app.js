@@ -92,6 +92,7 @@ if (cluster.isMaster) {
   const mypageRouter = require('./routes/mypage');
   const friendRouter = require('./routes/friend');
   const commentRouter = require('./routes/comment');
+  const noticeRouter = require('./routes/notice/notice');
 
   const prod = process.env.NODE_ENV === 'production';
 
@@ -166,6 +167,7 @@ if (cluster.isMaster) {
   app.use('/mypage', mypageRouter);
   app.use('/friend', friendRouter);
   app.use('/comment', commentRouter);
+  app.use('/notice', noticeRouter);
 
   // catch 404 and forward to error handler
   app.use(function (req, res, next) {
