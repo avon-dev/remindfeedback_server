@@ -209,6 +209,16 @@
     }
     ```
 
+ * **Code:** `404` NOT FOUND <br>
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "[SEARCH] 사용자를 찾을 수 없습니다."
+    }
+    ```
+
   * **Code:** `500` INTERNAL SERVER ERROR <br>
     **Content:** 
     ```json
@@ -219,7 +229,7 @@
     }
     ```
 
-  * **Code:** `404` INTERNAL SERVER ERROR <br>
+  * **Code:** `500` INTERNAL SERVER ERROR <br>
     **Content:** 
     ```json
     {
@@ -249,8 +259,7 @@
 
 * **Data Params**
 
-    `user_uid=[string]` 추가할 사용자 uid, NULL[X] <br>
-    `nickname=[string]` 추가할 사용자 닉네임, NULL[x]
+    `user_uid=[string]` 추가할 사용자 uid, NULL[X]
 
 * **Success Response:**
 
@@ -261,7 +270,14 @@
     ```json
     {
         "success": true,
-        "data": 1,
+        "data": {
+            "user_uid": "sdfgh^&^$%@@#qrwgsh@%%uiukjhht%&iujhgfe%y&iuyhgfd",
+            "email": "test2@naver.com",
+            "nickname": "test2",
+            "portrait": "",
+            "introduction": "",
+            "type": 1
+        },        
         "message": "[CREATE] test1이 test2에게 친구 요청을 보냈습니다."
     }
     ```
@@ -271,7 +287,14 @@
     ```json
     {
         "success": true,
-        "data": 2,
+        "data": {
+            "user_uid": "sdfgh^&^$%@@#qrwgsh@%%uiukjhht%&iujhgfe%y&iuyhgfd",
+            "email": "test2@naver.com",
+            "nickname": "test2",
+            "portrait": "",
+            "introduction": "",
+            "type": 2
+        },
         "message": "[CREATE] test1이 test2의 친구 요청을 수락해서 친구가 되었습니다."
     }
     ```
@@ -295,6 +318,26 @@
         "success": false,
         "data": "NONE",
         "message": "[CREATE] 서로 친구이거나 차단한 사용자입니다."
+    }
+    ```
+
+ * **Code:** `404` NOT FOUND <br>
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "[CREATE] 사용자를 찾을 수 없습니다."
+    }
+    ```
+
+  * **Code:** `500` INTERNAL SERVER ERROR <br>
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "[CREATE] 사용자 조회 과정에서 에러가 발생하였습니다."
     }
     ```
     
@@ -348,8 +391,7 @@
 
 * **Data Params**
 
-    `user_uid=[string]` 거절할 사용자 uid, NULL[X] <br>
-    `nickname=[string]` 거절할 사용자 닉네임, NULL[x]
+    `user_uid=[string]` 거절할 사용자 uid, NULL[X]
 
 * **Success Response:**
 
@@ -358,7 +400,14 @@
     ```json
     {
         "success": true,
-        "data": 0,
+        "data": {
+            "user_uid": "sdfgh^&^$%@@#qrwgsh@%%uiukjhht%&iujhgfe%y&iuyhgfd",
+            "email": "test2@naver.com",
+            "nickname": "test2",
+            "portrait": "",
+            "introduction": "",
+            "type": 0
+        },
         "message": "[REJECT] test1이 test2의 친구 요청을 거절했습니다."
     }
     ```
@@ -395,6 +444,16 @@
     }
     ```
 
+  * **Code:** `404` NOT FOUND <br>
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "[REJECT] 사용자를 찾을 수 없습니다."
+    }
+    ```
+
   * **Code:** `404` NOT FOUND : 친구 요청을 보낸 적도, 받은 적도 없는 경우 <br>
     **Content:**
     ```json
@@ -404,7 +463,17 @@
         "message": "[REJECT] 친구를 찾을 수 없습니다."
     }
     ```
-    
+
+  * **Code:** `500` INTERNAL SERVER ERROR <br>
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "[REJECT] 사용자 조회 과정에서 에러가 발생하였습니다."
+    }
+    ```
+
   * **Code:** `500` INTERNAL SERVER ERROR <br>
     **Content:** 
     ```json
@@ -788,8 +857,7 @@
 
 * **Data Params**
  
-    `user_uid=[string]` 차단할 사용자 uid, NULL[X] <br>
-    `nickname=[string]` 차단할 사용자 닉네임, NULL[x]
+    `user_uid=[string]` 차단할 사용자 uid, NULL[X]
 
 * **Success Response:**
 
@@ -798,8 +866,15 @@
     ```json
     {
         "success": true,
-        "data": 3,
-        "message": "[BLOCK] 성공적으로 test를 차단하였습니다."
+        "data": {
+            "user_uid": "sdfgh^&^$%@@#qrwgsh@%%uiukjhht%&iujhgfe%y&iuyhgfd",
+            "email": "test2@naver.com",
+            "nickname": "test2",
+            "portrait": "",
+            "introduction": "",
+            "type": 3
+        },
+        "message": "[BLOCK] 성공적으로 test1이 test2를 차단하였습니다."
     }
     ```
 
@@ -808,7 +883,14 @@
     ```json
     {
         "success": true,
-        "data": 4,
+        "data": {
+            "user_uid": "sdfgh^&^$%@@#qrwgsh@%%uiukjhht%&iujhgfe%y&iuyhgfd",
+            "email": "test2@naver.com",
+            "nickname": "test2",
+            "portrait": "",
+            "introduction": "",
+            "type": 4
+        },
         "message": "[BLOCK] 성공적으로 test1이 test2를 차단하였습니다."
     }
     ```
@@ -818,8 +900,15 @@
     ```json
     {
         "success": true,
-        "data": 5,
-        "message": "[BLOCK] 성공적으로 test를 차단하였습니다."
+        "data": {
+            "user_uid": "sdfgh^&^$%@@#qrwgsh@%%uiukjhht%&iujhgfe%y&iuyhgfd",
+            "email": "test2@naver.com",
+            "nickname": "test2",
+            "portrait": "",
+            "introduction": "",
+            "type": 5
+        },
+        "message": "[BLOCK] 성공적으로 성공적으로 test1이 test2를 차단하였습니다."
     }
     ```
 
@@ -881,6 +970,16 @@
     {
         "success": false,
         "data": "NONE",
+        "message": "[BLOCK] 사용자 조회 과정에서 에러가 발생하였습니다."
+    }
+    ```
+
+  * **Code:** `500` INTERNAL SERVER ERROR <br>
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
         "message": "[BLOCK] 친구 조회 과정에서 에러가 발생하였습니다."
     }
     ```
@@ -915,8 +1014,7 @@
 
 * **Data Params**
  
-    `user_uid=[string]` 차단 해제할 사용자 uid, NULL[X] <br>
-    `nickname=[string]` 차단 해제할 사용자 닉네임, NULL[x]
+    `user_uid=[string]` 차단 해제할 사용자 uid, NULL[X]
 
 * **Success Response:**
 
@@ -925,7 +1023,14 @@
     ```json
     {
         "success": true,
-        "data": 4,
+        "data": {
+            "user_uid": "sdfgh^&^$%@@#qrwgsh@%%uiukjhht%&iujhgfe%y&iuyhgfd",
+            "email": "test2@naver.com",
+            "nickname": "test2",
+            "portrait": "",
+            "introduction": "",
+            "type": 4
+        },
         "message": "[UNBLOCK] 성공적으로 test1이 test2의 차단을 해제하였습니다."
     }
     ```
@@ -935,7 +1040,14 @@
     ```json
     {
         "success": true,
-        "data": 3,
+        "data": {
+            "user_uid": "sdfgh^&^$%@@#qrwgsh@%%uiukjhht%&iujhgfe%y&iuyhgfd",
+            "email": "test2@naver.com",
+            "nickname": "test2",
+            "portrait": "",
+            "introduction": "",
+            "type": 3
+        },
         "message": "[UNBLOCK] 성공적으로 test1이 test2의 차단을 해제하였습니다."
     }
     ```
@@ -945,7 +1057,14 @@
     ```json
     {
         "success": true,
-        "data": 2,
+        "data": {
+            "user_uid": "sdfgh^&^$%@@#qrwgsh@%%uiukjhht%&iujhgfe%y&iuyhgfd",
+            "email": "test2@naver.com",
+            "nickname": "test2",
+            "portrait": "",
+            "introduction": "",
+            "type": 2
+        },
         "message": "[UNBLOCK] 성공적으로 test1이 test2의 차단을 해제하였습니다."
     }
     ```
@@ -968,7 +1087,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[BLOCK] 친구가 아니므로 차단할 수 없습니다."
+        "message": "[UNBLOCK] 친구가 아니므로 차단 해제할 수 없습니다."
     }
     ```
 
@@ -999,6 +1118,16 @@
         "success": false,
         "data": "NONE",
         "message": "[UNBLOCK] 친구를 찾을 수 없습니다."
+    }
+    ```
+
+  * **Code:** `500` INTERNAL SERVER ERROR <br>
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "[UNBLOCK] 사용자 조회 과정에서 에러가 발생하였습니다."
     }
     ```
 
