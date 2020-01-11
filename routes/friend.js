@@ -384,7 +384,7 @@ router.post('/create', isLoggedIn, async function (req, res, next) {
                                     const result = new Object();
                                     result.success = true;
                                     result.data = searchData;
-                                    result.message = '[CREATE] ' + user_nickname + '이 ' + friend_nickname + '의 친구 요청을 수락해서 친구가 되었습니다.';
+                                    result.message = '[CREATE] ' + user_nickname + '이 ' + searchData.nickname + '의 친구 요청을 수락해서 친구가 되었습니다.';
                                     console.log(result);
                                     return res.status(201).send(result);
                                 }).catch(error => {
