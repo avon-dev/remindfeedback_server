@@ -28,6 +28,9 @@ let result = { // response form
     message: ""
 }
 
+let type = 'portrait';
+let fileSize = 50 * 1024 * 1024;
+
 /* Sign Up API
  * - parameter email
  * - parameter nickname
@@ -77,13 +80,14 @@ router.delete('/unregister', isLoggedIn, async (req, res, next) => {
         }).then(user => { 
             // 사용자 테이블 조회를 성공한 경우
             console.log('[DELETE] 사용자 테이블 조회 성공');
+            let deleteItems = []; // 삭제할 파일명 저장할 배열
             
             // 사진 경로 있으면 기존 파일 삭제
-            //if(user.portrait){fileDelete(user.portrait)}
-            if (user.portrait) { deleteS3Obj(user.portrait) }
+            if (user.portrait) { deleteItems.push({Key:user.portrait})}
 
             let query_select = 'SELECT * FROM boards WHERE fk_feedbackId=ANY(SELECT id FROM feedbacks WHERE user_uid=:user_uid)';
 
+            
             // 게시글 테이블에서 board_id로 검색
             sequelize.query(query_select, {
                 replacements: {
@@ -98,32 +102,20 @@ router.delete('/unregister', isLoggedIn, async (req, res, next) => {
                 if (board[0] != null) {
                     // 게시글 테이블에서 게시글 검색에 성공한 경우
                     console.log('[DELETE] 게시글 검색 성공');
-
-                    /*
-                        ===================================================================================================
-                        ===================================================================================================
-                        TTTTTTTTTTTTTTTTTTTTTTT     OOOOOOOOO                      DDDDDDDDDDDDD             OOOOOOOOO     
-                        T:::::::::::::::::::::T   OO:::::::::OO                    D::::::::::::DDD        OO:::::::::OO   
-                        T:::::::::::::::::::::T OO:::::::::::::OO                  D:::::::::::::::DD    OO:::::::::::::OO 
-                        T:::::TT:::::::TT:::::TO:::::::OOO:::::::O                 DDD:::::DDDDD:::::D  O:::::::OOO:::::::O
-                        TTTTTT  T:::::T  TTTTTTO::::::O   O::::::O                   D:::::D    D:::::D O::::::O   O::::::O
-                                T:::::T        O:::::O     O:::::O                   D:::::D     D:::::DO:::::O     O:::::O
-                                T:::::T        O:::::O     O:::::O                   D:::::D     D:::::DO:::::O     O:::::O
-                                T:::::T        O:::::O     O:::::O ---------------   D:::::D     D:::::DO:::::O     O:::::O
-                                T:::::T        O:::::O     O:::::O -:::::::::::::-   D:::::D     D:::::DO:::::O     O:::::O
-                                T:::::T        O:::::O     O:::::O ---------------   D:::::D     D:::::DO:::::O     O:::::O
-                                T:::::T        O:::::O     O:::::O                   D:::::D     D:::::DO:::::O     O:::::O
-                                T:::::T        O::::::O   O::::::O                   D:::::D    D:::::D O::::::O   O::::::O
-                            TT:::::::TT      O:::::::OOO:::::::O                 DDD:::::DDDDD:::::D  O:::::::OOO:::::::O
-                            T:::::::::T       OO:::::::::::::OO                  D:::::::::::::::DD    OO:::::::::::::OO 
-                            T:::::::::T         OO:::::::::OO                    D::::::::::::DDD        OO:::::::::OO   
-                            TTTTTTTTTTT           OOOOOOOOO                      DDDDDDDDDDDDD             OOOOOOOOO     
-                        ===================================================================================================
-                        TO-DO : S3에서 파일 삭제 코드 추가/테스트 필요함!!
-                        ===================================================================================================
-                        ===================================================================================================
-                    */
+                    board.forEach(element=>{
+                        if(element.board_file1){
+                            deleteItems.push({ Key: element.board_file1 })
+                        }
+                        if(element.board_file2){
+                            deleteItems.push({ Key: element.board_file2 })
+                        }
+                        if(element.board_file3){
+                            deleteItems.push({ Key: element.board_file3 })
+                        }
+                    })
                 }
+                // 삭제할 목록에 있는 파일들 전부 삭제
+                deleteS3Obj(deleteItems);
 
                 let query_update =
                     'UPDATE comments SET deletedAt=NOW() WHERE fk_user_uid=:user_uid; ' +
