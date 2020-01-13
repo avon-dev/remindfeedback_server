@@ -487,7 +487,7 @@
 
 * **URL**
 
-  http://54.180.118.35/feedback/feedback_id
+  `http://54.180.118.35/feedback/feedback_id`
 
 * **Method:**
 
@@ -495,33 +495,60 @@
   
 *  **URL Params**
 
-   **Required:**
- 
-    * `feedback_id` 피드백 ID
+  `feedback_id` 피드백 ID
 
 * **Data Params**
 
-    **Required:**
-    NONE
-
-    <!--필요한 form field 명시 + 설명-->
-
+  `NONE`
 
 * **Success Response:**
 
-  * **Code:** 200
-    **Content:** 성공여부 및 삭제된 피드백 id
- <br />
+  * **Code:** `200` SUCCESS : 피드백을 삭제한 경우 삭제한 피드백 아이디 반환 <br>
+    **Content:** 
+    ```json
+    {
+        "success": true,
+        "data": 1,
+        "message": "[DELETE] 성공적으로 피드백을 삭제했습니다."
+    }
+    ```
 
-* **Sample request JSON data:**
-  ```json
-  {
-    "feedback_id" : 9,
-    "headers": {
-      "Content-Type": "application/json",
-    },
-    "cookie": {
-      "connect.sid": "s%3AfxZgKcirzD_d0zAHVTEnf9DQu9FVI2rO.Ijf7scJ%2Buj6YtprVUB6Vcuf1QVNXDIR64MP43366CaQ",
-    },
-  }
-  ```
+  * **Code:** `403` FORBIDDEN : 본인이 작성한 피드백이 아닌 경우<br>
+    **Content:**
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "[DELETE] 내가 작성한 피드백이 아닙니다."
+    }
+    ```
+
+  * **Code:** `404` NOT FOUND <br>
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "[DELETE] 피드백을 찾을 수 없습니다."
+    }
+    ```
+
+  * **Code:** `500` INTERNAL SERVER ERROR <br>
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "[DELETE] 피드백 조회 과정에서 에러가 발생하였습니다."
+    }
+    ```
+
+  * **Code:** `500` INTERNAL SERVER ERROR <br>
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "[DELETE] 피드백 삭제 실행 과정에서 에러가 발생하였습니다."
+    }
+    ```

@@ -1,48 +1,14 @@
 const express = require('express');
 const { Board } = require('../../models');
 const { isLoggedIn, isNotLoggedIn } = require('../middlewares'); 
-const AWS = require('aws-sdk');
-const multerS3 = require('multer-s3');
-const multer = require('multer');
-const path = require('path');
+const {deleteS3Obj, upload_s3_test} = require('../S3');
 
 const router = express.Router();
 
-AWS.config.update({
-    //서울리전
-    region: 'ap-northeast-2',
-    accessKeyId: process.env.S3_ACCESS_KEY_ID,
-    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
-})
+let type = 'picture';
+let fileSize = 50 * 1024 * 1024;
 
-const S3 = new AWS.S3();
-
-const upload = multer({ //멀터를 사용하면 upload 객체를 받을 수 있다.
-    storage: multerS3({ 
-        s3: new AWS.S3(),
-        bucket: 'remindfeedback',
-        key(req, file, cb) {
-            cb(null, `picture/${+new Date()}${path.basename(file.originalname)}`); //picture 폴더의 시간+파일이름
-        }
-    }),
-    limits: { fileSize: 50 * 1024 * 1024 }, //파일 사이즈 (5mb)
-});
-
-const filedelete = (deleteItems) => {
-    console.log(deleteItems);
-    let params = {
-        Bucket: 'remindfeedback',
-        Delete: {
-            Objects: deleteItems,
-        }
-    };
-    S3.deleteObjects(params, function(err, data) {
-        if (err) console.log(err)
-        else console.log("Successfully deleted remindfeedback");
-    })
-}
-
-router.post('/create', isLoggedIn, upload.fields([{ name: 'file1' }, { name: 'file2' }, { name: 'file3' }]), async (req, res, next) => {
+router.post('/create', isLoggedIn, upload_s3_test(type, fileSize).fields([{ name: 'file1' }, { name: 'file2' }, { name: 'file3' }]), async (req, res, next) => {
     try{
         const { feedback_id, board_title, board_content } = req.body;
         console.log(req.files)
@@ -87,7 +53,7 @@ router.post('/create', isLoggedIn, upload.fields([{ name: 'file1' }, { name: 'fi
     }
 });
 
-router.put('/update/:board_id', isLoggedIn, upload.fields([{ name: 'file1' }, { name: 'file2' }, { name: 'file3' }]), async (req, res, next) => {
+router.put('/update/:board_id', isLoggedIn, upload_s3_test(type, fileSize).fields([{ name: 'file1' }, { name: 'file2' }, { name: 'file3' }]), async (req, res, next) => {
     try{
         const board_id = req.params.board_id;
         const { board_title, board_content, updatefile1, updatefile2, updatefile3 } = req.body; 
@@ -123,7 +89,7 @@ router.put('/update/:board_id', isLoggedIn, upload.fields([{ name: 'file1' }, { 
             if(req.files.file3)tempBoard.board_file3 = await req.files.file3[0].key
             else{tempBoard.board_file3 = null}
         }
-        await filedelete(deleteItems);
+        await deleteS3Obj(deleteItems);
         //업데이트
         await Board.update({
             board_title:tempBoard.board_title, board_content:tempBoard.board_content,
@@ -151,7 +117,7 @@ router.put('/update/:board_id', isLoggedIn, upload.fields([{ name: 'file1' }, { 
     }
 });
 
-router.patch('/files/:board_id', isLoggedIn, upload.fields([{ name: 'file1' }, { name: 'file2' }, { name: 'file3' }]), async (req, res, next) => {
+router.patch('/files/:board_id', isLoggedIn, upload_s3_test(type, fileSize).fields([{ name: 'file1' }, { name: 'file2' }, { name: 'file3' }]), async (req, res, next) => {
     try{
         const board_id = req.params.board_id;
         const { updatefile1, updatefile2, updatefile3 } = req.body; 
@@ -180,7 +146,7 @@ router.patch('/files/:board_id', isLoggedIn, upload.fields([{ name: 'file1' }, {
             if(req.files.file3)tempBoard.board_file3 = await req.files.file3[0].key
             else{tempBoard.board_file3 = null}
         }
-        await filedelete(deleteItems);
+        await deleteS3Obj(deleteItems);
         //업데이트
         await Board.update({
             board_file1: tempBoard.board_file1,

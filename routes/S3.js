@@ -4,12 +4,6 @@ const fs = require('fs');
 const AWS = require('aws-sdk');
 const multerS3 = require('multer-s3');
 
-let result = {
-    success: true,
-    data: 'NONE',
-    message: ""
-}
-
 AWS.config.update({
     //서울리전
     region: 'ap-northeast-2',
@@ -17,19 +11,40 @@ AWS.config.update({
     secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
 })
 
-// multer_S3 설정 
-exports.upload_s3 = multer({ //멀터를 사용하면 upload 객체를 받을 수 있다.
+exports.upload_s3_test = (type, fileSize) => multer({ //멀터를 사용하면 upload 객체를 받을 수 있다.
     storage: multerS3({ 
         s3: new AWS.S3(),
         bucket: 'remindfeedback',
         key(req, file, cb) {
-            cb(null, `portrait/${+new Date()}${path.basename(file.originalname)}`); //picture 폴더의 시간+파일이름
+            cb(null, `${type}/${+new Date()}${path.basename(file.originalname)}`); //picture 폴더의 시간+파일이름
         }
     }),
-    limits: { fileSize: 50 * 1024 * 1024 }, //파일 사이즈 (5mb)
+    limits: { fileSize: fileSize }, //파일 사이즈 (5mb)
 });
-// multer_S3 설정 
 
+exports.deleteS3Obj = (deleteItems)=>{
+    console.log(deleteItems);
+    const s3 = new AWS.S3();
+    deleteItems.forEach(element => { //삭제 리스트 받아서 하나씩 검사
+        let params = {
+            Bucket: "remindfeedback",
+            Key: element.Key
+        };
+        let filename = element.Key; // 삭제할 파일 이름
+        s3.headObject(params, (err, data)=>{
+            if(err) return console.log(`파일 찾기 오류: ${err}`);
+            console.log(`파일 있음: ${filename}`);
+            s3.deleteObject(params, (err, data)=>{
+                if(err) { 
+                    console.log(`파일 삭제 오류: ${err}`);
+                }
+                console.log(`파일 삭제 완료: ${filename}`);
+            });
+        });
+    });
+};
+
+// 로컬 디스크 관련
 // multer 설정 (디스크)
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -56,22 +71,4 @@ exports.fileDelete = (filename)=>{
             })
          }
         });
-};
-
-exports.deleteS3Obj = (key)=>{
-    const params = {
-        Bucket: "remindfeedback",
-        Key: key
-    };
-    const s3 = new AWS.S3();
-    s3.headObject(params, (err, data)=>{
-        if(err) console.log(`파일 찾기 오류: ${err}`);
-        console.log(`파일 있음: ${data}`);
-        s3.deleteObject(params, (err, data)=>{
-            if(err) { 
-                console.log(`파일 삭제 오류: ${err}`);
-            }
-            console.log(`파일 삭제 완료: ${data}`);
-        });
-    });
 };
