@@ -1,8 +1,10 @@
-## About Board
 ----
+## About Board
   <_게시물 (가져오기, 삭제, 수정)_>
 
 
+
+----
 **GET All Board**
 ----
 
@@ -63,14 +65,14 @@
   ```
 
 
-----
+
 **Delete Board**
 ----
-게시물 삭제
+게시글 삭제
 
 * **URL**
 
-  http://54.180.118.35/board/(board_id)
+  `http://54.180.118.35/board/(board_id)`
 
 * **Method:**
 
@@ -78,37 +80,63 @@
   
 *  **URL Params**
 
-   **Required:**
- 
-    * `board_id` 게시물 ID
+  `board_id` 게시글 ID, NULL[X]
 
 * **Data Params**
 
-    **Required:**
-    NONE
-
-    <!--필요한 form field 명시 + 설명-->
-
+  `NONE`
 
 * **Success Response:**
 
-  * **Code:** 200 
-    **Content:** 성공여부 및 삭제된 피드백 id
- <br />
+  * **Code:** `200` SUCCESS : 게시글을 삭제한 경우 삭제한 게시글 아이디 반환 <br>
+    **Content:** 
+    ```json
+    {
+        "success": true,
+        "data": 1,
+        "message": "[DELETE] 성공적으로 게시글을 삭제했습니다."
+    }
+    ```
 
-* **Sample request JSON data:**
-  ```json
-  {
-    "headers": {
-      "Content-Type": "application/json",
-    },
-    "cookie": {
-      "connect.sid": "s%3AfxZgKcirzD_d0zAHVTEnf9DQu9FVI2rO.Ijf7scJ%2Buj6YtprVUB6Vcuf1QVNXDIR64MP43366CaQ",
-    },
-    "board_id" : 9,
-  }
-  ```
+  * **Code:** `403` FORBIDDEN : 본인이 작성한 게시글이 아닌 경우<br>
+    **Content:**
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "[DELETE] 내가 작성한 게시글이 아닙니다."
+    }
+    ```
 
+  * **Code:** `404` NOT FOUND <br>
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "[DELETE] 게시글을 찾을 수 없습니다."
+    }
+    ```
+
+  * **Code:** `500` INTERNAL SERVER ERROR <br>
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "[DELETE] 게시글 조회 과정에서 에러가 발생하였습니다."
+    }
+    ```
+
+  * **Code:** `500` INTERNAL SERVER ERROR <br>
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "[DELETE] 게시글 삭제 실행 과정에서 에러가 발생하였습니다."
+    }
+    ```
 
 
 ----

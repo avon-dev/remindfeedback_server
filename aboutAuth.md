@@ -19,7 +19,6 @@
 
 
 
-
 **SignUp**
 ----
   클라이언트로부터 JSON 형식의 유저 정보를 받아 새로운 유저 생성 후 생성된 유저의 정보를 JSON 형태로 반환.
@@ -235,13 +234,16 @@
   }
   ```
 
+
+
+----
 **Unregister**
 ----
-  로그인 된 유저의 사용자정보 조회 후 프로필 사진 및 User테이블 destroy 후 성공 메시지 반환
+  로그인 한 유저의 데이터 삭제, 연관 테이블 업데이트 후 회원 탈퇴
 
 * **URL**
 
-  http://54.180.118.35/auth/unregister
+  `http://54.180.118.35/auth/unregister`
 
 * **Method:**
 
@@ -249,28 +251,50 @@
   
 *  **URL Params**
 
-   **Required:**
- 
-   None
+  `NONE`
 
 * **Data Params**
 
-    **Required:**
-    
-    None
+  `NONE`
    
 * **Success Response:**
 
-  * **Code:** 200 <br />
-    **Content:** 회원 한 명의 모든 정보 삭제
-        <!--회원정보 JSON 그대로 들어감-->
- 
+  * **Code:** `200` SUCCESS : 피드백을 삭제한 경우 삭제한 피드백 아이디 반환 <br>
+    **Content:** 
+    ```json
+    {
+        "success": true,
+        "data": 1,
+        "message": "[DELETE] 성공적으로 회원 탈퇴를 하였습니다."
+    }
+    ```
 
-* **Sample JSON data:**
-  ```json
-  {
-    "success": true,
-    "data": 0,
-    "message": "[200 OK] 회원 탈퇴 성공"
-  }
-  ```
+  * **Code:** `500` INTERNAL SERVER ERROR <br>
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "[DELETE] 사용자 조회 과정에서 에러가 발생하였습니다."
+    }
+    ```
+
+  * **Code:** `500` INTERNAL SERVER ERROR <br>
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "[DELETE] 게시글 조회 과정에서 에러가 발생하였습니다."
+    }
+    ```
+
+  * **Code:** `500` INTERNAL SERVER ERROR <br>
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "[DELETE] 회원 탈퇴 실행 과정에서 에러가 발생하였습니다."
+    }
+    ```

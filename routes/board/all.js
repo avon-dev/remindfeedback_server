@@ -1,29 +1,45 @@
 const express = require('express');
 const { Feedback, Board, Sequelize: { Op } } = require('../../models');
-const { isLoggedIn } = require('../middlewares'); 
+const { isLoggedIn } = require('../middlewares');
 const router = express.Router();
-const {deleteS3Obj, upload_s3_test} = require('../S3');
+const { deleteS3Obj, upload_s3_test } = require('../S3');
 
-router.get('/selectone/:board_id', async(req, res, next)=>{
+const Sequelize = require('sequelize');
+const env = process.env.NODE_ENV || 'development';
+const config = require(__dirname + '/../../config/config.json')[env];
+
+let sequelize;
+if (config.use_env_variable) {
+    sequelize = new Sequelize(process.env[config.use_env_variable], config);
+} else {
+    sequelize = new Sequelize(
+        config.database,
+        config.username,
+        config.password,
+        config
+    );
+}
+
+router.get('/selectone/:board_id', async (req, res, next) => {
     let board_id = parseInt(req.params.board_id);
     let result = {
         success: true,
         data: '',
         message: ""
     }
-    try{
+    try {
         const exBoard = await Board.findAll({
-            where: {id: board_id},
-            include:[{
+            where: { id: board_id },
+            include: [{
                 model: Feedback,
                 attributes: ['user_uid', 'adviser_uid']
             }]
-        }).then(board=>{
+        }).then(board => {
             result.data = board;
             return res.status(200).json(result);
         })
 
-    }catch(e){
+    } catch (e) {
         let result = {
             success: false,
             data: '',
@@ -38,28 +54,28 @@ router.get('/selectone/:board_id', async(req, res, next)=>{
 /* getfeedback API
  */
 router.get('/:feedbackid/:lastid', isLoggedIn, async (req, res, next) => {
-    try{
+    try {
         let feedbackid = parseInt(req.params.feedbackid);
         let lastid = parseInt(req.params.lastid);
-        if(lastid === 0){
+        if (lastid === 0) {
             lastid = 9999;
         }
         console.log('AllBoard 요청', lastid);
         let boardList;
-        
+
         boardList = await Board.findAll({
-            where: {id: { [Op.lt]:lastid}, fk_feedbackId: feedbackid},
+            where: { id: { [Op.lt]: lastid }, fk_feedbackId: feedbackid },
             order: [['id', 'DESC']],
             limit: 10,
         })
-        
+
         let result = {
             success: true,
             data: boardList,
             message: ""
         }
         res.status(200).json(result);
-    } catch(e){
+    } catch (e) {
         let result = {
             success: false,
             data: '',
@@ -71,40 +87,138 @@ router.get('/:feedbackid/:lastid', isLoggedIn, async (req, res, next) => {
     }
 });
 
-
 router.delete('/:board_id', isLoggedIn, async (req, res, next) => {
-    try{
+    try {
+        console.log('[DELETE] 게시글 삭제 요청');
+
+        const user_uid = req.user.user_uid;
         let board_id = parseInt(req.params.board_id);
-        console.log('Board 삭제 요청', board_id);
+        let query_select =
+        'SELECT DISTINCT f.user_uid, b.* ' +
+        'FROM boards AS b, feedbacks AS f ' +
+        'WHERE b.id = :board_id ' +
+        'AND b.deletedAt IS NULL';
 
-        const beforeBoard = await Board.findOne({
-            where: {id:board_id},
+        // 게시글 테이블에서 board_id로 검색
+        sequelize.query(query_select, {
+            replacements: {
+                board_id: board_id
+            },
+            type: Sequelize.QueryTypes.SELECT,
+            raw: true
+        }).then((board) => {
+            // 게시글 테이블 조회를 성공한 경우
+            console.log('[DELETE] 게시글 테이블 조회 성공');
+
+            if (board[0] == null) {
+                // 게시글 테이블에서 게시글 검색에 실패한 경우
+                console.log('[DELETE] 게시글 검색 실패');
+
+                const result = new Object();
+                result.success = false;
+                result.data = 'NONE';
+                result.message = '[DELETE] 게시글을 찾을 수 없습니다.';
+                console.log(result);
+                return res.status(404).send(result);
+            } else {
+                // 게시글 테이블에서 게시글 검색에 성공한 경우
+                console.log('[DELETE] 게시글 검색 성공');
+
+                if (user_uid != board[0].user_uid) {
+                    // 본인이 작성한 게시글이 아닌 경우
+
+                    const result = new Object();
+                    result.success = false;
+                    result.data = 'NONE';
+                    result.message = '[DELETE] 내가 작성한 게시글이 아닙니다.';
+                    console.log(result);
+                    return res.status(403).send(result);
+                } else {
+                    // 본인이 작성한 게시글인 경우
+                    /*
+                    ===================================================================================================
+                    ===================================================================================================
+                    TTTTTTTTTTTTTTTTTTTTTTT     OOOOOOOOO                      DDDDDDDDDDDDD             OOOOOOOOO     
+                    T:::::::::::::::::::::T   OO:::::::::OO                    D::::::::::::DDD        OO:::::::::OO   
+                    T:::::::::::::::::::::T OO:::::::::::::OO                  D:::::::::::::::DD    OO:::::::::::::OO 
+                    T:::::TT:::::::TT:::::TO:::::::OOO:::::::O                 DDD:::::DDDDD:::::D  O:::::::OOO:::::::O
+                    TTTTTT  T:::::T  TTTTTTO::::::O   O::::::O                   D:::::D    D:::::D O::::::O   O::::::O
+                            T:::::T        O:::::O     O:::::O                   D:::::D     D:::::DO:::::O     O:::::O
+                            T:::::T        O:::::O     O:::::O                   D:::::D     D:::::DO:::::O     O:::::O
+                            T:::::T        O:::::O     O:::::O ---------------   D:::::D     D:::::DO:::::O     O:::::O
+                            T:::::T        O:::::O     O:::::O -:::::::::::::-   D:::::D     D:::::DO:::::O     O:::::O
+                            T:::::T        O:::::O     O:::::O ---------------   D:::::D     D:::::DO:::::O     O:::::O
+                            T:::::T        O:::::O     O:::::O                   D:::::D     D:::::DO:::::O     O:::::O
+                            T:::::T        O::::::O   O::::::O                   D:::::D    D:::::D O::::::O   O::::::O
+                          TT:::::::TT      O:::::::OOO:::::::O                 DDD:::::DDDDD:::::D  O:::::::OOO:::::::O
+                          T:::::::::T       OO:::::::::::::OO                  D:::::::::::::::DD    OO:::::::::::::OO 
+                          T:::::::::T         OO:::::::::OO                    D::::::::::::DDD        OO:::::::::OO   
+                          TTTTTTTTTTT           OOOOOOOOO                      DDDDDDDDDDDDD             OOOOOOOOO     
+                    ===================================================================================================
+                    TO-DO : S3에서 파일 삭제 테스트 필요함!!!!!!
+                    ===================================================================================================
+                    */
+                    // S3에서 게시글 삭제
+                    let deleteItems = [];
+
+                    if (board[0].board_file1) {
+                        deleteItems.push({ Key: board.board_file1 })
+                    }
+                    if (board[0].board_file2) {
+                        deleteItems.push({ Key: board.board_file2 })
+                    }
+                    if (board[0].board_file3) {
+                        deleteItems.push({ Key: board.board_file3 })
+                    }
+                    deleteS3Obj(deleteItems);
+
+                    let query_update =
+                        'UPDATE comments SET deletedAt=NOW() WHERE fk_board_id=:board_id; ' +
+                        'UPDATE boards SET deletedAt=NOW() WHERE board_id=:board_id';
+
+                    // DB에서 게시글 삭제
+                    sequelize.query(query_update, {
+                        replacements: {
+                            board_id: board_id
+                        },
+                        type: Sequelize.QueryTypes.update,
+                        raw: true
+                    }).then(() => {
+                        // 정상적으로 게시글 삭제 쿼리를 수행한 경우
+                        console.log('[DELETE] 게시글 삭제 성공');
+            
+                        // 친구 차단 목록을 그대로 리턴
+                        const result = new Object();
+                        result.success = true;
+                        result.data = board_id;
+                        result.message = '[DELETE] 성공적으로 게시글을 삭제했습니다.';
+                        console.log(result);
+                        return res.status(200).send(result);
+                    }).catch(error => {
+                        // 삭제 쿼리 실행을 실패한 경우
+                        console.log('[DELETE] 게시글 삭제 쿼리 실행 실패', error);
+            
+                        const result = new Object();
+                        result.success = false;
+                        result.data = 'NONE';
+                        result.message = '[DELETE] 게시글 삭제 실행 과정에서 에러가 발생하였습니다.';
+                        console.log(result);
+                        return res.status(500).send(result);
+                    });
+                }
+            }
+        }).catch(error => {
+            // 게시글 테이블 조회를 실패한 경우
+            console.log('[DELETE] 게시글 테이블 조회 실패', error);
+
+            const result = new Object();
+            result.success = false;
+            result.data = 'NONE';
+            result.message = '[DELETE] 게시글 조회 과정에서 에러가 발생하였습니다.';
+            console.log(result);
+            return res.status(500).send(result);
         });
-
-        let deleteItems = [];
-
-        if(beforeBoard.board_file1){
-            await deleteItems.push({Key:beforeBoard.board_file1})
-        }
-        if(beforeBoard.board_file2){
-            await deleteItems.push({Key:beforeBoard.board_file2})
-        }
-        if(beforeBoard.board_file3){
-            await deleteItems.push({Key:beforeBoard.board_file3})
-        }
-        await deleteS3Obj(deleteItems);
-        
-        await Board.destroy({
-            where: {id: board_id},
-        })
-        
-        let result = {
-            success: true,
-            data: board_id,
-            message: "삭제되었습니다"
-        }
-        res.status(200).json(result);
-    } catch(e){
+    } catch (e) {
         let result = {
             success: false,
             data: '',
@@ -117,21 +231,21 @@ router.delete('/:board_id', isLoggedIn, async (req, res, next) => {
 });
 
 router.patch('/board_title/:board_id', isLoggedIn, async (req, res, next) => {
-    try{
+    try {
         const board_id = req.params.board_id;
-        const { board_title } = req.body; 
+        const { board_title } = req.body;
         console.log('board board_title 수정', board_title);
         const update = await Board.update({
             board_title
-        }, {where: {id:board_id}})
-        const data = await Board.findOne({where:{id:board_id}})
+        }, { where: { id: board_id } })
+        const data = await Board.findOne({ where: { id: board_id } })
         let result = {
             success: true,
             data,
             message: 'board update 성공'
         }
         res.status(200).json(result);
-    } catch(e){
+    } catch (e) {
         let result = {
             success: false,
             data: '',
@@ -144,21 +258,21 @@ router.patch('/board_title/:board_id', isLoggedIn, async (req, res, next) => {
 });
 
 router.patch('/board_content/:board_id', isLoggedIn, async (req, res, next) => {
-    try{
+    try {
         const board_id = req.params.board_id;
-        const { board_content } = req.body; 
+        const { board_content } = req.body;
         console.log('board board_content 수정', board_content);
         const update = await Board.update({
             board_content
-        }, {where: {id:board_id}})
-        const data = await Board.findOne({where:{id:board_id}})
+        }, { where: { id: board_id } })
+        const data = await Board.findOne({ where: { id: board_id } })
         let result = {
             success: true,
             data,
             message: 'board update 성공'
         }
         res.status(200).json(result);
-    } catch(e){
+    } catch (e) {
         let result = {
             success: false,
             data: '',
