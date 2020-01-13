@@ -5,12 +5,13 @@ const passport = require('passport');
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares'); 
 const router = express.Router();
 const {deleteS3Obj, upload_s3} = require('./S3');
+let { result_ok, result_err } = require('./response');
 
-let result = { // response form
-    success: true,
-    data: '',
-    message: ""
-}
+// let result = { // response form
+//     success: true,
+//     data: '',
+//     message: ""
+// }
 
 /* Sign Up API
  * - parameter email
@@ -24,7 +25,7 @@ router.post('/signup', async (req, res, next) => {
 
         const exUser = await User.findOne({where: { email } });
         if(exUser) {
-            return res.status(201).json( {msg:'이미 가입된 이메일 입니다.'});
+            return res.status(201).json(result_err('', 'ERR: [403 FORBIDDEN] 이미 가입된 이메일 입니다.'));
         }
         const uid = await bcrypt.hash(email, 12);
         const pw = await bcrypt.hash(password, 12);
@@ -40,10 +41,14 @@ router.post('/signup', async (req, res, next) => {
     
         // let text = {password,pw}
         console.log('newUser',newUser.nickname);
-        res.status(201).json(newUser);
+        result_ok.data = newUser;
+        result_ok.message = '[201 CREATED] '+ newUser.nickname+ '님 회원가입 완료되었습니다.';
+        res.status(201).json(result_ok);
     } catch(e){
+        result_err.message = 'ERR: [500 SERVER] auth.js/signup/~catch';
+        result_err.data = e;
         console.error(e);
-        return next(e);
+        return next(result_err);
     }
 });
 
@@ -62,22 +67,19 @@ router.delete('/unregister',isLoggedIn, async (req, res, next)=>{
             if(user.portrait){deleteS3Obj(user.portrait)}
         });
 
-        await User.destroy({
+        const destroyedUser = await User.destroy({
             where: {user_uid: user_uid}
-        });
-        result.data = await User.destroy({
-            where: {user_uid: user_uid}
-        }); // 유저 삭제 내역 반환
-        result.success = true;
-        result.message = "[200 OK] 회원 탈퇴 성공";
-        console.log(`Delete One User's all information.`, JSON.stringify(result));
-        return res.status(200).json(result);
+        });// 유저 삭제 내역 반환
+        console.log(`Delete One User's all information.`);
+
+        result_ok.data = destroyedUser;
+        result_ok.message = '[200 OK] 회원 탈퇴 성공';
+        return res.status(200).json(result_ok);
     }catch(e){
-        result.success = false;
-        result.message = e;
-        res.status(500).json(result);
+        result_err.message = 'ERR: [500 SERVER] auth.js/unregister/~catch';
+        result_err.data = e;
         console.error(e);
-        return next(e);
+        return next(result_err);
     }
 });
 
@@ -86,15 +88,20 @@ router.post('/login', async (req, res, next) => {
         passport.authenticate('local', (authError, user, info) => { //done(에러, 성공, 실패)
             if (authError) {
               console.error(authError);
-              return next(authError);
+              result_err.message = 'ERR: [500 SERVER] auth.js/login/authError';
+              result_err.data = authError;
+              return next(result_err);
             }
             if (!user) {
-                return res.status(201).send(info.message);
+                result_err.message = 'ERR: [404 NOT FOUND] 가입되지 않은 회원입니다.'
+                return res.status(404).send(result_err);
             }
             return req.login(user, (loginError) => { // req.user 사용자 정보가 들어있다.
                 if (loginError) {
+                    result_err.message = 'ERR: [403 FORBIDDEN] 비밀번호가 일치하지 않습니다.'
+                    result_err.data = loginError;
                     console.error(loginError);
-                    return next(loginError);
+                    return next(result_err);
                 }
                 if(user.tutorial === false){
                     User.update({tutorial:true},{where:{user_uid:user.user_uid}});
@@ -106,13 +113,17 @@ router.post('/login', async (req, res, next) => {
                     nickname: user.nickname,
                     tutorial: user.tutorial,
                 }
+                result_ok.data = jsonuser;
+                result_ok.message = '[200 OK] 로그인 성공하였습니다.'
                 return res.status(201).json(jsonuser);
             });
         })(req, res, next); // 미들웨어 내의 미들웨어에는 (req, res, next)를 붙입니다.
 
     } catch(e){
+        result_err.message = 'ERR: [500 SERVER] auth.js/login/~catch';
+        result_err.data = e;
         console.error(e);
-        return next(e);
+        return next(result_err);
     }
 });
 
@@ -126,17 +137,22 @@ router.get('/me', isLoggedIn, async (req,res,next) => {
             introduction: user.introduction,
             tutorial: user.tutorial,
         }
-        res.status(201).json(sendUser);
+        result_ok.data = sendUser;
+        result_ok.message = '[200 OK] 내 정보 조회 성공'
+        return res.status(200).json(result_ok);
     } catch(e){
+        result_err.message = 'ERR: [500 SERVER] auth.js/me/~catch';
+        result_err.data = e;
         console.error(e);
-        return next(e);
+        return next(result_err);
     }
   }
 );
 
 router.get('/logout', isLoggedIn, (req, res) => {
     req.logout();
-    res.status(200).json('logout');
+    result_ok.message = '[200 OK] 로그아웃 완료'
+    res.status(200).json(result_ok);
 })
 
 module.exports = router;
