@@ -155,12 +155,15 @@ exports.NewCommentNotice = async(req, res, next, comment) => {
         const board = await findboard(comment.fk_board_id);
         const feedback = await findfeedback(board.fk_feedbackId);
 
+        let receiver = await feedback.adviser_uid;
+        if(uid === receiver) {receiver = feedback.user_uid};
+
         await Notice.create({
             sender_uid: req.user.user_uid,
             type: '3.2',
             data: `${board.fk_feedbackId}.${board.id}.${comment.id}`,
             text: `${finduser(uid)} 님이 게시물에 댓글을 등록 했습니다`,
-            receiver_uid: feedback.adviser_uid,
+            receiver_uid: receiver,
             read_date: null,
         })
     }catch(e){
@@ -212,7 +215,7 @@ exports.OkCompleteNotice = async(req, res, next, feedback) => {
             type: '3.2',
             data: `${feedback.id}.0.0`,
             text: `${finduser(uid)} 님이 피드백 완료 요청을 수락했습니다.`,
-            receiver_uid: feedback.adviser_uid,
+            receiver_uid: feedback.user_uid,
             read_date: null,
         })
     }catch(e){
@@ -238,7 +241,7 @@ exports.NoCompleteNotice = async(req, res, next, feedback) => {
             type: '3.3',
             data: `${feedback.id}.0.0`,
             text: `${finduser(uid)} 님이 피드백 완료 요청을 거절했습니다.`,
-            receiver_uid: feedback.adviser_uid,
+            receiver_uid: feedback.user_uid,
             read_date: null,
         })
     }catch(e){
