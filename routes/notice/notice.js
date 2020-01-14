@@ -2,7 +2,8 @@ const express = require('express');
 const { Notice, Sequelize: { Op } } = require('../../models');
 const { isLoggedIn } = require('../middlewares'); 
 const router = express.Router();
-
+const moment = require('moment');
+moment.tz.setDefault("Asia/Seoul");
 
 router.get('/:lastid/:limit', isLoggedIn, async (req, res, next) => {
     try{
@@ -38,6 +39,34 @@ router.get('/:lastid/:limit', isLoggedIn, async (req, res, next) => {
     }
 });
 
+router.post('/', isLoggedIn, async (req, res, next) => {
+    try{
+        const useruid = req.user.user_uid;
+        const { notice_id } = req.body;
+        console.log('알림 확인', notice_id);
+
+        let noticeList = await Notice.update({
+            read_date: moment().format('YYYY-MM-DD HH:mm:ss')
+         },{ where: {id: { [Op.lt]:lastid}, receiver_uid: useruid},
+        })
+        
+        let result = {
+            success: true,
+            data: noticeList,
+            message: ""
+        }
+        res.status(200).json(result);
+    } catch(e){
+        let result = {
+            success: false,
+            data: '',
+            message: e
+        }
+        res.status(500).json(result);
+        console.error(e);
+        return next(e);
+    }
+});
 
 router.delete('/:notice_id', isLoggedIn, async (req, res, next) => {
     try{
