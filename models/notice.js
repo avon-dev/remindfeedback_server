@@ -13,6 +13,10 @@ module.exports = (sequelize, DataTypes) => (
             type: DataTypes.STRING,
             allowNull: true,
         }, 
+        text: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        }, 
         receiver_uid: {
             type: DataTypes.STRING,
             allowNull: true
