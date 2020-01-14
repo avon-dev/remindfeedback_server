@@ -212,7 +212,7 @@ exports.OkCompleteNotice = async(req, res, next, feedback) => {
 
         await Notice.create({
             sender_uid: req.user.user_uid,
-            type: '3.2',
+            type: '4.2',
             data: `${feedback.id}.0.0`,
             text: `${finduser(uid)} 님이 피드백 완료 요청을 수락했습니다.`,
             receiver_uid: feedback.user_uid,
@@ -238,7 +238,7 @@ exports.NoCompleteNotice = async(req, res, next, feedback) => {
 
         await Notice.create({
             sender_uid: req.user.user_uid,
-            type: '3.3',
+            type: '4.3',
             data: `${feedback.id}.0.0`,
             text: `${finduser(uid)} 님이 피드백 완료 요청을 거절했습니다.`,
             receiver_uid: feedback.user_uid,
