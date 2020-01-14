@@ -12,14 +12,14 @@ router.post('/create', isLoggedIn, upload_s3_test(type, fileSize).single('record
     try{
         const { feedback_id, board_title, board_content } = req.body;
         console.log(req.file)
-        console.log('게시물 영상 생성', feedback_id, board_title, board_content);
+        console.log('게시물 음성 생성', feedback_id, board_title, board_content);
         let file;
         if(req.file)file = await req.file.key;
 
         const exBoard = await Board.create({
             board_title,
             board_content,
-            board_category: 2,
+            board_category: 3,
             fk_feedbackId: feedback_id,
             board_file1: file,
         });

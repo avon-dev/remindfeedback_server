@@ -1,9 +1,10 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const { User, Feedback, Sequelize: { Op } } = require('../models');
+const { User, Feedback, Board, Sequelize: { Op } } = require('../models');
 const passport = require('passport');
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
 const router = express.Router();
+const { deleteS3Obj, upload_s3_test } = require('./S3');
 
 const Sequelize = require('sequelize');
 const env = process.env.NODE_ENV || 'development';
@@ -362,9 +363,10 @@ router.delete('/:feedback_id', isLoggedIn, async (req, res, next) => {
             where: {
                 id: feedback_id
             }
-        }).then((feedback) => {
+        }).then(async(feedback) => {
             // 피드백 테이블 조회를 성공한 경우
             console.log('[DELETE] 피드백 테이블 조회 성공');
+            console.log(feedback);
 
             if (feedback == null) {
                 // 피드백 테이블에서 피드백 검색에 실패한 경우
@@ -391,31 +393,31 @@ router.delete('/:feedback_id', isLoggedIn, async (req, res, next) => {
                     return res.status(403).send(result);
                 } else {
                     // 본인이 작성한 피드백인 경우
-                    /*
-                    ===================================================================================================
-                    ===================================================================================================
-                    TTTTTTTTTTTTTTTTTTTTTTT     OOOOOOOOO                      DDDDDDDDDDDDD             OOOOOOOOO     
-                    T:::::::::::::::::::::T   OO:::::::::OO                    D::::::::::::DDD        OO:::::::::OO   
-                    T:::::::::::::::::::::T OO:::::::::::::OO                  D:::::::::::::::DD    OO:::::::::::::OO 
-                    T:::::TT:::::::TT:::::TO:::::::OOO:::::::O                 DDD:::::DDDDD:::::D  O:::::::OOO:::::::O
-                    TTTTTT  T:::::T  TTTTTTO::::::O   O::::::O                   D:::::D    D:::::D O::::::O   O::::::O
-                            T:::::T        O:::::O     O:::::O                   D:::::D     D:::::DO:::::O     O:::::O
-                            T:::::T        O:::::O     O:::::O                   D:::::D     D:::::DO:::::O     O:::::O
-                            T:::::T        O:::::O     O:::::O ---------------   D:::::D     D:::::DO:::::O     O:::::O
-                            T:::::T        O:::::O     O:::::O -:::::::::::::-   D:::::D     D:::::DO:::::O     O:::::O
-                            T:::::T        O:::::O     O:::::O ---------------   D:::::D     D:::::DO:::::O     O:::::O
-                            T:::::T        O:::::O     O:::::O                   D:::::D     D:::::DO:::::O     O:::::O
-                            T:::::T        O::::::O   O::::::O                   D:::::D    D:::::D O::::::O   O::::::O
-                          TT:::::::TT      O:::::::OOO:::::::O                 DDD:::::DDDDD:::::D  O:::::::OOO:::::::O
-                          T:::::::::T       OO:::::::::::::OO                  D:::::::::::::::DD    OO:::::::::::::OO 
-                          T:::::::::T         OO:::::::::OO                    D::::::::::::DDD        OO:::::::::OO   
-                          TTTTTTTTTTT           OOOOOOOOO                      DDDDDDDDDDDDD             OOOOOOOOO     
-                    ===================================================================================================
-                    TO-DO : S3에서 파일 삭제 코드 추가/테스트 필요함!!
-                    ===================================================================================================
-                    ===================================================================================================
-                    */
-
+                    // 이 피드백에 속한 게시물의 파일 검색
+                    let deleteItems = [];
+                    await Board.findAll({
+                        attributes:['id','board_file1', 'board_file2', 'board_file3'],
+                        where:{fk_feedbackId: feedback_id}
+                    }).then(boards=>{
+                        console.log("board ="+ boards);
+                        // 삭제할 파일 목록 배열에 저장
+                        boards.forEach(element=>{
+                            if(element.board_file1){
+                                deleteItems.push({ Key: element.board_file1 })
+                            }
+                            if(element.board_file2){
+                                deleteItems.push({ Key: element.board_file2 })
+                            }
+                            if(element.board_file3){
+                                deleteItems.push({ Key: element.board_file3 })
+                            }
+                        })
+                        console.log(`deletedItems = ${deleteItems}`);
+                    })
+                    // 삭제할 목록에 있는 파일들 전부 삭제
+                    deleteS3Obj(deleteItems);
+                    
+                    
                     let query_update =
                         'UPDATE comments SET deletedAt=NOW() WHERE fk_board_id=ANY(SELECT id FROM boards WHERE fk_feedbackId=:feedback_id); ' +
                         'UPDATE boards SET deletedAt=NOW() WHERE fk_feedbackId=:feedback_id; ' +
@@ -427,9 +429,10 @@ router.delete('/:feedback_id', isLoggedIn, async (req, res, next) => {
                         },
                         raw: true
                     }).then(() => {
+                        // 삭제할 목록에 있는 파일들 전부 삭제
+                        //deleteS3Obj(deleteItems);
                         // 정상적으로 피드백 삭제 쿼리를 수행한 경우
                         console.log('[DELETE] 피드백 삭제 성공');
-
                         // 친구 차단 목록을 그대로 리턴
                         const result = new Object();
                         result.success = true;

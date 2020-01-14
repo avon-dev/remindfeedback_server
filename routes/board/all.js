@@ -135,30 +135,7 @@ router.delete('/:board_id', isLoggedIn, async (req, res, next) => {
                     return res.status(403).send(result);
                 } else {
                     // 본인이 작성한 게시글인 경우
-                    /*
-                    ===================================================================================================
-                    ===================================================================================================
-                    TTTTTTTTTTTTTTTTTTTTTTT     OOOOOOOOO                      DDDDDDDDDDDDD             OOOOOOOOO     
-                    T:::::::::::::::::::::T   OO:::::::::OO                    D::::::::::::DDD        OO:::::::::OO   
-                    T:::::::::::::::::::::T OO:::::::::::::OO                  D:::::::::::::::DD    OO:::::::::::::OO 
-                    T:::::TT:::::::TT:::::TO:::::::OOO:::::::O                 DDD:::::DDDDD:::::D  O:::::::OOO:::::::O
-                    TTTTTT  T:::::T  TTTTTTO::::::O   O::::::O                   D:::::D    D:::::D O::::::O   O::::::O
-                            T:::::T        O:::::O     O:::::O                   D:::::D     D:::::DO:::::O     O:::::O
-                            T:::::T        O:::::O     O:::::O                   D:::::D     D:::::DO:::::O     O:::::O
-                            T:::::T        O:::::O     O:::::O ---------------   D:::::D     D:::::DO:::::O     O:::::O
-                            T:::::T        O:::::O     O:::::O -:::::::::::::-   D:::::D     D:::::DO:::::O     O:::::O
-                            T:::::T        O:::::O     O:::::O ---------------   D:::::D     D:::::DO:::::O     O:::::O
-                            T:::::T        O:::::O     O:::::O                   D:::::D     D:::::DO:::::O     O:::::O
-                            T:::::T        O::::::O   O::::::O                   D:::::D    D:::::D O::::::O   O::::::O
-                          TT:::::::TT      O:::::::OOO:::::::O                 DDD:::::DDDDD:::::D  O:::::::OOO:::::::O
-                          T:::::::::T       OO:::::::::::::OO                  D:::::::::::::::DD    OO:::::::::::::OO 
-                          T:::::::::T         OO:::::::::OO                    D::::::::::::DDD        OO:::::::::OO   
-                          TTTTTTTTTTT           OOOOOOOOO                      DDDDDDDDDDDDD             OOOOOOOOO     
-                    ===================================================================================================
-                    TO-DO : S3에서 파일 삭제 테스트 필요함!!!!!!
-                    ===================================================================================================
-                    */
-                    // S3에서 게시글 삭제
+                    // 삭제할 파일 목록 배열에 저장
                     let deleteItems = [];
 
                     if (board[0].board_file1) {
@@ -170,6 +147,7 @@ router.delete('/:board_id', isLoggedIn, async (req, res, next) => {
                     if (board[0].board_file3) {
                         deleteItems.push({ Key: board.board_file3 })
                     }
+                    // 삭제 목록 배열 전달 -> S3에서 파일 삭제
                     deleteS3Obj(deleteItems);
 
                     let query_update =
