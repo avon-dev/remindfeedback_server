@@ -8,7 +8,7 @@
 
 * **URL**
 
-  http://54.180.118.35/feedback/all/lastid
+  http://54.180.118.35/feedback/all/(lastid)
 
 * **Method:**
 
@@ -68,7 +68,7 @@
 ----
 * **URL**
 
-  http://54.180.118.35/feedback/my/lastid
+  http://54.180.118.35/feedback/my/(lastid)
 
 * **Method:**
 
@@ -123,7 +123,7 @@
 ----
 * **URL**
 
-  http://54.180.118.35/feedback/your/lastid
+  http://54.180.118.35/feedback/your/(lastid)
 
 * **Method:**
 
@@ -197,7 +197,7 @@
 
     **Required:**
     
-    * `adviser=[string]` 조언자 uid, (현재는 null보내기 바람 친구기능구현시 수정예정)
+    * `adviser=[string]` 조언자 uid, 
     * `category=[integer]` 주제 id,
     * `title=[string]` 피드백 제목, null[x]
     * `write_date=[date]` 피드백 받은 날짜, null[x]
@@ -234,7 +234,7 @@
 
 * **URL**
 
-  http://54.180.118.35/feedback/update/feedback_id
+  http://54.180.118.35/feedback/update/(feedback_id)
 
 * **Method:**
 
@@ -250,7 +250,7 @@
 
     **Required:**
     
-    * `adviser=[string]` 조언자 uid, (현재는 null보내기 바람 친구기능구현시 수정예정)
+    * `adviser=[string]` 조언자 uid, 
     * `category=[string]` 주제 id, 
     * `title=[string]` 피드백 제목, null[x]
     * `write_date=[date]` 피드백 받은 날짜, null[x]
@@ -286,7 +286,7 @@
 
 * **URL**
 
-  http://54.180.118.35/feedback/adviser/feedback_id
+  http://54.180.118.35/feedback/adviser/(feedback_id)
 
 * **Method:**
 
@@ -337,7 +337,7 @@
 
 * **URL**
 
-  http://54.180.118.35/feedback/category/feedback_id
+  http://54.180.118.35/feedback/category/(feedback_id)
 
 * **Method:**
 
@@ -388,7 +388,7 @@
 
 * **URL**
 
-  http://54.180.118.35/feedback/title/feedback_id
+  http://54.180.118.35/feedback/title/(feedback_id)
 
 * **Method:**
 
@@ -437,7 +437,7 @@
 
 * **URL**
 
-  http://54.180.118.35/feedback/write_date/feedback_id
+  http://54.180.118.35/feedback/write_date/(feedback_id)
 
 * **Method:**
 
@@ -487,7 +487,7 @@
 
 * **URL**
 
-  `http://54.180.118.35/feedback/feedback_id`
+  `http://54.180.118.35/feedback/(feedback_id)`
 
 * **Method:**
 
