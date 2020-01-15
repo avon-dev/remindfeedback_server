@@ -26,7 +26,7 @@ if (config.use_env_variable) {
  * - parameter friend_id : 친구 추가할 회원 uuid
  */
 // Search(친구 검색)
-router.get('/search', isLoggedIn, async function (req, res, next) {
+router.post ('/search', isLoggedIn, async function (req, res, next) {
     try {
         console.log('[SEARCH] 친구 검색 요청');
 
@@ -41,7 +41,7 @@ router.get('/search', isLoggedIn, async function (req, res, next) {
             result.data = 'NONE';
             result.message = '[SEARCH] 나 자신은 인생의 영원한 친구입니다.';
             console.log(result);
-            return res.status(403).send(result);
+            return res.status(200).send(result);
         }
 
         // 사용자 테이블에서 이메일로 사용자 검색
@@ -219,7 +219,7 @@ router.post('/create', isLoggedIn, async function (req, res, next) {
             result.data = 'NONE';
             result.message = '[CREATE] 나 자신을 추가할 수 없습니다. 나 자신은 인생의 영원한 친구입니다.';
             console.log(result);
-            return res.status(403).send(result);
+            return res.status(200).send(result);
         }
 
         // 사용자 테이블에서 이메일로 사용자 검색
@@ -242,7 +242,7 @@ router.post('/create', isLoggedIn, async function (req, res, next) {
                 result.data = 'NONE';
                 result.message = '[CREATE] 사용자를 찾을 수 없습니다.';
                 console.log(result);
-                return res.status(404).send(result);
+                return res.status(200).send(result);
             } else {
                 // 사용자 테이블에서 사용자 검색에 성공한 경우
                 console.log('[CREATE] 사용자 검색 성공');
@@ -358,7 +358,7 @@ router.post('/create', isLoggedIn, async function (req, res, next) {
                                 result.data = 'NONE';
                                 result.message = '[CREATE] 이미 친구 요청을 보낸 사용자입니다.';
                                 console.log(result);
-                                return res.status(403).send(result);
+                                return res.status(200).send(result);
                             } else {
                                 // 내가 RIGHT인 경우
                                 // 이미 LEFT가 RIGHT에게 친구 요청을 보낸 경우 친구 정보 UPDATE
@@ -386,7 +386,7 @@ router.post('/create', isLoggedIn, async function (req, res, next) {
                                     result.data = searchData;
                                     result.message = '[CREATE] ' + user_nickname + '이 ' + searchData.nickname + '의 친구 요청을 수락해서 친구가 되었습니다.';
                                     console.log(result);
-                                    return res.status(201).send(result);
+                                    return res.status(200).send(result);
                                 }).catch(error => {
                                     // 친구 추가를 실패한 경우
                                     console.log('[CREATE] 친구 추가 실패', error);
@@ -408,7 +408,7 @@ router.post('/create', isLoggedIn, async function (req, res, next) {
                             result.data = 'NONE';
                             result.message = '[CREATE] 서로 친구이거나 차단한 사용자입니다.';
                             console.log(result);
-                            return res.status(403).send(result);
+                            return res.status(200).send(result);
                         }
                     }
                 }).catch(error => {
@@ -457,7 +457,7 @@ router.put('/reject', isLoggedIn, async function (req, res, next) {
             result.data = 'NONE';
             result.message = '[REJECT] 나 자신을 거절할 수 없습니다. 나 자신은 인생의 영원한 친구입니다.';
             console.log(result);
-            return res.status(403).send(result);
+            return res.status(200).send(result);
         }
 
         // 사용자 테이블에서 이메일로 사용자 검색
@@ -480,7 +480,7 @@ router.put('/reject', isLoggedIn, async function (req, res, next) {
                 result.data = 'NONE';
                 result.message = '[REJECT] 사용자를 찾을 수 없습니다.';
                 console.log(result);
-                return res.status(404).send(result);
+                return res.status(200).send(result);
             } else {
                 // 사용자 테이블에서 사용자 검색에 성공한 경우
                 console.log('[REJECT] 사용자 검색 성공');
@@ -517,7 +517,7 @@ router.put('/reject', isLoggedIn, async function (req, res, next) {
                         result.data = 'NONE';
                         result.message = '[REJECT] 친구를 찾을 수 없습니다.';
                         console.log(result);
-                        return res.status(404).send(result);
+                        return res.status(200).send(result);
                     } else {
                         // 검색 후 결과 값이 NOT NULL인 경우(친구 테이블에 친구 데이터가 있는 경우)
                         console.log('[REJECT] 친구 검색 성공');
@@ -534,7 +534,7 @@ router.put('/reject', isLoggedIn, async function (req, res, next) {
                                 result.data = 'NONE';
                                 result.message = '[REJECT] 내가 보낸 요청을 거절할 수 없습니다.';
                                 console.log(result);
-                                return res.status(403).send(result);
+                                return res.status(200).send(result);
                             } else {
                                 // 내가 RIGHT인 경우
                                 // 상대방이 보낸 친구 요청을 거절
@@ -562,7 +562,7 @@ router.put('/reject', isLoggedIn, async function (req, res, next) {
                                     result.data = searchData;
                                     result.message = '[REJECT] ' + user_nickname + '이 ' + searchData.nickname + '의 친구 요청을 거절했습니다.';
                                     console.log(result);
-                                    return res.status(201).send(result);
+                                    return res.status(200).send(result);
                                 }).catch(error => {
                                     // 친구 추가를 실패한 경우
                                     console.log('[REJECT] 친구 거절 실패', error);
@@ -584,7 +584,7 @@ router.put('/reject', isLoggedIn, async function (req, res, next) {
                             result.data = 'NONE';
                             result.message = '[REJECT] 친구 요청을 보낸 사용자가 아닙니다.';
                             console.log(result);
-                            return res.status(403).send(result);
+                            return res.status(200).send(result);
                         }
                     }
                 }).catch(error => {
@@ -865,7 +865,7 @@ router.put('/block', isLoggedIn, async function (req, res, next) {
             result.data = 'NONE';
             result.message = '[BLOCK] 스스로를 차단할 수 없습니다. 나 자신은 인생의 영원한 친구입니다.';
             console.log(result);
-            return res.status(403).send(result);
+            return res.status(200).send(result);
         }
 
         // 사용자 테이블에서 이메일로 사용자 검색
@@ -888,7 +888,7 @@ router.put('/block', isLoggedIn, async function (req, res, next) {
                 result.data = 'NONE';
                 result.message = '[BLOCK] 사용자를 찾을 수 없습니다.';
                 console.log(result);
-                return res.status(404).send(result);
+                return res.status(200).send(result);
             } else {
                 // 사용자 테이블에서 사용자 검색에 성공한 경우
                 console.log('[BLOCK] 사용자 검색 성공');
@@ -925,7 +925,7 @@ router.put('/block', isLoggedIn, async function (req, res, next) {
                         result.data = 'NONE';
                         result.message = '[BLOCK] 친구를 찾을 수 없습니다.';
                         console.log(result);
-                        return res.status(404).send(result);
+                        return res.status(200).send(result);
                     } else {
                         // 검색 후 결과 값이 NOT NULL인 경우(친구 테이블에 친구 데이터가 있는 경우)
                         console.log('[BLOCK] 친구 검색 성공');
@@ -940,7 +940,7 @@ router.put('/block', isLoggedIn, async function (req, res, next) {
                             result.data = 'NONE';
                             result.message = '[BLOCK] 이미 차단한 사용자입니다.';
                             console.log(result);
-                            return res.status(403).send(result);
+                            return res.status(200).send(result);
                         } else {
                             /* 
                             1 -> LEFT 혹은 RIGHT가 친구 요청을 한 경우
@@ -964,7 +964,7 @@ router.put('/block', isLoggedIn, async function (req, res, next) {
                                 result.data = 'NONE';
                                 result.message = '[BLOCK] 친구가 아니므로 차단할 수 없습니다.';
                                 console.log(result);
-                                return res.status(403).send(result);
+                                return res.status(200).send(result);
                             } else if (friend.type == 2) {
                                 // 친구 상태인 경우
                                 if (updateInfo.position == 'LEFT') {
@@ -982,7 +982,7 @@ router.put('/block', isLoggedIn, async function (req, res, next) {
                                     result.data = 'NONE';
                                     result.message = '[BLOCK] 이미 차단한 사용자입니다.';
                                     console.log(result);
-                                    return res.status(400).send(result);
+                                    return res.status(200).send(result);
                                 } else {
                                     updateInfo.type = 5;
                                 }
@@ -998,7 +998,7 @@ router.put('/block', isLoggedIn, async function (req, res, next) {
                                     result.data = 'NONE';
                                     result.message = '[BLOCK] 이미 차단한 사용자입니다.';
                                     console.log(result);
-                                    return res.status(400).send(result);
+                                    return res.status(200).send(result);
                                 }
                             }
                             // UPDATE friends SET type=:type WHERE (user_uid=:user_uid AND friend_uid=:friend_uid) OR (user_uid=:friend_uid AND friend_uid=:user_uid); 
@@ -1084,7 +1084,7 @@ router.put('/unblock', isLoggedIn, async function (req, res, next) {
             result.data = 'NONE';
             result.message = '[UNBLOCK] 스스로를 차단 해제할 수 없습니다. 나 자신은 인생의 영원한 친구입니다.';
             console.log(result);
-            return res.status(403).send(result);
+            return res.status(200).send(result);
         }
 
         // 사용자 테이블에서 이메일로 사용자 검색
@@ -1107,7 +1107,7 @@ router.put('/unblock', isLoggedIn, async function (req, res, next) {
                 result.data = 'NONE';
                 result.message = '[UNBLOCK] 사용자를 찾을 수 없습니다.';
                 console.log(result);
-                return res.status(404).send(result);
+                return res.status(200).send(result);
             } else {
                 // 사용자 테이블에서 사용자 검색에 성공한 경우
                 console.log('[UNBLOCK] 사용자 검색 성공');
@@ -1144,7 +1144,7 @@ router.put('/unblock', isLoggedIn, async function (req, res, next) {
                         result.data = 'NONE';
                         result.message = '[UNBLOCK] 친구를 찾을 수 없습니다.';
                         console.log(result);
-                        return res.status(404).send(result);
+                        return res.status(200).send(result);
                     } else {
                         // 검색 후 결과 값이 NOT NULL인 경우(친구 테이블에 친구 데이터가 있는 경우)
                         console.log('[UNBLOCK] 친구 검색 성공');
@@ -1159,7 +1159,7 @@ router.put('/unblock', isLoggedIn, async function (req, res, next) {
                             result.data = 'NONE';
                             result.message = '[UNBLOCK] 친구가 아니므로 차단 해제할 수 없습니다.';
                             console.log(result);
-                            return res.status(403).send(result);
+                            return res.status(200).send(result);
                         } else if (friend.type == 2) {
                             // 친구 상태인 경우
                             console.log('[UNBLOCK] 친구 상태');
@@ -1169,7 +1169,7 @@ router.put('/unblock', isLoggedIn, async function (req, res, next) {
                             result.data = 'NONE';
                             result.message = '[UNBLOCK] 아직 차단하지 않은 친구입니다.';
                             console.log(result);
-                            return res.status(403).send(result);
+                            return res.status(200).send(result);
                         } else {
                             /* 
                             3 -> LEFT가 RIGHT를 차단한 경우
@@ -1196,7 +1196,7 @@ router.put('/unblock', isLoggedIn, async function (req, res, next) {
                                     result.data = 'NONE';
                                     result.message = '[UNBLOCK] 아직 차단하지 않은 친구입니다.';
                                     console.log(result);
-                                    return res.status(403).send(result);
+                                    return res.status(200).send(result);
                                 }
                             } else if (friend.type == 4) {
                                 // RIGHT가 LEFT를 차단한 경우
@@ -1209,7 +1209,7 @@ router.put('/unblock', isLoggedIn, async function (req, res, next) {
                                     result.data = 'NONE';
                                     result.message = '[UNBLOCK] 아직 차단하지 않은 친구입니다.';
                                     console.log(result);
-                                    return res.status(403).send(result);
+                                    return res.status(200).send(result);
                                 } else {
                                     updateInfo.type = 2;
                                 }
@@ -1284,22 +1284,6 @@ router.put('/unblock', isLoggedIn, async function (req, res, next) {
             console.log(result);
             return res.status(500).send(result);
         });
-    } catch (e) {
-        console.error(e);
-        return next(e);
-    }
-});
-
-// 탈퇴할 때 구현
-// friend delete(친구 삭제)
-router.delete('/delete', isLoggedIn, async function (req, res, next) {
-    try {
-        const result = new Object();
-        result.success = false;
-        result.data = 'NONE';
-        result.message = '[DELETE] 아직 미구현 된 기능입니다.';
-        console.log(result);
-        return res.status(404).send(result);
     } catch (e) {
         console.error(e);
         return next(e);
