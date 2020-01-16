@@ -98,7 +98,7 @@
     }
     ```
 
-  * **Code:** `403` FORBIDDEN : 본인이 작성한 게시글이 아닌 경우<br>
+  * **Code:** `200` FORBIDDEN : 본인이 작성한 게시글이 아닌 경우<br>
     **Content:**
     ```json
     {
@@ -108,7 +108,7 @@
     }
     ```
 
-  * **Code:** `404` NOT FOUND <br>
+  * **Code:** `200` NOT FOUND <br>
     **Content:** 
     ```json
     {

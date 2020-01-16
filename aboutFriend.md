@@ -65,7 +65,7 @@
 
 * **Method:**
 
-    `GET`
+    `POST`
   
 * **URL Params**
 
@@ -199,7 +199,7 @@
 
 * **Error Response:**
 
-  * **Code:** `403` FORBIDDEN : 로그인 한 이메일로 검색한 경우 <br>
+  * **Code:** `200` FORBIDDEN : 로그인 한 이메일로 검색한 경우 <br>
     **Content:**
     ```json
     {
@@ -209,7 +209,7 @@
     }
     ```
 
- * **Code:** `404` NOT FOUND <br>
+ * **Code:** `200` NOT FOUND <br>
     **Content:** 
     ```json
     {
@@ -301,7 +301,7 @@
 
 * **Error Response:**
 
-  * **Code:** `403` FORBIDDEN : 로그인 한 이메일로 친구를 추가한 경우 <br>
+  * **Code:** `200` FORBIDDEN : 로그인 한 이메일로 친구를 추가한 경우 <br>
     **Content:**
     ```json
     {
@@ -311,7 +311,7 @@
     }
     ```
 
-  * **Code:** `403` FORBIDDEN : 서로 친구이거나 차단한 상태인 경우 <br>
+  * **Code:** `200` FORBIDDEN : 서로 친구이거나 차단한 상태인 경우 <br>
     **Content:**
     ```json
     {
@@ -321,7 +321,7 @@
     }
     ```
 
- * **Code:** `404` NOT FOUND <br>
+ * **Code:** `200` NOT FOUND <br>
     **Content:** 
     ```json
     {
@@ -414,7 +414,7 @@
 
 * **Error Response:**
 
-  * **Code:** `403` FORBIDDEN : 로그인 한 이메일로 친구 요청을 거절한 경우 <br>
+  * **Code:** `200` FORBIDDEN : 로그인 한 이메일로 친구 요청을 거절한 경우 <br>
     **Content:**
     ```json
     {
@@ -424,7 +424,7 @@
     }
     ```
 
-  * **Code:** `403` FORBIDDEN : 내가 보낸 친구 요청을 내가 거절한 경우 <br>
+  * **Code:** `200` FORBIDDEN : 내가 보낸 친구 요청을 내가 거절한 경우 <br>
     **Content:**
     ```json
     {
@@ -434,7 +434,7 @@
     }
     ```
 
-  * **Code:** `403` FORBIDDEN : 이미 친구 이상의 관계인 친구 요청을 거절한 경우 <br>
+  * **Code:** `200` FORBIDDEN : 이미 친구 이상의 관계인 친구 요청을 거절한 경우 <br>
     **Content:**
     ```json
     {
@@ -444,7 +444,7 @@
     }
     ```
 
-  * **Code:** `404` NOT FOUND <br>
+  * **Code:** `200` NOT FOUND <br>
     **Content:** 
     ```json
     {
@@ -454,7 +454,7 @@
     }
     ```
 
-  * **Code:** `404` NOT FOUND : 친구 요청을 보낸 적도, 받은 적도 없는 경우 <br>
+  * **Code:** `200` NOT FOUND : 친구 요청을 보낸 적도, 받은 적도 없는 경우 <br>
     **Content:**
     ```json
     {
@@ -914,7 +914,7 @@
 
 * **Error Response:**
 
-  * **Code:** `403` FORBIDDEN : 로그인 한 이메일로 차단을 시도한 경우 <br>
+  * **Code:** `200` FORBIDDEN : 로그인 한 이메일로 차단을 시도한 경우 <br>
     **Content:**
     ```json
     {
@@ -924,7 +924,7 @@
     }
     ```
 
-  * **Code:** `403` FORBIDDEN : 친구 요청 상태인 경우 <br>
+  * **Code:** `200` FORBIDDEN : 친구 요청 상태인 경우 <br>
     **Content:**
     ```json
     {
@@ -934,7 +934,7 @@
     }
     ```
 
-  * **Code:** `403` FORBIDDEN : 이미 내가 상대방을 차단한 경우 <br>
+  * **Code:** `200` FORBIDDEN : 이미 내가 상대방을 차단한 경우 <br>
     **Content:**
     ```json
     {
@@ -944,7 +944,7 @@
     }
     ```
 
-   * **Code:** `404` NOT FOUND <br>
+   * **Code:** `200` NOT FOUND <br>
     **Content:** 
     ```json
     {
@@ -954,7 +954,7 @@
     }
     ```
 
-  * **Code:** `404` NOT FOUND <br>
+  * **Code:** `200` NOT FOUND <br>
     **Content:** 
     ```json
     {
@@ -1071,7 +1071,7 @@
 
 * **Error Response:**
 
-  * **Code:** `403` FORBIDDEN : 로그인 한 이메일로 차단 해제를 시도한 경우 <br>
+  * **Code:** `200` FORBIDDEN : 로그인 한 이메일로 차단 해제를 시도한 경우 <br>
     **Content:**
     ```json
     {
@@ -1081,7 +1081,7 @@
     }
     ```
 
-  * **Code:** `403` FORBIDDEN : 친구 요청 상태인 경우<br>
+  * **Code:** `200` FORBIDDEN : 친구 요청 상태인 경우<br>
     **Content:**
     ```json
     {
@@ -1091,7 +1091,7 @@
     }
     ```
 
-  * **Code:** `403` FORBIDDEN : 친구 상태이거나, 상대방이 나를 차단했어도 내가 상대방을 차단하지 않은 경우 <br>
+  * **Code:** `200` FORBIDDEN : 친구 상태이거나, 상대방이 나를 차단했어도 내가 상대방을 차단하지 않은 경우 <br>
     **Content:**
     ```json
     {
@@ -1101,7 +1101,7 @@
     }
     ```
 
-   * **Code:** `404` NOT FOUND <br>
+   * **Code:** `200` NOT FOUND <br>
     **Content:** 
     ```json
     {
@@ -1111,7 +1111,7 @@
     }
     ```
 
-  * **Code:** `404` NOT FOUND <br>
+  * **Code:** `200` NOT FOUND <br>
     **Content:** 
     ```json
     {

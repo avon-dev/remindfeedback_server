@@ -93,24 +93,21 @@ router.delete('/:board_id', isLoggedIn, async (req, res, next) => {
 
         const user_uid = req.user.user_uid;
         let board_id = parseInt(req.params.board_id);
-        let query_select =
-        'SELECT DISTINCT f.user_uid, b.* ' +
-        'FROM boards AS b, feedbacks AS f ' +
-        'WHERE b.id = :board_id ' +
-        'AND b.deletedAt IS NULL';
 
         // 게시글 테이블에서 board_id로 검색
-        sequelize.query(query_select, {
-            replacements: {
-                board_id: board_id
+        await Board.findOne({
+            where: {
+                id: board_id
             },
-            type: Sequelize.QueryTypes.SELECT,
-            raw: true
+            include: [{
+                model:Feedback,
+                attributes: ['user_uid']
+            }]
         }).then((board) => {
             // 게시글 테이블 조회를 성공한 경우
             console.log('[DELETE] 게시글 테이블 조회 성공');
 
-            if (board[0] == null) {
+            if (board == null) {
                 // 게시글 테이블에서 게시글 검색에 실패한 경우
                 console.log('[DELETE] 게시글 검색 실패');
 
@@ -119,12 +116,12 @@ router.delete('/:board_id', isLoggedIn, async (req, res, next) => {
                 result.data = 'NONE';
                 result.message = '[DELETE] 게시글을 찾을 수 없습니다.';
                 console.log(result);
-                return res.status(404).send(result);
+                return res.status(200).send(result);
             } else {
                 // 게시글 테이블에서 게시글 검색에 성공한 경우
                 console.log('[DELETE] 게시글 검색 성공');
 
-                if (user_uid != board[0].user_uid) {
+                if (user_uid != board.feedback.user_uid) {
                     // 본인이 작성한 게시글이 아닌 경우
 
                     const result = new Object();
@@ -132,7 +129,7 @@ router.delete('/:board_id', isLoggedIn, async (req, res, next) => {
                     result.data = 'NONE';
                     result.message = '[DELETE] 내가 작성한 게시글이 아닙니다.';
                     console.log(result);
-                    return res.status(403).send(result);
+                    return res.status(200).send(result);
                 } else {
                     // 본인이 작성한 게시글인 경우
                     // 삭제할 파일 목록 배열에 저장

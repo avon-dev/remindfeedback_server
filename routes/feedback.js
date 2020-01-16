@@ -377,7 +377,7 @@ router.delete('/:feedback_id', isLoggedIn, async (req, res, next) => {
                 result.data = 'NONE';
                 result.message = '[DELETE] 피드백을 찾을 수 없습니다.';
                 console.log(result);
-                return res.status(404).send(result);
+                return res.status(200).send(result);
             } else {
                 // 피드백 테이블에서 피드백 검색에 성공한 경우
                 console.log('[DELETE] 피드백 검색 성공');
@@ -390,7 +390,7 @@ router.delete('/:feedback_id', isLoggedIn, async (req, res, next) => {
                     result.data = 'NONE';
                     result.message = '[DELETE] 내가 작성한 피드백이 아닙니다.';
                     console.log(result);
-                    return res.status(403).send(result);
+                    return res.status(200).send(result);
                 } else {
                     // 본인이 작성한 피드백인 경우
                     // 이 피드백에 속한 게시물의 파일 검색
