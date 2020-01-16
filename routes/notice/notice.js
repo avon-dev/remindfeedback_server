@@ -1,32 +1,15 @@
 const express = require('express');
-const { Notice, Sequelize: { Op } } = require('../../models');
 const { isLoggedIn } = require('../middlewares'); 
 const router = express.Router();
-const moment = require('moment');
-moment.tz.setDefault("Asia/Seoul");
+
+const {db, insert, read, update} = require('./firebase.js');
+
 
 router.get('/:lastid/:limit', isLoggedIn, async (req, res, next) => {
     try{
-        const useruid = req.user.user_uid;
-        let lastid = parseInt(req.params.lastid);
-        let limit = parseInt(req.params.limit);
-        if(lastid === 0){
-            lastid = 9999;
-        }
-        console.log('AllNotice 요청', lastid);
-
-        let noticeList = await Notice.findAll({
-            where: {id: { [Op.lt]:lastid}, receiver_uid: useruid},
-            order: [['id', 'DESC']],
-            limit: limit,
-        })
-        
-        let result = {
-            success: true,
-            data: noticeList,
-            message: ""
-        }
-        res.status(200).json(result);
+        const result = await read(req.user.user_uid);
+        console.log('아아아알림테스트임다', result)
+        await res.status(200).json(result);   
     } catch(e){
         let result = {
             success: false,
@@ -42,19 +25,26 @@ router.get('/:lastid/:limit', isLoggedIn, async (req, res, next) => {
 router.post('/', isLoggedIn, async (req, res, next) => {
     try{
         const useruid = req.user.user_uid;
-        const { notice_id } = req.body;
-        console.log('알림 확인', notice_id);
-
-        let noticeList = await Notice.update({
-            read_date: moment().format('YYYY-MM-DD HH:mm:ss')
-         },{ where: {id: { [Op.lt]:lastid}, receiver_uid: useruid},
-        })
-        
+        const { receiver_uid } = req.body;
+        const result = await insert(useruid, [1, 1], [null, null, null], 'text', receiver_uid);
+        res.status(200).json(result);
+    } catch(e){
         let result = {
-            success: true,
-            data: noticeList,
-            message: ""
+            success: false,
+            data: '',
+            message: e
         }
+        res.status(500).json(result);
+        console.error(e);
+        return next(e);
+    }
+});
+
+router.patch('/', isLoggedIn, async (req, res, next) => {
+    try{
+        const useruid = req.user.user_uid;
+        const { docID } = req.body;
+        const result = await update(useruid, docID);
         res.status(200).json(result);
     } catch(e){
         let result = {
@@ -70,12 +60,11 @@ router.post('/', isLoggedIn, async (req, res, next) => {
 
 router.delete('/:notice_id', isLoggedIn, async (req, res, next) => {
     try{
-        let notice_id = parseInt(req.params.notice_id);
+        const uid = req.user.user_uid;
+        let notice_id = req.params.notice_id;
         console.log('Notice 삭제 요청', notice_id);
 
-        await Notice.destroy({
-            where: {id: notice_id},
-        })
+        await db.collection(uid).doc(notice_id).delete();
         
         let result = {
             success: true,

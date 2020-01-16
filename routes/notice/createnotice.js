@@ -1,6 +1,7 @@
 
-const { Notice, User, Feedback, Board } = require('../../models');
-const { isLoggedIn, isNotLoggedIn } = require('../middlewares');
+const { User, Feedback, Board } = require('../../models');
+
+const {insert, read} = require('./firebase.js'); //insert(sender_uid, type, data, text, reseiver_uid)
 
 function finduser(uid) {
     const user = User.findOne({where: {user_uid: uid}});
@@ -21,14 +22,13 @@ exports.ReqFriendNotice = async(req, res, next, id) => {
         console.log('친구요청알림');
         const uid = req.user.user_uid;
 
-        await Notice.create({
-            sender_uid: req.user.user_uid,
-            type: '1.1',
-            data: `0.0.0`,
-            text: `${finduser(uid)} 님이 친구 요청했습니다`,
-            receiver_uid: id,
-            read_date: null,
-        })
+        await insert(
+            uid,
+            [1, 1],
+            [null, null, null],
+            `${finduser(uid)} 님이 친구 요청했습니다`,
+            id,
+        )
     }catch(e){
         let result = {
             success: false,
@@ -47,14 +47,13 @@ exports.AcptFriendNotice = async(req, res, next, id) => {
         console.log('친구수락알림');
         const uid = req.user.user_uid;
 
-        await Notice.create({
-            sender_uid: req.user.user_uid,
-            type: '1.2',
-            data: `0.0.0`,
-            text: `${finduser(uid)} 님이 친구 수락했습니다`,
-            receiver_uid: id,
-            read_date: null,
-        })
+        await insert(
+            uid,
+            [1, 2],
+            [null, null, null],
+            `${finduser(uid)} 님이 친구 수락했습니다`,
+            id,
+        )
     }catch(e){
         let result = {
             success: false,
@@ -73,14 +72,13 @@ exports.NewAdviserNotice = async(req, res, next, feedback) => {
         console.log('조언자등록알림');
         const uid = req.user.user_uid;
 
-        await Notice.create({
-            sender_uid: req.user.user_uid,
-            type: '2.1',
-            data: `${feedback.id}.0.0`,
-            text: `${finduser(uid)} 님이 회원님을 조언자로 등록 했습니다`,
-            receiver_uid: feedback.adviser_uid,
-            read_date: null,
-        })
+        await insert(
+            uid,
+            [2, 1],
+            [feedback.id, null, null],
+            `${finduser(uid)} 님이 회원님을 조언자로 등록 했습니다`,
+            feedback.adviser_uid,
+        )
     }catch(e){
         let result = {
             success: false,
@@ -99,14 +97,13 @@ exports.ReleaseAdviserNotice = async(req, res, next, feedback) => {
         console.log('조언자해제알림');
         const uid = req.user.user_uid;
 
-        await Notice.create({
-            sender_uid: req.user.user_uid,
-            type: '2.2',
-            data: `${feedback.id}.0.0`,
-            text: `${finduser(uid)} 님이 조언자를 해제 했습니다`,
-            receiver_uid: feedback.adviser_uid,
-            read_date: null,
-        })
+        await insert(
+            uid,
+            [2, 2],
+            [feedback.id, null, null],
+            `${finduser(uid)} 님이 조언자를 해제 했습니다`,
+            feedback.adviser_uid,
+        )
     }catch(e){
         let result = {
             success: false,
@@ -127,14 +124,13 @@ exports.NewBoardNotice = async(req, res, next, board) => {
 
         const feedback = findfeedback(board.fk_feedbackId);
 
-        await Notice.create({
-            sender_uid: req.user.user_uid,
-            type: '3.1',
-            data: `${board.fk_feedbackId}.${board.id}.0`,
-            text: `${finduser(uid)} 님이 새로운 게시물을 등록 했습니다`,
-            receiver_uid: feedback.adviser_uid,
-            read_date: null,
-        })
+        await insert(
+            uid,
+            [3, 1],
+            [board.fk_feedbackId, board.id, null],
+            `${finduser(uid)} 님이 새로운 게시물을 등록 했습니다`,
+            feedback.adviser_uid,
+        )
     }catch(e){
         let result = {
             success: false,
@@ -158,14 +154,13 @@ exports.NewCommentNotice = async(req, res, next, comment) => {
         let receiver = await feedback.adviser_uid;
         if(uid === receiver) {receiver = feedback.user_uid};
 
-        await Notice.create({
-            sender_uid: req.user.user_uid,
-            type: '3.2',
-            data: `${board.fk_feedbackId}.${board.id}.${comment.id}`,
-            text: `${finduser(uid)} 님이 게시물에 댓글을 등록 했습니다`,
-            receiver_uid: receiver,
-            read_date: null,
-        })
+        await insert(
+            uid,
+            [3, 2],
+            [board.fk_feedbackId, board.id, comment.id],
+            `${finduser(uid)} 님이 게시물에 댓글을 등록 했습니다`,
+            receiver,
+        )
     }catch(e){
         let result = {
             success: false,
@@ -184,14 +179,13 @@ exports.ReqCompleteNotice = async(req, res, next, feedback) => {
         console.log('완료요청알림');
         const uid = req.user.user_uid;
 
-        await Notice.create({
-            sender_uid: req.user.user_uid,
-            type: '4.1',
-            data: `${feedback.id}.0.0`,
-            text: `${finduser(uid)} 님이 피드백 완료 요청 했습니다`,
-            receiver_uid: feedback.adviser_uid,
-            read_date: null,
-        })
+        await insert(
+            uid,
+            [4, 1],
+            [feedback.id, null, null],
+            `${finduser(uid)} 님이 피드백 완료 요청 했습니다`,
+            feedback.adviser_uid,
+        )
     }catch(e){
         let result = {
             success: false,
@@ -210,14 +204,13 @@ exports.OkCompleteNotice = async(req, res, next, feedback) => {
         console.log('피드백 완료 수락 알림');
         const uid = req.user.user_uid;
 
-        await Notice.create({
-            sender_uid: req.user.user_uid,
-            type: '4.2',
-            data: `${feedback.id}.0.0`,
-            text: `${finduser(uid)} 님이 피드백 완료 요청을 수락했습니다.`,
-            receiver_uid: feedback.user_uid,
-            read_date: null,
-        })
+        await insert(
+            uid,
+            [4, 2],
+            [feedback.id, null, null],
+            `${finduser(uid)} 님이 피드백 완료 요청을 수락했습니다.`,
+            feedback.user_uid,
+        )
     }catch(e){
         let result = {
             success: false,
@@ -236,14 +229,13 @@ exports.NoCompleteNotice = async(req, res, next, feedback) => {
         console.log('피드백 완료 수락 알림');
         const uid = req.user.user_uid;
 
-        await Notice.create({
-            sender_uid: req.user.user_uid,
-            type: '4.3',
-            data: `${feedback.id}.0.0`,
-            text: `${finduser(uid)} 님이 피드백 완료 요청을 거절했습니다.`,
-            receiver_uid: feedback.user_uid,
-            read_date: null,
-        })
+        await insert(
+            uid,
+            [4, 3],
+            [feedback.id, null, null],
+            `${finduser(uid)} 님이 피드백 완료 요청을 거절했습니다.`,
+            feedback.user_uid,
+        )
     }catch(e){
         let result = {
             success: false,
