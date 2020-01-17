@@ -72,6 +72,45 @@ router.post('/create', isLoggedIn, async (req, res, next) => {
     }
 });
 
+router.post('/complete', isLoggedIn, async (req, res, next) => {
+    try {
+        const { adviser, category, title, write_date } = req.body;
+        console.log('피드백 완료', adviser, category, title, write_date);
+
+        const exFeedback = await Feedback.create({
+            user_uid: req.user.user_uid,
+            adviser_uid: adviser,
+            category,
+            title,
+            write_date,
+        });
+
+        let result = {
+            success: true,
+            data: '',
+            message: '피드백 생성 완료',
+        }
+        if (exFeedback) {
+            result.data = exFeedback
+            res.status(201).json(result);
+        } else {
+            result.success = false;
+            result.message = '피드백이 생성되지 않았습니다.';
+            return res.status(201).json(result);
+        }
+
+    } catch (e) {
+        let result = {
+            success: false,
+            data: '',
+            message: e
+        }
+        res.status(500).json(result);
+        console.error(e);
+        return next(e);
+    }
+});
+
 /* getfeedback API
  */
 router.get('/all/:lastid', isLoggedIn, async (req, res, next) => {
@@ -164,6 +203,46 @@ router.get('/all/:lastid/:limit', isLoggedIn, async (req, res, next) => {
             data: feedbackList,
             message: ""
         }
+        res.status(200).json(result);
+    } catch (e) {
+        let result = {
+            success: false,
+            data: '',
+            message: e
+        }
+        res.status(500).json(result);
+        console.error(e);
+        return next(e);
+    }
+});
+
+router.get('/my/:lastid', isLoggedIn, async (req, res, next) => {
+    try {
+        let result = {
+            success: true,
+            data: '',
+            message: "내가 만든 피드백 목록"
+        }
+        let lastid = parseInt(req.params.lastid);
+        console.log('myFeedback 요청', lastid);
+        if (lastid === 0) {
+            lastid = 9999;
+        }
+        const user = await User.findOne({
+            where: { user_uid: req.user.user_uid }
+        })
+        const category = JSON.parse(user.category)
+        result.data = await Feedback.findAll({
+            where: { user_uid: req.user.user_uid, id: { [Op.lt]: lastid } },
+            order: [['write_date', 'DESC']],
+            limit: 10,
+        });
+        await result.data.map((contact) => {
+            findCategory(contact.category, category).then((data) => {
+                // console.log(data, contact.category);
+                contact.category = data
+            });
+        })
         res.status(200).json(result);
     } catch (e) {
         let result = {

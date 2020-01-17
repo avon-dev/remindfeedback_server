@@ -1,4 +1,10 @@
 //feedback 테이블 정보 담기
+/*complete
+[-1] : 피드백 상태가 아무것도 아님
+[0] : 피드백 완료 요청 거절 상태
+[1] : 피드백 완료 요청 상태
+[2] : 피드백 완료 수락 상태
+*/
 module.exports = (sequelize, DataTypes) => (
     sequelize.define('feedback', {
         user_uid: {
@@ -22,9 +28,9 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: false
         },
         complete: {
-            type: DataTypes.BOOLEAN,
+            type: DataTypes.INTEGER,
             allowNull: false,
-            defaultValue: false,
+            defaultValue: -1,
         },        
         confirm: {
             type: DataTypes.BOOLEAN,
