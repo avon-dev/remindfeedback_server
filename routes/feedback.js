@@ -177,6 +177,46 @@ router.get('/all/:lastid/:limit', isLoggedIn, async (req, res, next) => {
     }
 });
 
+router.get('/my/:lastid', isLoggedIn, async (req, res, next) => {
+    try {
+        let result = {
+            success: true,
+            data: '',
+            message: "내가 만든 피드백 목록"
+        }
+        let lastid = parseInt(req.params.lastid);
+        console.log('myFeedback 요청', lastid);
+        if (lastid === 0) {
+            lastid = 9999;
+        }
+        const user = await User.findOne({
+            where: { user_uid: req.user.user_uid }
+        })
+        const category = JSON.parse(user.category)
+        result.data = await Feedback.findAll({
+            where: { user_uid: req.user.user_uid, id: { [Op.lt]: lastid } },
+            order: [['write_date', 'DESC']],
+            limit: 10,
+        });
+        await result.data.map((contact) => {
+            findCategory(contact.category, category).then((data) => {
+                // console.log(data, contact.category);
+                contact.category = data
+            });
+        })
+        res.status(200).json(result);
+    } catch (e) {
+        let result = {
+            success: false,
+            data: '',
+            message: e
+        }
+        res.status(500).json(result);
+        console.error(e);
+        return next(e);
+    }
+});
+
 router.get('/my/:lastid/:limit', isLoggedIn, async (req, res, next) => {
     try {
         let result = {
