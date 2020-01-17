@@ -184,7 +184,7 @@ router.delete('/:board_id', isLoggedIn, async (req, res, next) => {
 
                     let query_update =
                         'UPDATE comments SET deletedAt=NOW() WHERE fk_board_id=:board_id; ' +
-                        'UPDATE boards SET deletedAt=NOW() WHERE board_id=:board_id';
+                        'UPDATE boards SET deletedAt=NOW() WHERE id=:board_id';
 
                     // DB에서 게시글 삭제
                     sequelize.query(query_update, {
