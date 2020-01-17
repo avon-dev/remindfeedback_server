@@ -620,6 +620,8 @@ router.put('/reject', isLoggedIn, async function (req, res, next) {
 router.get('/allrequest/send', isLoggedIn, async function (req, res, next) {
     try {
         const user_uid = req.user.user_uid;
+
+        // 쿼리문 수정 후 테스트(페이징 적용)
         let query =
             'SELECT u.user_uid, u.email, u.nickname, u.portrait, u.introduction, f.type ' +
             'FROM users AS u, (' +

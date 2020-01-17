@@ -170,13 +170,13 @@ router.delete('/:board_id', isLoggedIn, async (req, res, next) => {
                     // 삭제할 파일 목록 배열에 저장
                     let deleteItems = [];
 
-                    if (board[0].board_file1) {
+                    if (board.board_file1) {
                         deleteItems.push({ Key: board.board_file1 })
                     }
-                    if (board[0].board_file2) {
+                    if (board.board_file2) {
                         deleteItems.push({ Key: board.board_file2 })
                     }
-                    if (board[0].board_file3) {
+                    if (board.board_file3) {
                         deleteItems.push({ Key: board.board_file3 })
                     }
                     // 삭제 목록 배열 전달 -> S3에서 파일 삭제
