@@ -87,6 +87,41 @@ router.get('/:feedbackid/:lastid', isLoggedIn, async (req, res, next) => {
     }
 });
 
+router.get('/:feedbackid/:lastid/:limit', isLoggedIn, async (req, res, next) => {
+    try {
+        let feedbackid = parseInt(req.params.feedbackid);
+        let lastid = parseInt(req.params.lastid);
+        let limit = parseInt(req.params.limit);
+        if (lastid === 0) {
+            lastid = 9999;
+        }
+        console.log('AllBoard 요청', lastid);
+        let boardList;
+
+        boardList = await Board.findAll({
+            where: { id: { [Op.lt]: lastid }, fk_feedbackId: feedbackid },
+            order: [['id', 'DESC']],
+            limit,
+        })
+
+        let result = {
+            success: true,
+            data: boardList,
+            message: ""
+        }
+        res.status(200).json(result);
+    } catch (e) {
+        let result = {
+            success: false,
+            data: '',
+            message: e
+        }
+        res.status(500).json(result);
+        console.error(e);
+        return next(e);
+    }
+});
+
 router.delete('/:board_id', isLoggedIn, async (req, res, next) => {
     try {
         console.log('[DELETE] 게시글 삭제 요청');

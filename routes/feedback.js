@@ -125,7 +125,59 @@ router.get('/all/:lastid', isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.get('/my/:lastid', isLoggedIn, async (req, res, next) => {
+router.get('/all/:lastid/:limit', isLoggedIn, async (req, res, next) => {
+    try {
+        const user_uid = req.user.user_uid;
+        let lastid = parseInt(req.params.lastid);
+        let limit = parseInt(req.params.limit);
+        console.log('AllFeedback 요청', lastid);
+        if (lastid === 0) {
+            lastid = 9999;
+        }
+        let feedbackList = {
+            myFeedback: '',
+            yourFeedback: '',
+            user: '',
+            category: '',
+        }
+        //유저정보 담아주기
+        feedbackList.user = await User.findOne({
+            attributes: ['email', 'nickname', 'portrait', 'introduction', 'tutorial', 'category'],
+            where: { user_uid }
+        })
+        //유저의 카테고리 목록
+        feedbackList.category = await JSON.parse(feedbackList.user.category);
+        //유저가 만든 피드백 목록
+        feedbackList.myFeedback = await Feedback.findAll({
+            where: { user_uid, id: { [Op.lt]: lastid } },
+            order: [['createdAt', 'DESC']],
+            limit,
+        })
+        //유저가 조언자인 피드백 목록
+        feedbackList.yourFeedback = await Feedback.findAll({
+            where: { adviser_uid: user_uid, id: { [Op.lt]: lastid } },
+            order: [['createdAt', 'DESC']],
+            limit,
+        })
+        let result = {
+            success: true,
+            data: feedbackList,
+            message: ""
+        }
+        res.status(200).json(result);
+    } catch (e) {
+        let result = {
+            success: false,
+            data: '',
+            message: e
+        }
+        res.status(500).json(result);
+        console.error(e);
+        return next(e);
+    }
+});
+
+router.get('/my/:lastid/:limit', isLoggedIn, async (req, res, next) => {
     try {
         let result = {
             success: true,
@@ -133,6 +185,7 @@ router.get('/my/:lastid', isLoggedIn, async (req, res, next) => {
             message: "내가 만든 피드백 목록"
         }
         let lastid = parseInt(req.params.lastid);
+        let limit = parseInt(req.params.limit);
         console.log('myFeedback 요청', lastid);
         if (lastid === 0) {
             lastid = 9999;
@@ -144,7 +197,7 @@ router.get('/my/:lastid', isLoggedIn, async (req, res, next) => {
         result.data = await Feedback.findAll({
             where: { user_uid: req.user.user_uid, id: { [Op.lt]: lastid } },
             order: [['write_date', 'DESC']],
-            limit: 10,
+            limit,
         });
         await result.data.map((contact) => {
             findCategory(contact.category, category).then((data) => {
@@ -173,6 +226,34 @@ router.get('/your/:lastid', isLoggedIn, async (req, res, next) => {
             where: { adviser_uid: req.user.user_uid, id: { [Op.lt]: lastid } },
             order: [['write_date', 'DESC']],
             limit: 10,
+        });
+        let result = {
+            success: true,
+            data: yourFeedback,
+            message: "내가 조언자인 피드백 목록"
+        }
+        res.status(200).json(result);
+    } catch (e) {
+        let result = {
+            success: false,
+            data: '',
+            message: e
+        }
+        res.status(500).json(result);
+        console.error(e);
+        return next(e);
+    }
+});
+
+router.get('/your/:lastid/:limit', isLoggedIn, async (req, res, next) => {
+    try {
+        let lastid = parseInt(req.params.lastid);
+        let limit = parseInt(req.params.limit);
+        console.log('yourFeedback 요청', lastid);
+        const yourFeedback = await Feedback.findAll({
+            where: { adviser_uid: req.user.user_uid, id: { [Op.lt]: lastid } },
+            order: [['write_date', 'DESC']],
+            limit,
         });
         let result = {
             success: true,

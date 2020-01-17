@@ -9,6 +9,7 @@
 * **URL**
 
   http://54.180.118.35/feedback/all/(lastid)
+  http://54.180.118.35/feedback/all/(lastid)/(limit)
 
 * **Method:**
 
@@ -18,8 +19,11 @@
 
     **lastid:**
     * `lastid` 몇번째 id 부터 데이터를 반환받을지에 대한 정보
-    *  초기 값은 0
+    *  초기 값은 0으로 설정바람
     *  반환되는 배열의 마지막 feedback ID 값을 req 에 담기
+
+    **limit:**
+    * `limit` 몇개의 데이터를 반환받을지에 대한 정보
 
     **cookie:**
     
@@ -69,6 +73,7 @@
 * **URL**
 
   http://54.180.118.35/feedback/my/(lastid)
+  http://54.180.118.35/feedback/my/(lastid)/(limit)
 
 * **Method:**
 
@@ -79,10 +84,13 @@
     **lastid:**
     
     * `lastid` 몇번째 id 부터 데이터를 반환받을지에 대한 정보
-    *  초기 값은 0
+    *  초기 값은 0으로 설정바람
     *  반환되는 배열의 마지막 feedback ID 값을 req 에 담기
-    **cookie:**
     
+    **limit:**
+    * `limit` 몇개의 데이터를 반환받을지에 대한 정보
+
+    **cookie:**
     * `connect.sid` 로그인 시 발급된 cookie 정보
 
     
@@ -124,6 +132,7 @@
 * **URL**
 
   http://54.180.118.35/feedback/your/(lastid)
+  http://54.180.118.35/feedback/your/(lastid)/(limit)
 
 * **Method:**
 
@@ -137,8 +146,10 @@
     *  초기 값은 0
     *  반환되는 배열의 마지막 feedback ID 값을 req 에 담기
 
+    **limit:**
+    * `limit` 몇개의 데이터를 반환받을지에 대한 정보
+
     **cookie:**
-    
     * `connect.sid` 로그인 시 발급된 cookie 정보
 
     

@@ -11,6 +11,7 @@
 * **URL**
 
   http://54.180.118.35/board/(feedbackid)/(lastid)
+  http://54.180.118.35/board/(feedbackid)/(lastid)/(limit)
 
 * **Method:**
 
@@ -25,6 +26,9 @@
     * `lastid` 몇번째 id 부터 데이터를 반환받을지에 대한 정보
     *  초기 값은 0
     *  반환되는 배열의 마지막 feedback ID 값을 req 에 담기
+
+    **limit:**
+    * `limit` 몇개의 데이터를 반환받을지에 대한 정보
 
     **cookie:**
     * `connect.sid` 로그인 시 발급된 cookie 정보
