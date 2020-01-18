@@ -238,6 +238,61 @@
   }
   ```
 
+  
+----
+**Complete Feedback**
+----
+피드백 생성
+
+* **URL**
+  피드백 완료 요청
+  http://54.180.118.35/feedback/complete/request
+  피드백 완료 요청 거절
+  http://54.180.118.35/feedback/complete/reject
+  피드백 완료 요청 수락
+  http://54.180.118.35/feedback/complete/accept
+
+* **Method:**
+
+  `POST`
+  
+*  **complete 설명**
+  feedback 의 complete 변수 설명
+  -1 : 어떤 상태도 아님
+  0 : 피드백 완료 거절 상태
+  1 : 피드백 완료 요청 상태
+  2 : 피드백 완료 수락 상태
+
+* **Data Params**
+
+    **Required:**
+    
+    * `feedback_id=[string]` 피드백 id, 
+
+
+* **Success Response:**
+
+  * **Code:** 201 
+    **Content:** 요청한 피드백 정보
+ <br />
+
+* **Sample request JSON data:**
+  ```json
+  {
+      "headers": {
+        "Content-Type": "application/json",
+      },
+      "cookie": {
+        "connect.sid": "s%3AfxZgKcirzD_d0zAHVTEnf9DQu9FVI2rO.Ijf7scJ%2Buj6YtprVUB6Vcuf1QVNXDIR64MP43366CaQ",
+      },
+      "adviser": "$2b$12$P6uA2DrSoWi4uK1Ik5rvu.jbykxXOi71JMTtHr8yKxvLCr03HiPfO",
+      "category": 1,
+      "title": "나의 첫번째 피드백",
+      "write_date": "2019-12-25T18:25:43.000Z",
+  }
+  ```
+
+
 ----
 **Update Feedback All**
 ----

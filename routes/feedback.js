@@ -72,30 +72,129 @@ router.post('/create', isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.post('/complete', isLoggedIn, async (req, res, next) => {
+router.post('/complete/request', isLoggedIn, async (req, res, next) => {
     try {
-        const { adviser, category, title, write_date } = req.body;
-        console.log('피드백 완료', adviser, category, title, write_date);
+        const { feedback_id } = req.body;
+        console.log('피드백 완료 요청', feedback_id);
 
-        const exFeedback = await Feedback.create({
-            user_uid: req.user.user_uid,
-            adviser_uid: adviser,
-            category,
-            title,
-            write_date,
-        });
+        const beforeFeedback = await Feedback.findOne({ where: {id: feedback_id} });
 
         let result = {
             success: true,
             data: '',
-            message: '피드백 생성 완료',
+            message: '피드백 완료 요청 성공',
         }
+        
+        if(!beforeFeedback) {
+            result.success = false;
+            result.message = '피드백이 존재하지 않습니다';
+            return res.status(201).json(result);
+        }
+
+        await Feedback.update({
+            complete: 1
+        }, { where: { id: feedback_id } });
+
+        const exFeedback = await Feedback.findOne({ where: {id: feedback_id} });
+
         if (exFeedback) {
             result.data = exFeedback
             res.status(201).json(result);
         } else {
             result.success = false;
-            result.message = '피드백이 생성되지 않았습니다.';
+            result.message = '존재하지 않는 피드백 입니다.';
+            return res.status(201).json(result);
+        }
+
+    } catch (e) {
+        let result = {
+            success: false,
+            data: '',
+            message: e
+        }
+        res.status(500).json(result);
+        console.error(e);
+        return next(e);
+    }
+});
+
+router.post('/complete/reject', isLoggedIn, async (req, res, next) => {
+    try {
+        const { feedback_id } = req.body;
+        console.log('피드백 완료 거절 요청', feedback_id);
+
+        const beforeFeedback = await Feedback.findOne({ where: {id: feedback_id} });
+
+        let result = {
+            success: true,
+            data: '',
+            message: '피드백 완료 요청 거절',
+        }
+
+        if(!beforeFeedback) {
+            result.success = false;
+            result.message = '피드백이 존재하지 않습니다';
+            return res.status(201).json(result);
+        }
+
+        await Feedback.update({
+            complete: 0
+        }, { where: { id: feedback_id } });
+
+        const exFeedback = await Feedback.findOne({ where: {id: feedback_id} });
+
+        if (exFeedback) {
+            result.data = exFeedback
+            res.status(201).json(result);
+        } else {
+            result.success = false;
+            result.message = '존재하지 않는 피드백 입니다.';
+            return res.status(201).json(result);
+        }
+
+    } catch (e) {
+        let result = {
+            success: false,
+            data: '',
+            message: e
+        }
+        res.status(500).json(result);
+        console.error(e);
+        return next(e);
+    }
+});
+
+router.post('/complete/accept', isLoggedIn, async (req, res, next) => {
+    try {
+        const { feedback_id } = req.body;
+        console.log('피드백 완료 수락 요청', feedback_id);
+
+        const beforeFeedback = await Feedback.findOne({ where: {id: feedback_id} });
+
+        let result = {
+            success: true,
+            data: '',
+            message: '피드백 완료 요청 수락',
+        }
+
+        if(!beforeFeedback) {
+            result.success = false;
+            result.message = '피드백이 존재하지 않습니다';
+            return res.status(201).json(result);
+        }
+
+        await Feedback.update({
+            complete: 2
+        }, { where: { id: feedback_id } });
+
+        const exFeedback = await Feedback.findOne({ where: {id: feedback_id} });
+
+        if (exFeedback) {
+            result.data = exFeedback
+            res.status(201).json(result);
+        } else {
+            result.success = false;
+            result.message = '존재하지 않는 피드백 입니다.';
             return res.status(201).json(result);
         }
 
