@@ -21,9 +21,8 @@ if (config.use_env_variable) {
     );
 }
 
-/* Friend CRUD API
- * - parameter user_id : 로그인 한 회원 uuid
- * - parameter friend_id : 친구 추가할 회원 uuid
+/* 
+Friend CRUD API
  */
 // Search(친구 검색)
 router.post ('/search', isLoggedIn, async function (req, res, next) {
@@ -64,7 +63,7 @@ router.post ('/search', isLoggedIn, async function (req, res, next) {
                 result.data = 'NONE';
                 result.message = '[SEARCH] 사용자를 찾을 수 없습니다.';
                 console.log(result);
-                return res.status(404).send(result);
+                return res.status(200).send(result);
             } else {
                 // 사용자 테이블에서 사용자 검색에 성공한 경우
                 console.log('[SEARCH] 사용자 검색 성공');
@@ -791,6 +790,67 @@ router.get('/allfriend', isLoggedIn, async function (req, res, next) {
     }
 });
 
+// Read All Adviser(모든 조언자 목록)
+router.get('/alladviser', isLoggedIn, async function (req, res, next){
+    try {
+        const user_uid = req.user.user_uid;
+        let query =
+            'SELECT u.user_uid, u.email, u.nickname, u.portrait, u.introduction, f.type ' +
+            'FROM users AS u, ' +
+            '(' +
+            'SELECT friend_uid, type ' +
+            'FROM friends ' +
+            'WHERE user_uid=:user_uid AND type=2 ' +
+            'UNION ' +
+            'SELECT user_uid, type ' +
+            'FROM friends ' +
+            'WHERE friend_uid=:user_uid AND type=2' +
+            ') AS f ' +
+            'WHERE u.user_uid=f.friend_uid ' +
+            'ORDER BY u.nickname ASC';
+        await sequelize.query(query, {
+            replacements: {
+                user_uid: user_uid
+            },
+            type: Sequelize.QueryTypes.SELECT,
+            raw: true
+        }).then((friendList) => {
+            // 정상적으로 조언자 목록을 불러온 경우
+            console.log('[ALL ADVISER] 조언자 목록 불러오기 성공');
+
+            if (friendList[0] == null) {
+                const result = new Object();
+                result.success = true;
+                result.data = '';
+                result.message = '[ALL ADVISER] 가져올 조언자 목록이 없습니다.';
+                console.log(result);
+                return res.status(200).send(result);
+            } else {
+                // 친구 목록을 그대로 리턴
+                const result = new Object();
+                result.success = true;
+                result.data = friendList;
+                result.message = '[ALL ADVISER] 조언자 목록을 성공적으로 가져왔습니다.';
+                console.log(result);
+                return res.status(200).send(result);
+            }
+        }).catch(error => {
+            // 친구 목록 조회를 실패한 경우
+            console.log('[ALL ADVISER] 조언자 목록 조회 실패', error);
+
+            const result = new Object();
+            result.success = false;
+            result.data = 'NONE';
+            result.message = '[ALL ADVISER] 조언자 목록 조회 과정에서 에러가 발생하였습니다.';
+            console.log(result);
+            return res.status(500).send(result);
+        });
+    } catch (e) {
+        console.error(e);
+        return next(e);
+    }
+});
+
 // Read All Block(모든 친구 차단 목록)
 router.get('/allblock', isLoggedIn, async function (req, res, next) {
     try {
@@ -870,8 +930,8 @@ router.put('/block', isLoggedIn, async function (req, res, next) {
             return res.status(200).send(result);
         }
 
-        // 사용자 테이블에서 이메일로 사용자 검색
-        // SELECT user_uid, email, nickname, portrait, introduction FROM users WHERE email=:email;
+        // 사용자 테이블에서 uid로 사용자 검색
+        // SELECT user_uid, email, nickname, portrait, introduction FROM users WHERE user_uid=:friend_uid;
         await User.findOne({
             attributes: ['user_uid', 'email', 'nickname', 'portrait', 'introduction'],
             where: {

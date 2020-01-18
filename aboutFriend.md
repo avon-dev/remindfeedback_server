@@ -616,7 +616,7 @@
 
   * **Code:** `200` : 가져올 받은 친구 요청 목록이 있는 경우 <br>
     ```
-    친구 목록은 내가 상대방에게 친구 요청을 받고 거절하지 않은 경우(1)만 반환합니다.
+    모든 받은 친구 목록은 내가 상대방에게 친구 요청을 받고 거절하지 않은 경우(1)만 반환합니다.
     ```
     **Content:** 
     ```json
@@ -748,6 +748,82 @@
         "success": false,
         "data": "NONE",
         "message": "[ALL FRIEND] 친구 목록 조회 과정에서 에러가 발생하였습니다."
+    }
+    ```
+
+
+
+**Read All Adviser**
+----
+  조언자 목록 불러오기.
+
+* **URL**
+
+    `/alladviser`
+
+* **Method:**
+ 
+    `GET`
+  
+* **URL Params**
+
+   `NONE`
+
+* **Data Params**
+ 
+    `NONE`
+
+* **Success Response:**
+
+  * **Code:** `200` : 가져올 조언자 목록이 없는 경우 <br>
+    **Content:** 
+    ```json
+    {
+        "success": true,
+        "data": "",
+        "message": "[ALL ADVISER] 가져올 조언자 목록이 없습니다."
+    }
+    ```
+
+  * **Code:** `200` : 가져올 조언자 목록이 있는 경우 <br>
+    ```
+    조언자 목록은 나와 상대방이 친구 관계인 경우(2)만 반환합니다.
+    ```
+    **Content:** 
+    ```json
+    {
+        "success": true,
+        "data": [
+            {
+                "user_uid": "sdfgh^&^$%@@#qrwgsh@%%uiukjhht%&iujhgfe%y&iuyhgfd",
+                "email": "test1@naver.com",
+                "nickname": "test1",
+                "portrait": "",
+                "introduction": "",
+                "type": 2
+            },
+            {
+                "user_uid": "sdfgh^&^$%@@#qrwgsh@%%uiukjhht%&iujhgfe%y&iuyhgfd",
+                "email": "test2@naver.com",
+                "nickname": "test2",
+                "portrait": "",
+                "introduction": "",
+                "type": 2
+            }
+        ],
+        "message": "[ALL ADVISER] 조언자 목록을 성공적으로 가져왔습니다."
+    }
+    ```
+
+* **Error Response:**
+
+  * **Code:** `500` INTERNAL SERVER ERROR <br>
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "[ALL ADVISER] 조언자 목록 조회 과정에서 에러가 발생하였습니다."
     }
     ```
 
