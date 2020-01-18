@@ -13,7 +13,7 @@ let result = { // response form
  * - parameter user_id : 로그인 한 회원 uuid
  * - parameter friend_id : 친구 추가할 회원 uuid
  */
-router.get('/selectall/:board_id', async(req, res, next)=>{
+router.get('/selectall/:board_id', isLoggedIn, async(req, res, next)=>{
     const board_id = parseInt(req.params.board_id);
     console.log(`해당 게시물의 전체 댓글 조회 요청 = ${board_id}`);
     result.data = '';
@@ -61,7 +61,7 @@ router.get('/selectall/:board_id', async(req, res, next)=>{
  * - parameter user_uid : 로그인 한 회원 uuid
  * - parameter friend_id : 친구 추가할 회원 uuid
  */
-router.get('/selectone/:comment_id', async(req, res, next)=>{
+router.get('/selectone/:comment_id', isLoggedIn, async(req, res, next)=>{
     const comment_id = parseInt(req.params.comment_id);
     console.log(`댓글 조회 요청 = ${comment_id}`);
     result.data = '';
@@ -102,6 +102,7 @@ router.post('/create', isLoggedIn, async (req, res, next)=>{
         const user_uid = req.user.user_uid;
         const comment_content = req.body.comment_content;
         const board_id = parseInt(req.body.board_id);
+
         result.data = '';
         if(!comment_content) {
             result.success = false;
@@ -127,13 +128,24 @@ router.post('/create', isLoggedIn, async (req, res, next)=>{
                     console.log(`댓글 작성 실패: 댓글 작성 권한 없음`, JSON.stringify(result));
                     return res.status(401).json(result);
                 }
-                const newComment = await Comment.create({
+                const comment = await Comment.create({
                     fk_board_id: board_id,
                     fk_user_uid: user_uid,
                     comment_content,
                 });
-                if(newComment){
-                    result.data = newComment;
+                if(comment){
+                    const user = new Object();
+                    user.user_uid = user_uid;
+                    user.email = req.user.email;
+                    user.nickname = req.user.nickname;
+                    user.portrait = req.user.portrait;
+                    user.introduction = req.user.introduction;
+
+                    const returnData = new Object();
+                    returnData.user = user;
+                    returnData.comment = comment;
+
+                    result.data = returnData;
                     result.success = true;
                     result.message = '[201 CREATED] 댓글 생성 완료';
                     return res.status(201).json(result);
@@ -271,6 +283,5 @@ router.delete('/delete/:comment_id', isLoggedIn, async (req, res, next)=>{
         return next(e);
     }
 });
-
 
 module.exports = router;

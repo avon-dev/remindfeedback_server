@@ -95,20 +95,29 @@ Create a comment to a single post.
 * **Success Response:**
 
   * **Code:** 201 
-    **Content:** 사용자가 생성한 댓글 객체 반환<br/>
+    **Content:** 사용자 정보 및 사용자가 생성한 댓글 객체 반환<br/>
 
     * **Sample request JSON data:**
     ```json
     {
         "success": true,
         "data": {
-            "confirm": false,
-            "id": 6,
-            "fk_board_id": "3",
-            "fk_user_uid": "$2b$12$RCxSlT27FkieRFlulGF1uuE64BzKWVcF9r/SrssGRoD.wr8wjqrk6",
-            "comment_content": "3333-4444",
-            "updatedAt": "2019-12-31T12:32:20.722Z",
-            "createdAt": "2019-12-31T12:32:20.722Z"
+            "user": {
+                "user_uid": "sdfgh^&^$%@@#qrwgsh@%%uiukjhht%&iujhgfe%y&iuyhgfd",
+                "email": "test@naver.com",
+                "nickname": "test",
+                "portrait": "",
+                "introduction": ""
+            },
+            "comment": {
+                "confirm": false,
+                "id": 40,
+                "fk_board_id": 10,
+                "fk_user_uid": "sdfgh^&^$%@@#qrwgsh@%%uiukjhht%&iujhgfe%y&iuyhgfdq",
+                "comment_content": "content",
+                "updatedAt": "2020-01-01T09:12:20.178Z",
+                "createdAt": "2020-01-01T09:12:20.178Z"
+            }
         },
         "message": "[201 CREATED] 댓글 생성 완료"
     }
