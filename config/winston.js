@@ -1,17 +1,24 @@
 const { createLogger, format, transports } = require('winston');
 const moment = require('moment');
+require('moment-timezone');
 const fs = require('fs');
 
 const env = process.env.NODE_ENV || "development";
-const { combine, timestamp, label, printf } = format;
+const { combine, label, printf, timestamp } = format;
+const logDir = 'log';
+const DATE = moment().format("YYYY-MM-DD");
 
 // Log 출력 포맷 지정
 const myFormat = printf(({ level, message, label, timestamp }) => {
     return `${timestamp} [${label}] ${level}: ${message}`;
 });
 
-const logDir = 'log';
-const DATE = moment().format("YYYY-MM-DD");
+// 기본 timestamp 대신 확장 timestamp 사용
+const appendTimestamp = format((info, opts) => {
+    if (opts.tz)
+        info.timestamp = moment().tz(opts.tz).format('YYYY-MM-DD HH:mm:ss.SSS Z');
+    return info;
+});
 
 // log 폴더가 없으면 만듦
 if (!fs.existsSync(logDir)) {
@@ -24,13 +31,13 @@ const transport_file = new transports.File({
     datePattern: 'YYYY-MM-DD',
     zippedArchive: false,
     colorize: false,
-    level: env === "development" ? "debug" : "info",
+    // level: env === "development" ? "debug" : "info",
+    level: 'info',
     showLevel: true,
-    json: false,
-    timestamp: timestamp(),
+    json: true,
     format: combine(
         label({ label: 'server-test' }),
-        timestamp(),
+        appendTimestamp({ tz: 'Asia/Seoul' }),
         myFormat
     ),
     maxsize: 200000, // 단위는 바이트
@@ -42,10 +49,10 @@ const transport_console = new (transports.Console)({
     colorize: true,
     level: 'debug',
     showLevel: true,
-    json: false,
+    json: true,
     format: combine(
         label({ label: 'server-test' }),
-        timestamp(),
+        appendTimestamp({ tz: 'Asia/Seoul' }),
         myFormat
     )
 });

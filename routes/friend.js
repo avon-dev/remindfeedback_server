@@ -1,3 +1,5 @@
+const winston = require('../config/winston');
+
 const express = require('express');
 const { User, Friend } = require('../models');
 const passport = require('passport');
@@ -20,10 +22,9 @@ if (config.use_env_variable) {
         config
     );
 }
+ 
+// Friend CRUD API
 
-/* 
-Friend CRUD API
- */
 // Search(친구 검색)
 router.post ('/search', isLoggedIn, async function (req, res, next) {
     try {

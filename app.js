@@ -70,7 +70,7 @@ if (cluster.isMaster) {
            master_id = msg.master_id;
        }
    }).on('unhandledRejection', (reason, p) => {
-    winston.error(reason, ' [Unhandled Rejection at Promise] ', p);
+    winston.log('error', reason, ' [Unhandled Rejection at Promise] ', p);
   }).on('uncaughtException', (err) => {
     try{
       // 에러가 발생하면 3초 이내에 process를 죽인다.
