@@ -238,12 +238,20 @@ router.get('/all/:lastid', isLoggedIn, async (req, res, next) => {
             where: { user_uid, id: { [Op.lt]: lastid } },
             order: [['createdAt', 'DESC']],
             limit: 10,
+            include: [{
+                model: User,
+                attributes: ['nickname', 'portrait']
+            }]
         })
         //유저가 조언자인 피드백 목록
         feedbackList.yourFeedback = await Feedback.findAll({
             where: { adviser_uid: user_uid, id: { [Op.lt]: lastid } },
             order: [['createdAt', 'DESC']],
             limit: 10,
+            include: [{
+                model: User,
+                attributes: ['nickname', 'portrait']
+            }]
         })
         let result = {
             success: true,
@@ -290,12 +298,20 @@ router.get('/all/:lastid/:limit', isLoggedIn, async (req, res, next) => {
             where: { user_uid, id: { [Op.lt]: lastid } },
             order: [['createdAt', 'DESC']],
             limit,
+            include: [{
+                model: User,
+                attributes: ['nickname', 'portrait']
+            }]
         })
         //유저가 조언자인 피드백 목록
         feedbackList.yourFeedback = await Feedback.findAll({
             where: { adviser_uid: user_uid, id: { [Op.lt]: lastid } },
             order: [['createdAt', 'DESC']],
             limit,
+            include: [{
+                model: User,
+                attributes: ['nickname', 'portrait']
+            }]
         })
         let result = {
             success: true,

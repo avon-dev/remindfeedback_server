@@ -60,6 +60,13 @@ db.User.hasMany(db.Friend, {
   onDelete: 'CASCADE'
 });
 
+// db.User.hasMany(db.Feedback, {
+//   foreignKey: 'adviser_uid', sourceKey: 'user_uid',
+// });
+db.Feedback.belongsTo(db.User, {
+  foreignKey: 'adviser_uid', sourceKey: 'user_uid',
+});
+
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {
     db[modelName].associate(db);
