@@ -53,8 +53,11 @@
       -- `category` 주제 ID
       -- `title` 피드백 제목
       -- `write_date` 피드백 받은 날짜
-      -- `createdAt` 피드백 수정 날짜
+      -- `createdAt` 피드백 생성 날짜
+      -- `updatedAt` 피드백 수정 날짜
       -- `deletedAt` 피드백 삭제 날짜
+      -- `complete` 피드백 완료 여부(int)
+      -- `user` 조언자 닉네임과 사진정보 (객체)
       <br/>
 
   * **Sample request JSON data:**
@@ -111,8 +114,11 @@
       - `category` 주제
       - `title` 피드백 제목
       - `write_date` 피드백 받은 날짜
-      - `createdAt` 피드백 수정 날짜
-      - `deletedAt` 피드백 삭제 날짜
+      -- `createdAt` 피드백 생성 날짜
+      -- `updatedAt` 피드백 수정 날짜
+      -- `deletedAt` 피드백 삭제 날짜
+      -- `complete` 피드백 완료 여부(int)
+      -- `user` 조언자 닉네임과 사진정보 (객체)
       <br/>
 
   * **Sample request JSON data:**
@@ -170,8 +176,11 @@
       - `category` 주제 ID
       - `title` 피드백 제목
       - `write_date` 피드백 받은 날짜
-      - `createdAt` 피드백 수정 날짜
-      - `deletedAt` 피드백 삭제 날짜
+      -- `createdAt` 피드백 생성 날짜
+      -- `updatedAt` 피드백 수정 날짜
+      -- `deletedAt` 피드백 삭제 날짜
+      -- `complete` 피드백 완료 여부(int)
+      -- `user` 조언자 닉네임과 사진정보 (객체)
       <br/>
 
   * **Sample request JSON data:**
