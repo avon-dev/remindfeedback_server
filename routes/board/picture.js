@@ -131,17 +131,17 @@ router.patch('/files/:board_id', isLoggedIn, upload_s3_test(type, fileSize).fiel
         tempBoard.board_file1 = await beforeBoard.board_file1;
         tempBoard.board_file2 = await beforeBoard.board_file2;
         tempBoard.board_file3 = await beforeBoard.board_file3;
-        if(updatefile1){
+        if(updatefile1 === 'true' || updatefile1 === true){
             deleteItems.push({Key:beforeBoard.board_file1})
             if(req.files.file1)tempBoard.board_file1 = await req.files.file1[0].key
             else{tempBoard.board_file1 = null}
         }
-        if(updatefile2){
+        if(updatefile2 === 'true' || updatefile2 === true){
             deleteItems.push({Key:beforeBoard.board_file2})
             if(req.files.file2)tempBoard.board_file2 = await req.files.file2[0].key
             else{tempBoard.board_file2 = null}
         }
-        if(updatefile3){
+        if(updatefile3 === 'true' || updatefile3 === true){
             deleteItems.push({Key:beforeBoard.board_file3})
             if(req.files.file3)tempBoard.board_file3 = await req.files.file3[0].key
             else{tempBoard.board_file3 = null}
