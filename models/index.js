@@ -59,10 +59,7 @@ db.User.hasMany(db.Friend, {
   foreignKey:'fk_friendId', targetKey: 'id',
   onDelete: 'CASCADE'
 });
-
-// db.User.hasMany(db.Feedback, {
-//   foreignKey: 'adviser_uid', sourceKey: 'user_uid',
-// });
+//feedback 호출시 조언자 정보 반환 위한 관계
 db.Feedback.belongsTo(db.User, {
   foreignKey: 'adviser_uid', sourceKey: 'user_uid',
 });
