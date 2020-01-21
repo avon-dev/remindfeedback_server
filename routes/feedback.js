@@ -240,7 +240,8 @@ router.get('/all/:lastid', isLoggedIn, async (req, res, next) => {
             limit: 10,
             include: [{
                 model: User,
-                attributes: ['nickname', 'portrait']
+                attributes: ['nickname', 'portrait'],
+                as: 'myfeedback'
             }]
         })
         //유저가 조언자인 피드백 목록
@@ -250,7 +251,8 @@ router.get('/all/:lastid', isLoggedIn, async (req, res, next) => {
             limit: 10,
             include: [{
                 model: User,
-                attributes: ['nickname', 'portrait']
+                attributes: ['nickname', 'portrait'],
+                as: 'yourfeedback'
             }]
         })
         let result = {
@@ -300,7 +302,8 @@ router.get('/all/:lastid/:limit', isLoggedIn, async (req, res, next) => {
             limit,
             include: [{
                 model: User,
-                attributes: ['nickname', 'portrait']
+                attributes: ['nickname', 'portrait'],
+                as: 'myfeedback'
             }]
         })
         //유저가 조언자인 피드백 목록
@@ -310,7 +313,8 @@ router.get('/all/:lastid/:limit', isLoggedIn, async (req, res, next) => {
             limit,
             include: [{
                 model: User,
-                attributes: ['nickname', 'portrait']
+                attributes: ['nickname', 'portrait'],
+                as: 'yourfeedback'
             }]
         })
         let result = {
@@ -351,6 +355,11 @@ router.get('/my/:lastid', isLoggedIn, async (req, res, next) => {
             where: { user_uid: req.user.user_uid, id: { [Op.lt]: lastid } },
             order: [['write_date', 'DESC']],
             limit: 10,
+            include: [{
+                model: User,
+                attributes: ['nickname', 'portrait'],
+                as: 'myfeedback'
+            }]
         });
         await result.data.map((contact) => {
             findCategory(contact.category, category).then((data) => {
@@ -392,6 +401,11 @@ router.get('/my/:lastid/:limit', isLoggedIn, async (req, res, next) => {
             where: { user_uid: req.user.user_uid, id: { [Op.lt]: lastid } },
             order: [['write_date', 'DESC']],
             limit,
+            include: [{
+                model: User,
+                attributes: ['nickname', 'portrait'],
+                as: 'myfeedback'
+            }]
         });
         await result.data.map((contact) => {
             findCategory(contact.category, category).then((data) => {
@@ -420,6 +434,11 @@ router.get('/your/:lastid', isLoggedIn, async (req, res, next) => {
             where: { adviser_uid: req.user.user_uid, id: { [Op.lt]: lastid } },
             order: [['write_date', 'DESC']],
             limit: 10,
+            include: [{
+                model: User,
+                attributes: ['nickname', 'portrait'],
+                as: 'yourfeedback'
+            }]
         });
         let result = {
             success: true,
@@ -448,6 +467,11 @@ router.get('/your/:lastid/:limit', isLoggedIn, async (req, res, next) => {
             where: { adviser_uid: req.user.user_uid, id: { [Op.lt]: lastid } },
             order: [['write_date', 'DESC']],
             limit,
+            include: [{
+                model: User,
+                attributes: ['nickname', 'portrait'],
+                as: 'yourfeedback'
+            }]
         });
         let result = {
             success: true,
