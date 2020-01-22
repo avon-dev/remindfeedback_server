@@ -2,7 +2,7 @@ const winston = require('../config/winston');
 
 const express = require('express');
 const { Feedback, User } = require('../models');
-const { isLoggedIn } = require('./middlewares');
+const { clientIp, isLoggedIn } = require('./middlewares');
 
 const router = express.Router();
 
@@ -10,11 +10,13 @@ const router = express.Router();
 // Category CRUD API
 
 // Create(카테고리 생성)
-router.post('/create', isLoggedIn, async (req, res, next) => {
+router.post('/create', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        const user_uid = req.user.user_uid;
+        const {user_uid, user_email} = req.user;
         const { category_title, category_color } = req.body;
-        winston.log('info', `[CATEGORY][${user_uid}] Create(카테고리 생성) Request`);
+
+        winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] 카테고리 생성 Request`);
+        winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] category_title : ${category_title}, category_color : ${category_color}`);
 
         // 사용자 테이블에서 user_uid로 카테고리 검색
         // SELECT category FROM users WHERE user_uid=:user_uid;
@@ -29,7 +31,7 @@ router.post('/create', isLoggedIn, async (req, res, next) => {
                 result.success = false;
                 result.data = 'NONE';
                 result.message = '사용자를 찾을 수 없습니다.';
-                winston.log('info', `[CATEGORY][${user_uid}] ${JSON.stringify(result)}`);
+                winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                 return res.status(200).send(result);
             } else {
                 // 사용자 테이블에서 사용자 검색에 성공한 경우
@@ -42,7 +44,7 @@ router.post('/create', isLoggedIn, async (req, res, next) => {
                     result.success = false;
                     result.data = 'NONE';
                     result.message = '카테고리 제한 개수를 초과했습니다.';
-                    winston.log('info', `[CATEGORY][${user_uid}] ${JSON.stringify(result)}`);
+                    winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                     return res.status(200).json(result);
                 }
 
@@ -52,7 +54,7 @@ router.post('/create', isLoggedIn, async (req, res, next) => {
                     result.success = false;
                     result.data = 'NONE';
                     result.message = '기본 카테고리 이름으로 생성할 수 없습니다.';
-                    winston.log('info', `[CATEGORY][${user_uid}] ${JSON.stringify(result)}`);
+                    winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                     return res.status(200).json(result);
                 }
 
@@ -63,7 +65,7 @@ router.post('/create', isLoggedIn, async (req, res, next) => {
                         result.success = false;
                         result.data = 'NONE';
                         result.message = '이미 생성된 카테고리입니다.';
-                        winston.log('info', `[CATEGORY][${user_uid}] ${JSON.stringify(result)}`);
+                        winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                         return res.status(200).json(result);
                     }
                 }
@@ -89,44 +91,44 @@ router.post('/create', isLoggedIn, async (req, res, next) => {
                         result.success = true;
                         result.data = parseAllCategory;
                         result.message = '새로운 카테고리를 생성했습니다.';
-                        winston.log('info', `[CATEGORY][${user_uid}] ${JSON.stringify(result)}`);
+                        winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                         return res.status(200).json(result);
                     }).catch(error => {
                         // 카테고리 생성을 실패한 경우
-                        winston.log('error', `[CATEGORY][${user_uid}] 카테고리 생성 실패 \n ${error.stack}`);
+                        winston.log('error', `[CATEGORY][${req.clientIp}|${user_email}] 카테고리 생성 실패 \n ${error.stack}`);
 
                         const result = new Object();
                         result.success = false;
                         result.data = 'NONE';
                         result.message = '카테고리 생성 과정에서 에러가 발생하였습니다.';
-                        winston.log('error', `[CATEGORY][${user_uid}] ${JSON.stringify(result)}`);
+                        winston.log('error', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                         return res.status(500).send(result);
                     });
                 }
             }
         }).catch(error => {
             // 사용자 테이블 조회를 실패한 경우
-            winston.log('error', `[CATEGORY][${user_uid}] 사용자 테이블 조회 실패 \n ${error.stack}`);
+            winston.log('error', `[CATEGORY][${req.clientIp}|${user_email}] 사용자 테이블 조회 실패 \n ${error.stack}`);
 
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
             result.message = '사용자 조회 과정에서 에러가 발생하였습니다.';
-            winston.log('error', `[CATEGORY][${user_uid}] ${JSON.stringify(result)}`);
+            winston.log('error', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             return res.status(500).send(result);
         });
     } catch (e) {
-        winston.log('error', `[CATEGORY][${req.user.user_uid}] Create(카테고리 생성) Exception`);
+        winston.log('error', `[CATEGORY][${req.clientIp}|${req.user.email}] 카테고리 생성 Exception`);
         return next(e);
     }
 });
 
-// Selectall(모든 카테고리 요청)
-router.get('/selectall', isLoggedIn, async (req, res, next) => {
+// Selectall(모든 카테고리 읽기)
+router.get('/selectall', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        const user_uid = req.user.user_uid;
+        const {user_uid, user_email} = req.user;
 
-        winston.log('info', `[CATEGORY]][${user_uid}] Selectall(모든 카테고리) Request`);
+        winston.log('info', `[CATEGORY]][${req.clientIp}|${user_email}] 모든 카테고리 Request`);
 
         // 사용자 테이블에서 user_uid로 카테고리 검색
         // SELECT category FROM users WHERE user_uid=:user_uid;
@@ -143,7 +145,7 @@ router.get('/selectall', isLoggedIn, async (req, res, next) => {
                 result.success = false;
                 result.data = 'NONE';
                 result.message = '사용자를 찾을 수 없습니다.';
-                winston.log('info', `[CATEGORY][${user_uid}] ${JSON.stringify(result)}`);
+                winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                 return res.status(200).send(result);
             } else {
                 // 사용자 테이블에서 사용자 검색에 성공한 경우
@@ -153,7 +155,7 @@ router.get('/selectall', isLoggedIn, async (req, res, next) => {
                 result.success = true;
                 result.data = parseAllCategory;
                 result.message = '카테고리 목록을 성공적으로 가져왔습니다.';
-                winston.log('info', `[CATEGORY][${user_uid}] ${JSON.stringify(result)}`);
+                winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                 return res.status(200).json(result);
             }
         }).catch(error => {
@@ -164,23 +166,23 @@ router.get('/selectall', isLoggedIn, async (req, res, next) => {
             result.success = false;
             result.data = 'NONE';
             result.message = '사용자 조회 과정에서 에러가 발생하였습니다.';
-            winston.log('error', `[CATEGORY][${user_uid}] ${JSON.stringify(result)}`);
+            winston.log('error', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             return res.status(500).send(result);
         });
     } catch (e) {
-        winston.log('error', `[CATEGORY][${req.user.user_uid}] Selectall(모든 카테고리) Exception`);
+        winston.log('error', `[CATEGORY][${req.clientIp}|${req.user.email}] 모든 카테고리 Exception`);
         return next(e);
     }
 });
 
-// Selectone(특정 카테고리)
-router.get('/selectone/:category_id', isLoggedIn, async (req, res, next) => {
+// Selectone(특정 카테고리 읽기)
+router.get('/selectone/:category_id', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        const user_uid = req.user.user_uid;
+        const {user_uid, user_email} = req.user;
         const category_id = req.params.category_id;
 
-        winston.log('info', `[CATEGORY][${user_uid}] Selectone(특정 카테고리) Request`);
-        winston.log('info', `[CATEGORY][${user_uid}] category_id : ${category_id}`);
+        winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] Selectone(특정 카테고리) Request`);
+        winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] category_id : ${category_id}`);
 
         // 사용자 테이블에서 user_uid로 카테고리 검색
         // SELECT category FROM users WHERE user_uid=:user_uid;
@@ -197,7 +199,7 @@ router.get('/selectone/:category_id', isLoggedIn, async (req, res, next) => {
                 result.success = false;
                 result.data = 'NONE';
                 result.message = '사용자를 찾을 수 없습니다.';
-                winston.log('info', `[CATEGORY][${user_uid}] ${JSON.stringify(result)}`);
+                winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                 return res.status(200).send(result);
             } else {
                 // 사용자 테이블에서 사용자 검색에 성공한 경우
@@ -211,7 +213,7 @@ router.get('/selectone/:category_id', isLoggedIn, async (req, res, next) => {
                         result.success = true;
                         result.data = parseAllCategory[i];
                         result.message = '선택한 카테고리를 가져왔습니다.';
-                        winston.log('info', `[CATEGORY][${user_uid}] ${JSON.stringify(result)}`);
+                        winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                         return res.status(200).json(result);
                     }
                 }
@@ -221,7 +223,7 @@ router.get('/selectone/:category_id', isLoggedIn, async (req, res, next) => {
                     result.success = false;
                     result.data = 'NONE';
                     result.message = '선택한 카테고리를 찾을 수 없습니다.';
-                    winston.log('error', `[CATEGORY][${user_uid}] ${JSON.stringify(result)}`);
+                    winston.log('error', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                     return res.status(200).json(result);
                 }
             }
@@ -233,24 +235,24 @@ router.get('/selectone/:category_id', isLoggedIn, async (req, res, next) => {
             result.success = false;
             result.data = 'NONE';
             result.message = '사용자 조회 과정에서 에러가 발생하였습니다.';
-            winston.log('error', `[CATEGORY][${user_uid}] ${JSON.stringify(result)}`);
+            winston.log('error', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             return res.status(500).send(result);
         });
     } catch (e) {
-        winston.log('error', `[CATEGORY][${req.user.user_uid}] Selectone(특정 카테고리) Exception`);
+        winston.log('error', `[CATEGORY][${req.clientIp}|${req.user.email}] 특정 카테고리 Exception`);
         return next(e);
     }
 });
 
-// one category update
-router.put('/update/:category_id', isLoggedIn, async (req, res, next) => {
+// Update(카테고리 수정)
+router.put('/update/:category_id', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        const user_uid = req.user.user_uid;
+        const {user_uid, user_email} = req.user;
         const category_id = req.params.category_id;
         const { category_title, category_color } = req.body;
 
-        winston.log('info', `[CATEGORY][${user_uid}] Update(카테고리 수정) Request`);
-        winston.log('info', `[CATEGORY][${user_uid}] category_id : ${category_id}, category_title : ${category_title}, category_color : ${category_color}`);
+        winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] Update(카테고리 수정) Request`);
+        winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] category_id : ${category_id}, category_title : ${category_title}, category_color : ${category_color}`);
 
         // 카테고리 번호 검사(기본값 수정 불가)
         if (category_id == 0) {
@@ -258,7 +260,7 @@ router.put('/update/:category_id', isLoggedIn, async (req, res, next) => {
             result.success = false;
             result.data = 'NONE';
             result.message = '기본 카테고리는 수정할 수 없습니다.';
-            winston.log('info', `[CATEGORY][${user_uid}] ${JSON.stringify(result)}`);
+            winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             return res.status(200).send(result);
         }
 
@@ -277,7 +279,7 @@ router.put('/update/:category_id', isLoggedIn, async (req, res, next) => {
                 result.success = false;
                 result.data = 'NONE';
                 result.message = '사용자를 찾을 수 없습니다.';
-                winston.log('info', `[CATEGORY][${user_uid}] ${JSON.stringify(result)}`);
+                winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                 return res.status(200).send(result);
             } else {
                 // 사용자 테이블에서 사용자 검색에 성공한 경우
@@ -301,17 +303,17 @@ router.put('/update/:category_id', isLoggedIn, async (req, res, next) => {
                             result.success = true;
                             result.data = parseAllCategory[i];
                             result.message = '선택한 카테고리를 수정했습니다.';
-                            winston.log('info', `[CATEGORY][${user_uid}] ${JSON.stringify(result)}`);
+                            winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                             return res.status(200).json(result);
                         }).catch(error => {
                             // 카테고리 수정을 실패한 경우
-                            console.log(`[CATEGORY][${user_uid}] 카테고리 수정 실패 \n ${error.stack}`);
+                            console.log(`[CATEGORY][${req.clientIp}|${user_email}] 카테고리 수정 실패 \n ${error.stack}`);
 
                             const result = new Object();
                             result.success = false;
                             result.data = 'NONE';
                             result.message = '카테고리 수정 과정에서 에러가 발생하였습니다.';
-                            winston.log('error', `[CATEGORY][${user_uid}] ${JSON.stringify(result)}`);
+                            winston.log('error', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                             return res.status(500).send(result);
                         });
 
@@ -324,35 +326,35 @@ router.put('/update/:category_id', isLoggedIn, async (req, res, next) => {
                     result.success = false;
                     result.data = 'NONE';
                     result.message = '선택한 카테고리를 찾을 수 없습니다.';
-                    winston.log('info', `[CATEGORY][${user_uid}] ${JSON.stringify(result)}`);
+                    winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                     return res.status(200).json(result);
                 }
             }
         }).catch(error => {
             // 사용자 테이블 조회를 실패한 경우
-            console.log(`[CATEGORY][${user_uid}] 사용자 테이블 조회 실패 \n ${error.stack}`);
+            console.log(`[CATEGORY][${req.clientIp}|${user_email}] 사용자 테이블 조회 실패 \n ${error.stack}`);
 
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
             result.message = '[UPDATE] 사용자 조회 과정에서 에러가 발생하였습니다.';
-            console.log(result);
+            winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             return res.status(500).send(result);
         });
     } catch (e) {
-        winston.log('error', `[CATEGORY][${req.user.user_uid}] Update(카테고리 수정) Exception`);
+        winston.log('error', `[CATEGORY][${req.clientIp}|${req.user.email}] 카테고리 수정 Exception`);
         return next(e);
     }
 });
 
-// one category delete
-router.delete('/delete/:category_id', isLoggedIn, async (req, res, next) => {
+// Delete(카테고리 삭제)
+router.delete('/delete/:category_id', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        const user_uid = req.user.user_uid;
+        const {user_uid, user_email} = req.user;
         const category_id = req.params.category_id;
 
-        winston.log('info', `[CATEGORY][${user_uid}] Delete(카테고리 삭제) Request`);
-        winston.log('info', `[CATEGORY][${user_uid}] category_id : ${category_id}`);
+        winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] Delete(카테고리 삭제) Request`);
+        winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] category_id : ${category_id}`);
 
         // 카테고리 번호 검사(기본값 삭제 불가)
         if (category_id == 0) {
@@ -360,7 +362,7 @@ router.delete('/delete/:category_id', isLoggedIn, async (req, res, next) => {
             result.success = false;
             result.data = 'NONE';
             result.message = '기본 카테고리는 삭제할 수 없습니다.';
-            winston.log('info', `[CATEGORY][${user_uid}] ${JSON.stringify(result)}`);
+            winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             return res.status(200).send(result);
         }
         // SELECT category FROM User WHERE user_uid = 'user_uid';
@@ -377,7 +379,7 @@ router.delete('/delete/:category_id', isLoggedIn, async (req, res, next) => {
                 result.success = false;
                 result.data = 'NONE';
                 result.message = '사용자를 찾을 수 없습니다.';
-                winston.log('info', `[CATEGORY][${user_uid}] ${JSON.stringify(result)}`);
+                winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                 return res.status(200).send(result);
             } else {
                 // 사용자 테이블에서 사용자 검색에 성공한 경우
@@ -414,28 +416,28 @@ router.delete('/delete/:category_id', isLoggedIn, async (req, res, next) => {
                                 result.success = true;
                                 result.data = category_id;
                                 result.message = '선택한 카테고리를 삭제했습니다.';
-                                winston.log('info', `[CATEGORY][${user_uid}] ${JSON.stringify(result)}`);
+                                winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                                 return res.status(200).json(result);
                             }).catch(error => {
                                 // 선택한 카테고리 삭제를 실패한 경우
-                                console.log(`[CATEGORY][${user_uid}] 사용자 테이블 조회 실패 \n ${error.stack}`);
+                                console.log(`[CATEGORY][${req.clientIp}|${user_email}] 사용자 테이블 조회 실패 \n ${error.stack}`);
 
                                 const result = new Object();
                                 result.success = false;
                                 result.data = 'NONE';
                                 result.message = '카테고리 삭제 과정에서 에러가 발생하였습니다.';
-                                winston.log('error', `[CATEGORY][${user_uid}] ${JSON.stringify(result)}`);
+                                winston.log('error', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                                 return res.status(500).send(result);
                             });
                         }).catch(error => {
                             // 피드백 테이블 수정을 실패한 경우
-                            console.log(`[CATEGORY][${user_uid}] 사용자 테이블 조회 실패 \n ${error.stack}`);
+                            console.log(`[CATEGORY][${req.clientIp}|${user_email}] 사용자 테이블 조회 실패 \n ${error.stack}`);
 
                             const result = new Object();
                             result.success = false;
                             result.data = 'NONE';
                             result.message = '[DELETE] 피드백 수정 과정에서 에러가 발생하였습니다.';
-                            winston.log('error', `[CATEGORY][${user_uid}] ${JSON.stringify(result)}`);
+                            winston.log('error', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                             return res.status(500).send(result);
                         });
                         break;
@@ -447,23 +449,23 @@ router.delete('/delete/:category_id', isLoggedIn, async (req, res, next) => {
                     result.success = false;
                     result.data = 'NONE';
                     result.message = '[DELETE] 선택한 카테고리를 찾을 수 없습니다.';
-                    winston.log('info', `[CATEGORY][${user_uid}] ${JSON.stringify(result)}`);
+                    winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                     return res.status(200).json(result);
                 }
             }
         }).catch(error => {
             // 사용자 테이블 조회를 실패한 경우
-            console.log(`[CATEGORY][${user_uid}] 사용자 테이블 조회 실패 \n ${error.stack}`);
+            console.log(`[CATEGORY][${req.clientIp}|${user_email}] 사용자 테이블 조회 실패 \n ${error.stack}`);
 
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
             result.message = '[DELETE] 사용자 조회 과정에서 에러가 발생하였습니다.';
-            winston.log('error', `[CATEGORY][${user_uid}] ${JSON.stringify(result)}`);
+            winston.log('error', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             return res.status(500).send(result);
         });
     } catch (e) {
-        winston.log('error', `[CATEGORY][${req.user.user_uid}] Delete(카테고리 삭제) Exception`);
+        winston.log('error', `[CATEGORY][${req.clientIp}|${req.user.email}] 카테고리 삭제 Exception`);
         return next(e);
     }
 });

@@ -25,6 +25,7 @@ if (!fs.existsSync(logDir)) {
     fs.mkdirSync(logDir);
 }
 
+// 파일 출력 옵션 설정
 const transport_file = new transports.File({
     name: 'info-file',
     filename: `${logDir}/${DATE}_server-test.log`,
@@ -44,6 +45,7 @@ const transport_file = new transports.File({
     maxFiles: 100 // 자동으로 분리되어 생성되는 파일 개수
 });
 
+// 콘솔 출력 옵션 설정
 const transport_console = new (transports.Console)({
     name: 'debug-console',
     colorize: true,

@@ -3,7 +3,7 @@ const winston = require('../config/winston');
 const express = require('express');
 const { User, Friend } = require('../models');
 const passport = require('passport');
-const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
+const { clientIp, isLoggedIn, isNotLoggedIn } = require('./middlewares');
 const router = express.Router();
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
@@ -26,7 +26,7 @@ if (config.use_env_variable) {
 // Friend CRUD API
 
 // Search(친구 검색)
-router.post ('/search', isLoggedIn, async function (req, res, next) {
+router.post ('/search', clientIp, isLoggedIn, async function (req, res, next) {
     try {
         console.log('[SEARCH] 친구 검색 요청');
 

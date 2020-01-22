@@ -8,6 +8,8 @@
 
     $ npm install winston
     $ npm install moment
+    $ npm install moment-timezone
+    $ npm install request-ip
 
     명령어 실행 후 package.json의 dependency 항목 확인이 필요합니다.
     ```
