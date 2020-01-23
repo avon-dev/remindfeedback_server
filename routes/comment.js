@@ -16,7 +16,7 @@ let result = { // response form
  * - parameter friend_id : 친구 추가할 회원 uuid
  */
 router.get('/selectall/:board_id', clientIp, isLoggedIn, async(req, res, next)=>{
-    const user_email = req.user;
+    const user_email = req.user.email;
     const board_id = parseInt(req.params.board_id);
 
     winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] 게시물의 전체 댓글 목록 Request`);
@@ -60,6 +60,13 @@ router.get('/selectall/:board_id', clientIp, isLoggedIn, async(req, res, next)=>
         });
     }catch(e){
         winston.log('error', `[COMMENT][${req.clientIp}|${req.user.email}] 게시물의 전체 댓글 목록 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[COMMENT][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
@@ -69,7 +76,7 @@ router.get('/selectall/:board_id', clientIp, isLoggedIn, async(req, res, next)=>
  * - parameter friend_id : 친구 추가할 회원 uuid
  */
 router.get('/selectone/:comment_id', clientIp, isLoggedIn, async(req, res, next)=>{
-    const user_email = req.user;
+    const user_email = req.user.email;
     const comment_id = parseInt(req.params.comment_id);
 
     winston.log('info', `[COMMENT]][${req.clientIp}|${user_email}] 댓글 조회 Request`);
@@ -99,6 +106,13 @@ router.get('/selectone/:comment_id', clientIp, isLoggedIn, async(req, res, next)
         });
     }catch(e){
         winston.log('error', `[COMMENT][${req.clientIp}|${req.user.email}] 댓글 조회 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[COMMENT][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
@@ -109,7 +123,8 @@ router.get('/selectone/:comment_id', clientIp, isLoggedIn, async(req, res, next)
  */
 router.post('/create', clientIp, isLoggedIn, async (req, res, next)=>{
     try{
-        const {user_uid, user_email} = req.user;
+        const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
         const comment_content = req.body.comment_content;
         const board_id = parseInt(req.body.board_id);
     
@@ -177,6 +192,13 @@ router.post('/create', clientIp, isLoggedIn, async (req, res, next)=>{
         });
     }catch(e){
         winston.log('error', `[COMMENT][${req.clientIp}|${req.user.email}] 댓글 생성 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[COMMENT][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
@@ -186,7 +208,8 @@ router.post('/create', clientIp, isLoggedIn, async (req, res, next)=>{
  * - parameter friend_id : 친구 추가할 회원 uuid
  */
 router.put('/update/:comment_id', clientIp, isLoggedIn, async (req, res, next)=>{
-    const {user_uid, user_email} = req.user;
+    const user_uid = req.user.user_uid;
+    const user_email = req.user.email;
     const comment_id = parseInt(req.params.comment_id);
     const comment_content = req.body.comment_content;
 
@@ -238,6 +261,13 @@ router.put('/update/:comment_id', clientIp, isLoggedIn, async (req, res, next)=>
 
     }catch(e){
         winston.log('error', `[COMMENT][${req.clientIp}|${req.user.email}] 댓글 수정 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[COMMENT][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
@@ -248,7 +278,8 @@ router.put('/update/:comment_id', clientIp, isLoggedIn, async (req, res, next)=>
  * - parameter friend_id : 친구 추가할 회원 uuid
  */
 router.delete('/delete/:comment_id', clientIp, isLoggedIn, async (req, res, next)=>{
-    const {user_uid, user_email} = req.user;
+    const user_uid = req.user.user_uid;
+    const user_email = req.user.email;
     const comment_id = parseInt(req.params.comment_id);
 
     winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] 댓글 삭제 Request`);
@@ -294,6 +325,13 @@ router.delete('/delete/:comment_id', clientIp, isLoggedIn, async (req, res, next
         });        
     }catch(e){
         winston.log('error', `[COMMENT][${req.clientIp}|${req.user.email}] 댓글 삭제 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[COMMENT][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });

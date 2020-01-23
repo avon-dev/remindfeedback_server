@@ -11,7 +11,8 @@ const router = express.Router();
 // Create(카테고리 생성)
 router.post('/create', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        const {user_uid, user_email} = req.user;
+        const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
         const { category_title, category_color } = req.body;
 
         winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] 카테고리 생성 Request`);
@@ -118,6 +119,13 @@ router.post('/create', clientIp, isLoggedIn, async (req, res, next) => {
         });
     } catch (e) {
         winston.log('error', `[CATEGORY][${req.clientIp}|${req.user.email}] 카테고리 생성 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[CATEGORY][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
@@ -125,7 +133,8 @@ router.post('/create', clientIp, isLoggedIn, async (req, res, next) => {
 // Selectall(모든 카테고리 읽기)
 router.get('/selectall', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        const {user_uid, user_email} = req.user;
+        const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
 
         winston.log('info', `[CATEGORY]][${req.clientIp}|${user_email}] 모든 카테고리 Request`);
 
@@ -170,6 +179,13 @@ router.get('/selectall', clientIp, isLoggedIn, async (req, res, next) => {
         });
     } catch (e) {
         winston.log('error', `[CATEGORY][${req.clientIp}|${req.user.email}] 모든 카테고리 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[CATEGORY][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
@@ -177,7 +193,8 @@ router.get('/selectall', clientIp, isLoggedIn, async (req, res, next) => {
 // Selectone(특정 카테고리 읽기)
 router.get('/selectone/:category_id', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        const {user_uid, user_email} = req.user;
+        const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
         const category_id = req.params.category_id;
 
         winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] Selectone(특정 카테고리) Request`);
@@ -239,6 +256,13 @@ router.get('/selectone/:category_id', clientIp, isLoggedIn, async (req, res, nex
         });
     } catch (e) {
         winston.log('error', `[CATEGORY][${req.clientIp}|${req.user.email}] 특정 카테고리 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[CATEGORY][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
@@ -246,7 +270,8 @@ router.get('/selectone/:category_id', clientIp, isLoggedIn, async (req, res, nex
 // Update(카테고리 수정)
 router.put('/update/:category_id', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        const {user_uid, user_email} = req.user;
+        const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
         const category_id = req.params.category_id;
         const { category_title, category_color } = req.body;
 
@@ -342,6 +367,13 @@ router.put('/update/:category_id', clientIp, isLoggedIn, async (req, res, next) 
         });
     } catch (e) {
         winston.log('error', `[CATEGORY][${req.clientIp}|${req.user.email}] 카테고리 수정 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[CATEGORY][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
@@ -349,7 +381,8 @@ router.put('/update/:category_id', clientIp, isLoggedIn, async (req, res, next) 
 // Delete(카테고리 삭제)
 router.delete('/delete/:category_id', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        const {user_uid, user_email} = req.user;
+        const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
         const category_id = req.params.category_id;
 
         winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] Delete(카테고리 삭제) Request`);
@@ -465,6 +498,13 @@ router.delete('/delete/:category_id', clientIp, isLoggedIn, async (req, res, nex
         });
     } catch (e) {
         winston.log('error', `[CATEGORY][${req.clientIp}|${req.user.email}] 카테고리 삭제 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[CATEGORY][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });

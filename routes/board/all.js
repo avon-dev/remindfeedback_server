@@ -1,6 +1,8 @@
+const winston = require('../../config/winston');
+const { clientIp, isLoggedIn, isNotLoggedIn } = require('../middlewares');
+
 const express = require('express');
 const { Feedback, Board, Sequelize: { Op } } = require('../../models');
-const { isLoggedIn } = require('../middlewares');
 const router = express.Router();
 const { deleteS3Obj, upload_s3_test } = require('../S3');
 
@@ -20,13 +22,19 @@ if (config.use_env_variable) {
     );
 }
 
-router.get('/selectone/:board_id', async (req, res, next) => {
+router.get('/selectone/:board_id', clientIp, async (req, res, next) => {
+    const user_email = req.user.email;
     let board_id = parseInt(req.params.board_id);
+
+    winston.log('info', `[BOARD|ALL][${req.clientIp}|${user_email}] 게시글 조회 Request`);
+    winston.log('info', `[BOARD|ALL][${req.clientIp}|${user_email}] board_id : ${board_id}`);
+
     let result = {
         success: true,
         data: '',
         message: ""
     }
+
     try {
         const exBoard = await Board.findAll({
             where: { id: board_id },
@@ -36,27 +44,34 @@ router.get('/selectone/:board_id', async (req, res, next) => {
             }]
         }).then(board => {
             result.data = board;
+            winston.log('info', `[BOARD|ALL][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             return res.status(200).json(result);
         })
 
     } catch (e) {
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[BOARD|ALL][${req.clientIp}|${req.user.email}] 게시글 조회 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[BOARD|ALL][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
-})
+});
 
 /* getfeedback API
  */
-router.get('/:feedbackid/:lastid', isLoggedIn, async (req, res, next) => {
+router.get('/:feedbackid/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
     try {
+        const user_email = req.user.email;
         let feedbackid = parseInt(req.params.feedbackid);
         let lastid = parseInt(req.params.lastid);
+    
+        winston.log('info', `[BOARD|ALL][${req.clientIp}|${user_email}] 게시글 목록 조회 Request`);
+        winston.log('info', `[BOARD|ALL][${req.clientIp}|${user_email}] feedbackid : ${feedbackid}, lastid : ${lastid}`);
+
         if (lastid === 0) {
             lastid = 9999;
         }
@@ -74,24 +89,31 @@ router.get('/:feedbackid/:lastid', isLoggedIn, async (req, res, next) => {
             data: boardList,
             message: ""
         }
+        winston.log('info', `[BOARD|ALL][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
         res.status(200).json(result);
     } catch (e) {
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[BOARD|ALL][${req.clientIp}|${req.user.email}] 게시글 목록 조회 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[BOARD|ALL][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
 
-router.get('/:feedbackid/:lastid/:limit', isLoggedIn, async (req, res, next) => {
+router.get('/:feedbackid/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next) => {
     try {
+        const user_email = req.user.email;
         let feedbackid = parseInt(req.params.feedbackid);
         let lastid = parseInt(req.params.lastid);
         let limit = parseInt(req.params.limit);
+    
+        winston.log('info', `[BOARD|ALL][${req.clientIp}|${user_email}] 게시글 목록(제한) 조회 Request`);
+        winston.log('info', `[BOARD|ALL][${req.clientIp}|${user_email}] feedbackid : ${feedbackid}, lastid : ${lastid}, limit : ${limit}`);
+
         if (lastid === 0) {
             lastid = 9999;
         }
@@ -109,25 +131,29 @@ router.get('/:feedbackid/:lastid/:limit', isLoggedIn, async (req, res, next) => 
             data: boardList,
             message: ""
         }
+        winston.log('info', `[BOARD|ALL][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);ㄴ
         res.status(200).json(result);
     } catch (e) {
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[BOARD|ALL][${req.clientIp}|${req.user.email}] 게시글 목록(제한) 조회 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[BOARD|ALL][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
 
-router.delete('/:board_id', isLoggedIn, async (req, res, next) => {
+router.delete('/:board_id', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        console.log('[DELETE] 게시글 삭제 요청');
-
         const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
         let board_id = parseInt(req.params.board_id);
+    
+        winston.log('info', `[BOARD|ALL][${req.clientIp}|${user_email}] 게시글 삭제 Request`);
+        winston.log('info', `[BOARD|ALL][${req.clientIp}|${user_email}] board_id : ${board_id}`);
 
         // 게시글 테이블에서 board_id로 검색
         await Board.findOne({
@@ -140,30 +166,23 @@ router.delete('/:board_id', isLoggedIn, async (req, res, next) => {
             }]
         }).then((board) => {
             // 게시글 테이블 조회를 성공한 경우
-            console.log('[DELETE] 게시글 테이블 조회 성공');
-
             if (board == null) {
                 // 게시글 테이블에서 게시글 검색에 실패한 경우
-                console.log('[DELETE] 게시글 검색 실패');
-
                 const result = new Object();
                 result.success = false;
                 result.data = 'NONE';
-                result.message = '[DELETE] 게시글을 찾을 수 없습니다.';
-                console.log(result);
+                result.message = '게시글을 찾을 수 없습니다.';
+                winston.log('info', `[BOARD|ALL][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                 return res.status(200).send(result);
             } else {
                 // 게시글 테이블에서 게시글 검색에 성공한 경우
-                console.log('[DELETE] 게시글 검색 성공');
-
                 if (user_uid != board.feedback.user_uid) {
                     // 본인이 작성한 게시글이 아닌 경우
-
                     const result = new Object();
                     result.success = false;
                     result.data = 'NONE';
-                    result.message = '[DELETE] 내가 작성한 게시글이 아닙니다.';
-                    console.log(result);
+                    result.message = '내가 작성한 게시글이 아닙니다.';
+                    winston.log('info', `[BOARD|ALL][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                     return res.status(200).send(result);
                 } else {
                     // 본인이 작성한 게시글인 경우
@@ -194,57 +213,60 @@ router.delete('/:board_id', isLoggedIn, async (req, res, next) => {
                         type: Sequelize.QueryTypes.update,
                         raw: true
                     }).then(() => {
-                        // 정상적으로 게시글 삭제 쿼리를 수행한 경우
-                        console.log('[DELETE] 게시글 삭제 성공');
-            
+                        // 정상적으로 게시글 삭제 쿼리를 수행한 경우            
                         // 친구 차단 목록을 그대로 리턴
                         const result = new Object();
                         result.success = true;
                         result.data = board_id;
-                        result.message = '[DELETE] 성공적으로 게시글을 삭제했습니다.';
-                        console.log(result);
+                        result.message = '성공적으로 게시글을 삭제했습니다.';
+                        winston.log('info', `[BOARD|ALL][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                         return res.status(200).send(result);
                     }).catch(error => {
                         // 삭제 쿼리 실행을 실패한 경우
-                        console.log('[DELETE] 게시글 삭제 쿼리 실행 실패', error);
+                        winston.log('error', `[CATEGORY][${req.clientIp}|${user_email}] 게시글 삭제 쿼리 실행 실패 \n ${error.stack}`);
             
                         const result = new Object();
                         result.success = false;
                         result.data = 'NONE';
-                        result.message = '[DELETE] 게시글 삭제 실행 과정에서 에러가 발생하였습니다.';
-                        console.log(result);
+                        result.message = '게시글 삭제 실행 과정에서 에러가 발생하였습니다.';
+                        winston.log('error', `[BOARD|ALL][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                         return res.status(500).send(result);
                     });
                 }
             }
         }).catch(error => {
             // 게시글 테이블 조회를 실패한 경우
-            console.log('[DELETE] 게시글 테이블 조회 실패', error);
+            winston.log('error', `[CATEGORY][${req.clientIp}|${user_email}] 게시글 테이블 조회 실패 \n ${error.stack}`);
 
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
-            result.message = '[DELETE] 게시글 조회 과정에서 에러가 발생하였습니다.';
-            console.log(result);
+            result.message = '게시글 조회 과정에서 에러가 발생하였습니다.';
+            winston.log('error', `[BOARD|ALL][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             return res.status(500).send(result);
         });
     } catch (e) {
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[BOARD|ALL][${req.clientIp}|${req.user.email}] 게시글 삭제 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[BOARD|ALL][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
 
-router.patch('/board_title/:board_id', isLoggedIn, async (req, res, next) => {
+router.patch('/board_title/:board_id', clientIp, isLoggedIn, async (req, res, next) => {
     try {
+        const user_email = req.user.email;
         const board_id = req.params.board_id;
-        const { board_title } = req.body;
-        console.log('board board_title 수정', board_title);
+        const board_title = req.body.board_title;
+    
+        winston.log('info', `[BOARD|ALL][${req.clientIp}|${user_email}] 게시글 제목 수정 Request`);
+        winston.log('info', `[BOARD|ALL][${req.clientIp}|${user_email}] board_id : ${board_id}, board_title : ${board_title}`);
+
         const update = await Board.update({
             board_title
         }, { where: { id: board_id } })
@@ -254,24 +276,30 @@ router.patch('/board_title/:board_id', isLoggedIn, async (req, res, next) => {
             data,
             message: 'board update 성공'
         }
+        winston.log('info', `[BOARD|ALL][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
         res.status(200).json(result);
     } catch (e) {
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[BOARD|ALL][${req.clientIp}|${req.user.email}] 게시글 제목 수정 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[BOARD|ALL][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
 
-router.patch('/board_content/:board_id', isLoggedIn, async (req, res, next) => {
+router.patch('/board_content/:board_id', clientIp, isLoggedIn, async (req, res, next) => {
     try {
+        const user_email = req.user.email;
         const board_id = req.params.board_id;
-        const { board_content } = req.body;
-        console.log('board board_content 수정', board_content);
+        const board_content = req.body.board_content;
+    
+        winston.log('info', `[BOARD|ALL][${req.clientIp}|${user_email}] 게시글 내용 수정 Request`);
+        winston.log('info', `[BOARD|ALL][${req.clientIp}|${user_email}] board_id : ${board_id}, board_content : ${board_content}`);
+
         const update = await Board.update({
             board_content
         }, { where: { id: board_id } })
@@ -281,15 +309,17 @@ router.patch('/board_content/:board_id', isLoggedIn, async (req, res, next) => {
             data,
             message: 'board update 성공'
         }
+        winston.log('info', `[BOARD|ALL][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
         res.status(200).json(result);
     } catch (e) {
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[BOARD|ALL][${req.clientIp}|${req.user.email}] 게시글 내용 수정 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[BOARD|ALL][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });

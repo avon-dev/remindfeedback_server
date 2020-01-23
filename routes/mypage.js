@@ -21,7 +21,8 @@ let fileSize = 50 * 1024 * 1024;
 */
 router.get('/', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        const {user_uid, user_email} = req.user;
+        const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
 
         winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] 마이페이지 조회 Request`);
 
@@ -39,6 +40,13 @@ router.get('/', clientIp, isLoggedIn, async (req, res, next) => {
 
     } catch (e) {
         winston.log('error', `[MYPAGE][${req.clientIp}|${req.user.email}] 마이페이지 조회 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[MYPAGE][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
@@ -52,7 +60,8 @@ router.get('/', clientIp, isLoggedIn, async (req, res, next) => {
 */
 router.put('/update', clientIp, isLoggedIn, upload_s3_test(type, fileSize).single('portrait'), async (req, res, next) => {
     try {
-        const {user_uid, user_email} = req.user;
+        const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
         const { nickname, introduction } = req.body;
         let portrait = "";
 
@@ -108,6 +117,13 @@ router.put('/update', clientIp, isLoggedIn, upload_s3_test(type, fileSize).singl
         return res.status(200).json(result);
     } catch (e) {
         winston.log('error', `[MYPAGE][${req.clientIp}|${req.user.email}] 마이페이지 수정 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[MYPAGE][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
@@ -120,7 +136,8 @@ router.put('/update', clientIp, isLoggedIn, upload_s3_test(type, fileSize).singl
 */
 router.patch('/update/nickname', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        const {user_uid, user_email} = req.user;
+        const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
         const nickname = req.body.nickname;
 
         winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] 마이페이지 별명 수정 Request`);
@@ -154,6 +171,13 @@ router.patch('/update/nickname', clientIp, isLoggedIn, async (req, res, next) =>
         res.status(200).json(result);
     } catch (e) {
         winston.log('error', `[MYPAGE][${req.clientIp}|${req.user.email}] 마이페이지 별명 수정 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[MYPAGE][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
@@ -166,7 +190,8 @@ router.patch('/update/nickname', clientIp, isLoggedIn, async (req, res, next) =>
 */
 router.patch('/update/introduction', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        const {user_uid, user_email} = req.user;
+        const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
         const introduction = req.body.introduction;
 
         winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] 마이페이지 소개 수정 Request`);
@@ -191,6 +216,13 @@ router.patch('/update/introduction', clientIp, isLoggedIn, async (req, res, next
         res.status(200).json(result);
     } catch (e) {
         winston.log('error', `[MYPAGE][${req.clientIp}|${req.user.email}] 마이페이지 소개 수정 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[MYPAGE][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
@@ -207,7 +239,8 @@ router.patch('/update/portrait', clientIp, isLoggedIn, upload_s3_test(type, file
     try {
         if(!req.file) console.log(`보낸 파일 없음`); 
 
-        const {user_uid, user_email} = req.user;
+        const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
         let portrait = "";
 
         winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] 마이페이지 사진 수정 Request`);
@@ -249,6 +282,13 @@ router.patch('/update/portrait', clientIp, isLoggedIn, upload_s3_test(type, file
         res.status(200).json(result);
     } catch (e) {
         winston.log('error', `[MYPAGE][${req.clientIp}|${req.user.email}] 마이페이지 사진 수정 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[MYPAGE][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
@@ -259,7 +299,8 @@ router.patch('/update/portrait', clientIp, isLoggedIn, upload_s3_test(type, file
 */
 router.delete('/delete/portrait', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        const {user_uid, user_email} = req.user;
+        const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
         
         winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] 마이페이지 사진 삭제 Request`);
 
@@ -293,6 +334,13 @@ router.delete('/delete/portrait', clientIp, isLoggedIn, async (req, res, next) =
         res.status(200).json(result);
     } catch (e) {
         winston.log('error', `[MYPAGE][${req.clientIp}|${req.user.email}] 마이페이지 사진 삭제 Exception`);
+
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[MYPAGE][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });

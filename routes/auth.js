@@ -34,8 +34,8 @@ router.post('/signup', clientIp, async (req, res, next) => {
     try {
         const { email, nickname, password } = req.body;
 
-        winston.log('info', `[AUTH][${req.clientIp}|${user_email}] 회원가입 Request`);
-        winston.log('info', `[AUTH][${req.clientIp}|${user_email}] email : ${email}, nickname : ${nickname}, password : ${password}`);
+        winston.log('info', `[AUTH][${req.clientIp}|${email}] 회원가입 Request`);
+        winston.log('info', `[AUTH][${req.clientIp}|${email}] email : ${email}, nickname : ${nickname}, password : ${password}`);
 
         const exUser = await User.findOne({ where: { email } });
         if (exUser) {
@@ -43,7 +43,7 @@ router.post('/signup', clientIp, async (req, res, next) => {
             result.success = false;
             result.data = 'NONE';
             result.message = '이미 가입한 이메일입니다.';
-            winston.log('info', `[AUTH][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            winston.log('info', `[AUTH][${req.clientIp}|${email}] ${JSON.stringify(result)}`);
             return res.status(200).send(result);
         }
         const uid = await bcrypt.hash(email, 12);
@@ -61,10 +61,17 @@ router.post('/signup', clientIp, async (req, res, next) => {
         result.success = true;
         result.data = newUser;
         result.message = '회원 가입에 성공했습니다.';
-        winston.log('info', `[AUTH][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('info', `[AUTH][${req.clientIp}|${email}] ${JSON.stringify(result)}`);
         return res.status(201).send(result);
     } catch (e) {
-        winston.log('error', `[AUTH][${req.clientIp}|${req.user.email}] 회원가입 Exception`);
+        winston.log('error', `[AUTH][${req.clientIp}|${req.body.email}] 회원가입 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[AUTH][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
@@ -72,7 +79,8 @@ router.post('/signup', clientIp, async (req, res, next) => {
 // 회원 탈퇴
 router.delete('/unregister', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        const {user_uid, user_email} = req.user;
+        const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
 
         winston.log('info', `[AUTH][${req.clientIp}|${user_email}] 회원 탈퇴 Request`);
 
@@ -172,38 +180,45 @@ router.delete('/unregister', clientIp, isLoggedIn, async (req, res, next) => {
         });
     } catch (e) {
         winston.log('error', `[AUTH][${req.clientIp}|${req.user.email}] 회원 탈퇴 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[AUTH][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
 
-// Login(로그인)
+// 로그인
 router.post('/login', clientIp, async (req, res, next) => {
     try {
         const { email, password } = req.body;
 
-        winston.log('info', `[AUTH][${req.clientIp}|${user_email}] 로그인 Request`);
-        winston.log('info', `[AUTH][${req.clientIp}|${user_email}] email : ${email}, password : ${password}`);
+        winston.log('info', `[AUTH][${req.clientIp}|${email}] 로그인 Request`);
+        winston.log('info', `[AUTH][${req.clientIp}|${email}] email : ${email}, password : ${password}`);
 
         passport.authenticate('local', (authError, user, info) => { //done(에러, 성공, 실패)
             if (authError) {
-                winston.log('error', authError);
+                winston.log('error', `[AUTH][${req.clientIp}|${email}] ${authError}`);
                 return next(authError);
             }
             if (!user) {
-                winston.log('info', info.message);
+                winston.log('info', `[AUTH][${req.clientIp}|${email}] ${info.message}`);
                 return res.status(200).send(info.message);
             }
             return req.login(user, (loginError) => { // req.user 사용자 정보가 들어있다.
                 if (loginError) {
-                    winston.log('error', loginError);
+                    winston.log('error', `[AUTH][${req.clientIp}|${email}] ${loginError}`);
                     return next(loginError);
                 }
                 if (user.tutorial === false) {
                     User.update({ tutorial: true }, { where: { user_uid: user.user_uid } });
                 }
                 // 정상적으로 로그인에 성공한 경우
-                winston.log('debug', `[AUTH][${req.clientIp}|${user_email}] 로그인 성공`);
-                winston.log('debug', `[AUTH][${req.clientIp}|${user_email}] 로그인 인증 여부 : ${req.isAuthenticated()}`);
+                winston.log('debug', `[AUTH][${req.clientIp}|${email}] 로그인 성공`);
+                winston.log('debug', `[AUTH][${req.clientIp}|${email}] 로그인 인증 여부 : ${req.isAuthenticated()}`);
 
                 let json_user = {
                     email: user.email,
@@ -216,20 +231,27 @@ router.post('/login', clientIp, async (req, res, next) => {
                 result.success = true;
                 result.data = json_user;
                 result.message = '성공적으로 로그인했습니다.';
-                winston.log('info', `[AUTH][${req.clientIp}|${user_email}}] ${JSON.stringify(result)}`);
+                winston.log('info', `[AUTH][${req.clientIp}|${email}] ${JSON.stringify(result)}`);
                 return res.status(200).send(result);
             });
         })(req, res, next); // 미들웨어 내의 미들웨어에는 (req, res, next)를 붙입니다.
     } catch (e) {
-        winston.log('error', `[AUTH][${req.clientIp}|${req.user.email}] 로그인 Exception`);
+        winston.log('error', `[AUTH][${req.clientIp}|${req.body.email}] 로그인 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[AUTH][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
 
-// Me(내 정보)
+// 내 정보
 router.get('/me', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        const {user_uid, user_email} = req.user;
+        const user_email = req.user.email;
 
         winston.log('info', `[AUTH][${req.clientIp}|${user_email}] 내 정보 Request`);
 
@@ -250,14 +272,21 @@ router.get('/me', clientIp, isLoggedIn, async (req, res, next) => {
         return res.status(200).send(result);
     } catch (e) {
         winston.log('error', `[AUTH][${req.clientIp}|${req.user.email}] 내 정보 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[AUTH][${req.clientIp}|${req.user.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
 
-// Logout(로그아웃)
+// 로그아웃
 router.get('/logout', clientIp, isLoggedIn, (req, res) => {
     try {
-        const user_email = req.user;
+        const user_email = req.user.email;
 
         winston.log('info', `[AUTH][${req.clientIp}|${user_email}] 로그아웃 Request`);
 
@@ -273,6 +302,13 @@ router.get('/logout', clientIp, isLoggedIn, (req, res) => {
         return res.status(200).send(result);
     } catch (e) {
         winston.log('error', `[AUTH][${req.clientIp}|${req.user.email}] 로그아웃 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[AUTH][${req.clientIp}|${req.user.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });

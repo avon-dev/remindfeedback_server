@@ -1,8 +1,10 @@
+const winston = require('../config/winston');
+const { clientIp, isLoggedIn, isNotLoggedIn } = require('./middlewares');
+
 const express = require('express');
 const bcrypt = require('bcrypt');
 const { User, Feedback, Board, Sequelize: { Op } } = require('../models');
 const passport = require('passport');
-const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
 const router = express.Router();
 const { deleteS3Obj, upload_s3_test } = require('./S3');
 
@@ -13,7 +15,7 @@ const config = require(__dirname + '/../config/config.json')[env];
 let sequelize;
 if (config.use_env_variable) {
     sequelize = new Sequelize(
-        process.env[config.use_env_variable], 
+        process.env[config.use_env_variable],
         config);
 } else {
     sequelize = new Sequelize(
@@ -33,10 +35,13 @@ const findCategory = async (category_id, categoryList) => {
 }
 
 
-router.post('/create', isLoggedIn, async (req, res, next) => {
+router.post('/create', clientIp, isLoggedIn, async (req, res, next) => {
     try {
+        const user_email = req.user.email;
         const { adviser, category, title, write_date } = req.body;
-        console.log('피드백 생성', adviser, category, title, write_date);
+
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] 피드백 생성 Request`);
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] adviser : ${adviser}, category : ${category}, title : ${title}, write_date : ${write_date}`);
 
         const exFeedback = await Feedback.create({
             user_uid: req.user.user_uid,
@@ -51,79 +56,93 @@ router.post('/create', isLoggedIn, async (req, res, next) => {
             data: '',
             message: '피드백 생성 완료',
         }
+
         if (exFeedback) {
             result.data = exFeedback
+            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             res.status(201).json(result);
         } else {
             result.success = false;
             result.message = '피드백이 생성되지 않았습니다.';
-            return res.status(201).json(result);
+            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            return res.status(200).json(result);
         }
 
     } catch (e) {
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 피드백 생성 Exception`);
+
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
 
-router.post('/complete/request', isLoggedIn, async (req, res, next) => {
+router.post('/complete/request', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        const { feedback_id } = req.body;
-        console.log('피드백 완료 요청', feedback_id);
+        const user_email = req.user.email;
+        const feedback_id = req.body.feedback_id;
 
-        const beforeFeedback = await Feedback.findOne({ where: {id: feedback_id} });
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] 피드백 완료 Request`);
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] feedback_id : ${feedback_id}`);
+
+        const beforeFeedback = await Feedback.findOne({ where: { id: feedback_id } });
 
         let result = {
             success: true,
             data: '',
             message: '피드백 완료 요청 성공',
         }
-        
-        if(!beforeFeedback) {
+
+        if (!beforeFeedback) {
             result.success = false;
             result.message = '피드백이 존재하지 않습니다';
-            return res.status(201).json(result);
+            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            return res.status(200).json(result);
         }
 
         await Feedback.update({
             complete: 1
         }, { where: { id: feedback_id } });
 
-        const exFeedback = await Feedback.findOne({ where: {id: feedback_id} });
+        const exFeedback = await Feedback.findOne({ where: { id: feedback_id } });
 
         if (exFeedback) {
             result.data = exFeedback
-            res.status(201).json(result);
+            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            res.status(200).json(result);
         } else {
             result.success = false;
             result.message = '존재하지 않는 피드백 입니다.';
-            return res.status(201).json(result);
+            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            return res.status(200).json(result);
         }
 
     } catch (e) {
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 피드백 완료 요청 Exception`);
+
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
 
-router.post('/complete/reject', isLoggedIn, async (req, res, next) => {
+router.post('/complete/reject', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        const { feedback_id } = req.body;
-        console.log('피드백 완료 거절 요청', feedback_id);
+        const user_email = req.user.email;
+        const feedback_id = req.body.feedback_id;
 
-        const beforeFeedback = await Feedback.findOne({ where: {id: feedback_id} });
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] 피드백 완료 거절 Request`);
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] feedback_id : ${feedback_id}`);
+
+        const beforeFeedback = await Feedback.findOne({ where: { id: feedback_id } });
 
         let result = {
             success: true,
@@ -131,45 +150,52 @@ router.post('/complete/reject', isLoggedIn, async (req, res, next) => {
             message: '피드백 완료 요청 거절',
         }
 
-        if(!beforeFeedback) {
+        if (!beforeFeedback) {
             result.success = false;
             result.message = '피드백이 존재하지 않습니다';
-            return res.status(201).json(result);
+            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            return res.status(200).json(result);
         }
 
         await Feedback.update({
             complete: 0
         }, { where: { id: feedback_id } });
 
-        const exFeedback = await Feedback.findOne({ where: {id: feedback_id} });
+        const exFeedback = await Feedback.findOne({ where: { id: feedback_id } });
 
         if (exFeedback) {
             result.data = exFeedback
-            res.status(201).json(result);
+            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            res.status(200).json(result);
         } else {
             result.success = false;
             result.message = '존재하지 않는 피드백 입니다.';
-            return res.status(201).json(result);
+            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            return res.status(200).json(result);
         }
 
     } catch (e) {
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 피드백 완료 거절 Exception`);
+
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
 
-router.post('/complete/accept', isLoggedIn, async (req, res, next) => {
+router.post('/complete/accept', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        const { feedback_id } = req.body;
-        console.log('피드백 완료 수락 요청', feedback_id);
+        const user_email = req.user.email;
+        const feedback_id = req.body.feedback_id;
 
-        const beforeFeedback = await Feedback.findOne({ where: {id: feedback_id} });
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] 피드백 완료 수락 Request`);
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] feedback_id : ${feedback_id}`);
+
+        const beforeFeedback = await Feedback.findOne({ where: { id: feedback_id } });
 
         let result = {
             success: true,
@@ -177,46 +203,55 @@ router.post('/complete/accept', isLoggedIn, async (req, res, next) => {
             message: '피드백 완료 요청 수락',
         }
 
-        if(!beforeFeedback) {
+        if (!beforeFeedback) {
             result.success = false;
             result.message = '피드백이 존재하지 않습니다';
-            return res.status(201).json(result);
+            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            return res.status(200).json(result);
         }
 
         await Feedback.update({
             complete: 2
         }, { where: { id: feedback_id } });
 
-        const exFeedback = await Feedback.findOne({ where: {id: feedback_id} });
+        const exFeedback = await Feedback.findOne({ where: { id: feedback_id } });
 
         if (exFeedback) {
-            result.data = exFeedback
-            res.status(201).json(result);
+            result.data = exFeedback;
+            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            res.status(200).json(result);
         } else {
             result.success = false;
             result.message = '존재하지 않는 피드백 입니다.';
-            return res.status(201).json(result);
+            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            return res.status(200).json(result);
         }
 
     } catch (e) {
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 피드백 완료 수락 Exception`);
+
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
 
 /* getfeedback API
  */
-router.get('/all/:lastid', isLoggedIn, async (req, res, next) => {
+router.get('/all/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
     try {
         const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
         let lastid = parseInt(req.params.lastid);
-        console.log('AllFeedback 요청', lastid);
+
+        winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] 피드백 목록 조회 Request`);
+        winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] lastid : ${lastid}`);
+
+
         if (lastid === 0) {
             lastid = 9999;
         }
@@ -260,25 +295,31 @@ router.get('/all/:lastid', isLoggedIn, async (req, res, next) => {
             data: feedbackList,
             message: ""
         }
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
         res.status(200).json(result);
     } catch (e) {
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 피드백 목록 조회 Exception`);
+
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
 
-router.get('/all/:lastid/:limit', isLoggedIn, async (req, res, next) => {
+router.get('/all/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next) => {
     try {
         const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
         let lastid = parseInt(req.params.lastid);
         let limit = parseInt(req.params.limit);
-        console.log('AllFeedback 요청', lastid);
+
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] 피드백 목록(제한) 조회 Request`);
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] lastid : ${lastid}, limit : ${limit}`);
+
         if (lastid === 0) {
             lastid = 9999;
         }
@@ -322,28 +363,35 @@ router.get('/all/:lastid/:limit', isLoggedIn, async (req, res, next) => {
             data: feedbackList,
             message: ""
         }
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
         res.status(200).json(result);
     } catch (e) {
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 피드백 목록(제한) 조회 Exception`);
+
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
 
-router.get('/my/:lastid', isLoggedIn, async (req, res, next) => {
+router.get('/my/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
     try {
+        const user_email = req.user.email;
+        let lastid = parseInt(req.params.lastid);
+
+        winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] 내가 만든 피드백 목록 조회 Request`);
+        winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] lastid : ${lastid}`);
+
         let result = {
             success: true,
             data: '',
             message: "내가 만든 피드백 목록"
         }
-        let lastid = parseInt(req.params.lastid);
-        console.log('myFeedback 요청', lastid);
+
         if (lastid === 0) {
             lastid = 9999;
         }
@@ -367,29 +415,36 @@ router.get('/my/:lastid', isLoggedIn, async (req, res, next) => {
                 contact.category = data
             });
         })
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
         res.status(200).json(result);
     } catch (e) {
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 내가 만든 피드백 목록 조회 Exception`);
+
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
 
-router.get('/my/:lastid/:limit', isLoggedIn, async (req, res, next) => {
+router.get('/my/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next) => {
     try {
+        const user_email = req.user.email;
+        let lastid = parseInt(req.params.lastid);
+        let limit = parseInt(req.params.limit);
+
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] 내가 만든 피드백 목록(제한) 조회 Request`);
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] lastid : ${lastid}, limit : ${limit}`);
+
         let result = {
             success: true,
             data: '',
             message: "내가 만든 피드백 목록"
         }
-        let lastid = parseInt(req.params.lastid);
-        let limit = parseInt(req.params.limit);
-        console.log('myFeedback 요청', lastid);
+
         if (lastid === 0) {
             lastid = 9999;
         }
@@ -412,24 +467,30 @@ router.get('/my/:lastid/:limit', isLoggedIn, async (req, res, next) => {
                 // console.log(data, contact.category);
                 contact.category = data
             });
-        })
+        });
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
         res.status(200).json(result);
     } catch (e) {
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 내가 만든 피드백 목록(제한) 조회 Exception`);
+
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
 
-router.get('/your/:lastid', isLoggedIn, async (req, res, next) => {
+router.get('/your/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
     try {
+        const user_email = req.user.email;
         let lastid = parseInt(req.params.lastid);
-        console.log('yourFeedback 요청', lastid);
+
+        winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] 내가 조언자인 피드백 목록 조회 Request`);
+        winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] lastid : ${lastid}`);
+
         const yourFeedback = await Feedback.findAll({
             where: { adviser_uid: req.user.user_uid, id: { [Op.lt]: lastid } },
             order: [['write_date', 'DESC']],
@@ -445,24 +506,30 @@ router.get('/your/:lastid', isLoggedIn, async (req, res, next) => {
             data: yourFeedback,
             message: "내가 조언자인 피드백 목록"
         }
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
         res.status(200).json(result);
     } catch (e) {
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 내가 조언자인 피드백 목록 조회 Exception`);
+
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
 
-router.get('/your/:lastid/:limit', isLoggedIn, async (req, res, next) => {
+router.get('/your/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next) => {
     try {
+        const user_email = req.user.email;
         let lastid = parseInt(req.params.lastid);
         let limit = parseInt(req.params.limit);
-        console.log('yourFeedback 요청', lastid);
+
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] 내가 조언자인 피드백 목록(제한) 조회 Request`);
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] lastid : ${lastid}, limit : ${limit}`);
+
         const yourFeedback = await Feedback.findAll({
             where: { adviser_uid: req.user.user_uid, id: { [Op.lt]: lastid } },
             order: [['write_date', 'DESC']],
@@ -478,24 +545,30 @@ router.get('/your/:lastid/:limit', isLoggedIn, async (req, res, next) => {
             data: yourFeedback,
             message: "내가 조언자인 피드백 목록"
         }
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
         res.status(200).json(result);
     } catch (e) {
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 내가 조언자인 피드백 목록(제한) 조회  Exception`);
+
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
 
-router.put('/update/:feedback_id', isLoggedIn, async (req, res, next) => {
+router.put('/update/:feedback_id', clientIp, isLoggedIn, async (req, res, next) => {
     try {
+        const user_email = req.user.email;
         const feedback_id = req.params.feedback_id;
         const { adviser, category, title, write_date } = req.body;
-        console.log('feedback put 요청', adviser, category, title, write_date);
+
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] 피드백 생성 Request`);
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] feedback_id : ${feedback_id}, adviser : ${adviser}, category : ${category}, title : ${title}, write_date : ${write_date}`);
+
         const beforeFeedback = await Feedback.findOne({
             where: { id: feedback_id },
         });
@@ -527,24 +600,30 @@ router.put('/update/:feedback_id', isLoggedIn, async (req, res, next) => {
             data,
             message: 'feedback update 성공'
         }
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
         res.status(200).json(result);
     } catch (e) {
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 피드백 수정 Exception`);
+
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
 
-router.patch('/adviser/:feedback_id', isLoggedIn, async (req, res, next) => {
+router.patch('/adviser/:feedback_id', clientIp, isLoggedIn, async (req, res, next) => {
     try {
+        const user_email = req.user.email;
         const feedback_id = req.params.feedback_id;
-        const { adviser } = req.body;
-        console.log('feedback adviser 수정', adviser);
+        const adviser = req.body.adviser;
+
+        winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] 피드백 조언자 수정 Request`);
+        winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] feedback_id : ${feedback_id}, adviser : ${adviser}`);
+
         await Feedback.update({
             adviser_uid: adviser
         }, { where: { id: feedback_id } })
@@ -554,24 +633,30 @@ router.patch('/adviser/:feedback_id', isLoggedIn, async (req, res, next) => {
             data,
             message: 'feedback update 성공'
         }
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
         res.status(200).json(result);
     } catch (e) {
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 피드백 조언자 수정 Exception`);
+
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
 
-router.patch('/category/:feedback_id', isLoggedIn, async (req, res, next) => {
+router.patch('/category/:feedback_id', clientIp, isLoggedIn, async (req, res, next) => {
     try {
+        const user_email = req.user.email;
         const feedback_id = req.params.feedback_id;
-        const { category } = req.body;
-        console.log('feedback category 수정', category);
+        const category = req.body.category;
+
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] 피드백 카테고리 수정 Request`);
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] feedback_id : ${feedback_id}, category : ${category}`);
+
         await Feedback.update({
             category: category
         }, { where: { id: feedback_id } })
@@ -581,24 +666,30 @@ router.patch('/category/:feedback_id', isLoggedIn, async (req, res, next) => {
             data: data,
             message: 'feedback update 성공'
         }
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
         res.status(200).json(result);
     } catch (e) {
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 피드백 카테고리 수정 Exception`);
+
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
 
-router.patch('/title/:feedback_id', isLoggedIn, async (req, res, next) => {
+router.patch('/title/:feedback_id', clientIp, isLoggedIn, async (req, res, next) => {
     try {
+        const user_email = req.user.email;
         const feedback_id = req.params.feedback_id;
-        const { title } = req.body;
-        console.log('feedback title 수정', title);
+        const title = req.body.title;
+
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] 피드백 카테고리 수정 Request`);
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] feedback_id : ${feedback_id}, title : ${title}`);
+
         await Feedback.update({
             title
         }, { where: { id: feedback_id } })
@@ -608,24 +699,30 @@ router.patch('/title/:feedback_id', isLoggedIn, async (req, res, next) => {
             data,
             message: 'feedback update 성공'
         }
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
         res.status(200).json(result);
     } catch (e) {
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 피드백 제목 수정 Exception`);
+
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
 
-router.patch('/write_date/:feedback_id', isLoggedIn, async (req, res, next) => {
+router.patch('/write_date/:feedback_id', clientIp, isLoggedIn, async (req, res, next) => {
     try {
+        const user_email = req.user.email;
         const feedback_id = req.params.feedback_id;
-        const { write_date } = req.body;
-        console.log('feedback title 수정', write_date);
+        const write_date = req.body.write_date;
+
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] 피드백 날짜 수정 Request`);
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] feedback_id : ${feedback_id}, write_date : ${write_date}`);
+
         await Feedback.update({
             write_date
         }, { where: { id: feedback_id } })
@@ -635,25 +732,30 @@ router.patch('/write_date/:feedback_id', isLoggedIn, async (req, res, next) => {
             data,
             message: 'feedback update 성공'
         }
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
         res.status(200).json(result);
     } catch (e) {
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 피드백 날짜 수정 Exception`);
+
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
 
-router.delete('/:feedback_id', isLoggedIn, async (req, res, next) => {
+router.delete('/:feedback_id', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        console.log('[DELETE] 피드백 삭제 요청');
-
         const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
         const feedback_id = req.params.feedback_id;
+
+        winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] 피드백 삭제 Request`);
+        winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] feedback_id : ${feedback_id}`);
+
 
         // 피드백 테이블에서 feedback_id로 uuid 검색
         // SELECT user_uid FROM feedbacks WHERE id=:feedback_id;
@@ -662,52 +764,44 @@ router.delete('/:feedback_id', isLoggedIn, async (req, res, next) => {
             where: {
                 id: feedback_id
             }
-        }).then(async(feedback) => {
+        }).then(async (feedback) => {
             // 피드백 테이블 조회를 성공한 경우
-            console.log('[DELETE] 피드백 테이블 조회 성공');
-            console.log(feedback);
-
             if (feedback == null) {
                 // 피드백 테이블에서 피드백 검색에 실패한 경우
-                console.log('[DELETE] 피드백 검색 실패');
-
                 const result = new Object();
                 result.success = false;
                 result.data = 'NONE';
-                result.message = '[DELETE] 피드백을 찾을 수 없습니다.';
-                console.log(result);
+                result.message = '피드백을 찾을 수 없습니다.';
+                winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                 return res.status(200).send(result);
             } else {
                 // 피드백 테이블에서 피드백 검색에 성공한 경우
-                console.log('[DELETE] 피드백 검색 성공');
-
                 if (user_uid != feedback.user_uid) {
                     // 본인이 작성한 피드백이 아닌 경우
-
                     const result = new Object();
                     result.success = false;
                     result.data = 'NONE';
-                    result.message = '[DELETE] 내가 작성한 피드백이 아닙니다.';
-                    console.log(result);
+                    result.message = '내가 작성한 피드백이 아닙니다.';
+                    winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                     return res.status(200).send(result);
                 } else {
                     // 본인이 작성한 피드백인 경우
                     // 이 피드백에 속한 게시물의 파일 검색
                     let deleteItems = [];
                     await Board.findAll({
-                        attributes:['id','board_file1', 'board_file2', 'board_file3'],
-                        where:{fk_feedbackId: feedback_id}
-                    }).then(boards=>{
-                        console.log("board ="+ boards);
+                        attributes: ['id', 'board_file1', 'board_file2', 'board_file3'],
+                        where: { fk_feedbackId: feedback_id }
+                    }).then(boards => {
+                        console.log("board =" + boards);
                         // 삭제할 파일 목록 배열에 저장
-                        boards.forEach(element=>{
-                            if(element.board_file1){
+                        boards.forEach(element => {
+                            if (element.board_file1) {
                                 deleteItems.push({ Key: element.board_file1 })
                             }
-                            if(element.board_file2){
+                            if (element.board_file2) {
                                 deleteItems.push({ Key: element.board_file2 })
                             }
-                            if(element.board_file3){
+                            if (element.board_file3) {
                                 deleteItems.push({ Key: element.board_file3 })
                             }
                         })
@@ -715,8 +809,8 @@ router.delete('/:feedback_id', isLoggedIn, async (req, res, next) => {
                     })
                     // 삭제할 목록에 있는 파일들 전부 삭제
                     deleteS3Obj(deleteItems);
-                    
-                    
+
+
                     let query_update =
                         'UPDATE comments SET deletedAt=NOW() WHERE fk_board_id=ANY(SELECT id FROM boards WHERE fk_feedbackId=:feedback_id); ' +
                         'UPDATE boards SET deletedAt=NOW() WHERE fk_feedbackId=:feedback_id; ' +
@@ -731,46 +825,46 @@ router.delete('/:feedback_id', isLoggedIn, async (req, res, next) => {
                         // 삭제할 목록에 있는 파일들 전부 삭제
                         //deleteS3Obj(deleteItems);
                         // 정상적으로 피드백 삭제 쿼리를 수행한 경우
-                        console.log('[DELETE] 피드백 삭제 성공');
                         // 친구 차단 목록을 그대로 리턴
                         const result = new Object();
                         result.success = true;
                         result.data = feedback_id;
-                        result.message = '[DELETE] 성공적으로 피드백을 삭제했습니다.';
-                        console.log(result);
+                        result.message = '성공적으로 피드백을 삭제했습니다.';
+                        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                         return res.status(200).send(result);
                     }).catch(error => {
                         // 삭제 쿼리 실행을 실패한 경우
-                        console.log('[DELETE] 피드백 삭제 쿼리 실행 실패', error);
+                        winston.log('error', `[FEEDBACK][${req.clientIp}|${user_email}] 피드백 삭제 쿼리 실행 실패 \n ${error.stack}`);
 
                         const result = new Object();
                         result.success = false;
                         result.data = 'NONE';
-                        result.message = '[DELETE] 피드백 삭제 실행 과정에서 에러가 발생하였습니다.';
-                        console.log(result);
+                        result.message = '피드백 삭제 실행 과정에서 에러가 발생하였습니다.';
+                        winston.log('error', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                         return res.status(500).send(result);
                     });
                 }
             }
         }).catch(error => {
             // 피드백 테이블 조회를 실패한 경우
-            console.log('[DELETE] 피드백 테이블 조회 실패', error);
+            winston.log('error', `[FEEDBACK][${req.clientIp}|${user_email}] 피드백 테이블 조회 실패 \n ${error.stack}`);
 
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
-            result.message = '[DELETE] 피드백 조회 과정에서 에러가 발생하였습니다.';
-            console.log(result);
+            result.message = '피드백 조회 과정에서 에러가 발생하였습니다.';
+            winston.log('error', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             return res.status(500).send(result);
         });
     } catch (e) {
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 피드백 삭제 Exception`);
+
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });

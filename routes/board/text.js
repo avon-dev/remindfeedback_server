@@ -1,13 +1,18 @@
+const winston = require('../../config/winston');
+const { clientIp, isLoggedIn, isNotLoggedIn } = require('../middlewares'); 
+
 const express = require('express');
 const { Board } = require('../../models');
-const { isLoggedIn, isNotLoggedIn } = require('../middlewares'); 
 const router = express.Router();
 
 
-router.post('/create', isLoggedIn, async (req, res, next) => {
+router.post('/create', clientIp, isLoggedIn, async (req, res, next) => {
     try{
+        const user_email = req.user.email;
         const { feedback_id, board_title, board_content } = req.body;
-        console.log('피드백 생성', feedback_id, board_title, board_content);
+
+        winston.log('info', `[BOARD|TEXT][${req.clientIp}|${user_email}] 게시글(텍스트) 생성 Request`);
+        winston.log('info', `[BOARD|TEXT][${req.clientIp}|${user_email}] feedback_id : ${feedback_id}, board_title : ${board_title},  board_content : ${board_content}`);
 
         const exBoard = await Board.create({
             board_title,
@@ -21,31 +26,38 @@ router.post('/create', isLoggedIn, async (req, res, next) => {
             message: '게시글 생성 완료',
         }
         if(exBoard) {
-            result.data= exBoard
+            result.data= exBoard;
+            winston.log('info', `[BOARD|TEXT][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             res.status(201).json(result);
         }else {
             result.success = false;
             result.message = '게시글이 생성되지 않았습니다.';
-            return res.status(201).json(result);
+            winston.log('info', `[BOARD|TEXT][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            return res.status(200).json(result);
         }
 
     } catch(e){
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[BOARD|TEXT][${req.clientIp}|${req.user.email}] 게시글(텍스트) 생성 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[BOARD|TEXT][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
 
-router.put('/update/:board_id', isLoggedIn, async (req, res, next) => {
+router.put('/update/:board_id', clientIp, isLoggedIn, async (req, res, next) => {
     try{
+        const user_email = req.user.email;
         const board_id = req.params.board_id;
         const { board_title, board_content } = req.body; 
-        console.log('board text put 요청', board_title, board_content);
+
+        winston.log('info', `[BOARD|TEXT][${req.clientIp}|${user_email}] 게시글(텍스트) 수정 Request`);
+        winston.log('info', `[BOARD|TEXT][${req.clientIp}|${user_email}] board_id : ${board_id}, board_title : ${board_title},  board_content : ${board_content}`);
+
         const beforeBoard = await Board.findOne({
             where: {id:board_id},
         });
@@ -70,15 +82,17 @@ router.put('/update/:board_id', isLoggedIn, async (req, res, next) => {
             data,
             message: 'board text update 성공'
         }
+        winston.log('info', `[BOARD|TEXT][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
         res.status(200).json(result);
     } catch(e){
-        let result = {
-            success: false,
-            data: '',
-            message: e
-        }
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[BOARD|TEXT][${req.clientIp}|${req.user.email}] 게시글(텍스트) 수정 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[BOARD|TEXT][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });

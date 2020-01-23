@@ -28,7 +28,8 @@ if (config.use_env_variable) {
 // 친구 검색
 router.post ('/search', clientIp, isLoggedIn, async function (req, res, next) {
     try {
-        const {user_uid, user_email} = req.user;
+        const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
         const email = req.body.email;
 
         winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] 친구 검색 Request`);
@@ -187,6 +188,13 @@ router.post ('/search', clientIp, isLoggedIn, async function (req, res, next) {
         });
     } catch (e) {
         winston.log('error', `[FRIEND][${req.clientIp}|${req.user.email}] 친구 검색 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[FRIEND][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
@@ -194,7 +202,9 @@ router.post ('/search', clientIp, isLoggedIn, async function (req, res, next) {
 // 친구 추가
 router.post('/create', clientIp, isLoggedIn, async function (req, res, next) {
     try {
-        const {user_uid, user_email, user_nickname} = req.user;
+        const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
+        const user_nickname = req.user.nickname;
         const friend_uid = req.body.user_uid;
 
         winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] 친구 추가 Request`);
@@ -404,6 +414,13 @@ router.post('/create', clientIp, isLoggedIn, async function (req, res, next) {
         });
     } catch (e) {
         winston.log('error', `[FRIEND][${req.clientIp}|${req.user.email}] 친구 추가 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[FRIEND][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
@@ -411,7 +428,9 @@ router.post('/create', clientIp, isLoggedIn, async function (req, res, next) {
 // 친구 거절
 router.put('/reject', clientIp, isLoggedIn, async function (req, res, next) {
     try {
-        const {user_uid, user_email, user_nickname} = req.user;
+        const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
+        const user_nickname = req.user.nickname;
         const friend_uid = req.body.user_uid;
 
         winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] 친구 거절 Request`);
@@ -561,6 +580,13 @@ router.put('/reject', clientIp, isLoggedIn, async function (req, res, next) {
         });
     } catch (e) {
         winston.log('error', `[FRIEND][${req.clientIp}|${req.user.email}] 친구 거절 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[FRIEND][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
@@ -568,7 +594,8 @@ router.put('/reject', clientIp, isLoggedIn, async function (req, res, next) {
 // 보낸 친구 요청 목록
 router.get('/allrequest/send', clientIp, isLoggedIn, async function (req, res, next) {
     try {
-        const {user_uid, user_email} = req.user;
+        const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
 
         winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] 보낸 친구 요청 목록 Request`);
 
@@ -619,6 +646,13 @@ router.get('/allrequest/send', clientIp, isLoggedIn, async function (req, res, n
         });
     } catch (e) {
         winston.log('error', `[FRIEND][${req.clientIp}|${req.user.email}] 보낸 친구 요청 목록 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[FRIEND][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
@@ -626,7 +660,8 @@ router.get('/allrequest/send', clientIp, isLoggedIn, async function (req, res, n
 // 받은 친구 요청 목록
 router.get('/allrequest/receive', clientIp, isLoggedIn, async function (req, res, next) {
     try {
-        const {user_uid, user_email} = req.user;
+        const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
 
         winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] 받은 친구 요청 목록 Request`);
 
@@ -676,6 +711,13 @@ router.get('/allrequest/receive', clientIp, isLoggedIn, async function (req, res
         });
     } catch (e) {
         winston.log('error', `[FRIEND][${req.clientIp}|${req.user.email}] 받은 친구 요청 목록 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[FRIEND][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
@@ -683,7 +725,8 @@ router.get('/allrequest/receive', clientIp, isLoggedIn, async function (req, res
 // 친구 목록
 router.get('/allfriend', clientIp, isLoggedIn, async function (req, res, next) {
     try {
-        const {user_uid, user_email} = req.user;
+        const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
 
         winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] 친구 목록 Request`);
 
@@ -738,6 +781,13 @@ router.get('/allfriend', clientIp, isLoggedIn, async function (req, res, next) {
         });
     } catch (e) {
         winston.log('error', `[FRIEND][${req.clientIp}|${req.user.email}] 모든 친구 목록 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[FRIEND][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
@@ -745,7 +795,8 @@ router.get('/allfriend', clientIp, isLoggedIn, async function (req, res, next) {
 // 조언자 목록
 router.get('/alladviser', clientIp, isLoggedIn, async function (req, res, next){
     try {
-        const {user_uid, user_email} = req.user;
+        const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
 
         winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] 조언자 목록 Request`);
 
@@ -800,6 +851,13 @@ router.get('/alladviser', clientIp, isLoggedIn, async function (req, res, next){
         });
     } catch (e) {
         winston.log('error', `[FRIEND][${req.clientIp}|${req.user.email}] 모든 조언자 목록 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[FRIEND][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
@@ -807,7 +865,8 @@ router.get('/alladviser', clientIp, isLoggedIn, async function (req, res, next){
 // 친구 차단 목록
 router.get('/allblock', clientIp, isLoggedIn, async function (req, res, next) {
     try {
-        const {user_uid, user_email} = req.user;
+        const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
 
         winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] 친구 차단 목록 Request`);
 
@@ -861,6 +920,13 @@ router.get('/allblock', clientIp, isLoggedIn, async function (req, res, next) {
         });
     } catch (e) {
         winston.log('error', `[FRIEND][${req.clientIp}|${req.user.email}] 모든 친구 차단 목록 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[FRIEND][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
@@ -868,7 +934,9 @@ router.get('/allblock', clientIp, isLoggedIn, async function (req, res, next) {
 // Block(친구 차단)
 router.put('/block', clientIp, isLoggedIn, async function (req, res, next) {
     try {
-        const {user_uid, user_email, user_nickname} = req.user;
+        const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
+        const user_nickname = req.user.nickname;
         const friend_uid = req.body.user_uid;
 
         winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] 친구 차단 Request`);
@@ -1064,6 +1132,13 @@ router.put('/block', clientIp, isLoggedIn, async function (req, res, next) {
         });
     } catch (e) {
         winston.log('error', `[FRIEND][${req.clientIp}|${req.user.email}] 친구 차단 Exception`);
+
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[FRIEND][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
@@ -1071,7 +1146,9 @@ router.put('/block', clientIp, isLoggedIn, async function (req, res, next) {
 // Unblock(친구 차단 해제)
 router.put('/unblock', clientIp, isLoggedIn, async function (req, res, next) {
     try {
-        const {user_uid, user_email, user_nickname} = req.user;
+        const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
+        const user_nickname = req.user.nickname;
         const friend_uid = req.body.user_uid;
 
         winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] 친구 차단 해제 Request`);
@@ -1265,7 +1342,15 @@ router.put('/unblock', clientIp, isLoggedIn, async function (req, res, next) {
         });
     } catch (e) {
         winston.log('error', `[FRIEND][${req.clientIp}|${req.user.email}] 친구 차단 해제 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[FRIEND][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
         return next(e);
     }
 });
+
 module.exports = router;
