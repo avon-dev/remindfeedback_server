@@ -1,6 +1,8 @@
+const winston = require('../config/winston');
+const { clientIp, isLoggedIn, isNotLoggedIn } = require('./middlewares');
+
 const express = require('express');
 const { User } = require('../models');
-const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
 const router = express.Router();
 const {deleteS3Obj, upload_s3_test} = require('./S3');
 
@@ -17,10 +19,12 @@ let fileSize = 50 * 1024 * 1024;
 * Select One User.
 * @returns {json} json data of response result.
 */
-router.get('/', isLoggedIn, async (req, res, next) => {
+router.get('/', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        const user_uid = req.user.user_uid;
-        console.log('마이페이지 조회');
+        const {user_uid, user_email} = req.user;
+
+        winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] 마이페이지 조회 Request`);
+
         // SELECT category FROM User WHERE user_uid = 'user_uid';
         result.data = await User.findOne({
             attributes: ['email','nickname','portrait','introduction'], // 이메일, 닉네임, 프로필사진 주소, 소개글
@@ -30,14 +34,11 @@ router.get('/', isLoggedIn, async (req, res, next) => {
         });
         result.success = true;
         result.message="마이페이지 조회 성공"
-        console.log('select one user.', JSON.stringify(result));
+        winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
         return res.status(200).json(result);
 
     } catch (e) {
-        result.success = false;
-        result.message = "마이페이지 조회 실패"
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[MYPAGE][${req.clientIp}|${req.user.email}] 마이페이지 조회 Exception`);
         return next(e);
     }
 });
@@ -49,19 +50,22 @@ router.get('/', isLoggedIn, async (req, res, next) => {
 * @param {file} portrait user profile picture
 * @returns {json} json data of response result.
 */
-router.put('/update', isLoggedIn, upload_s3_test(type, fileSize).single('portrait'), async (req, res, next) => {
+router.put('/update', clientIp, isLoggedIn, upload_s3_test(type, fileSize).single('portrait'), async (req, res, next) => {
     try {
-        const user_uid = req.user.user_uid;
+        const {user_uid, user_email} = req.user;
         const { nickname, introduction } = req.body;
         let portrait = "";
-        console.log('마이페이지 수정 요청');
+
+        winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] 마이페이지 수정 Request`);
+        winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] nickname : ${nickname}, introduction : ${introduction}`);
 
         // 닉네임 검사 (필수값)
         if (!nickname) {
             result.success = false;
             result.data = 'NONE';
             result.message = '닉네임은 반드시 입력해야 합니다.';
-            return res.status(403).json(result);
+            winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            return res.status(200).json(result);
         }
         // 기존 유저 정보 조회
         const exUser = await User.findOne({
@@ -100,13 +104,10 @@ router.put('/update', isLoggedIn, upload_s3_test(type, fileSize).single('portrai
         });
         result.success = true;
         result.message = "마이페이지 수정 성공"
-        console.log('Update One User', JSON.stringify(result));
+        winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
         return res.status(200).json(result);
     } catch (e) {
-        result.success = false;
-        result.message = "마이페이지 수정 실패"
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[MYPAGE][${req.clientIp}|${req.user.email}] 마이페이지 수정 Exception`);
         return next(e);
     }
 });
@@ -117,19 +118,22 @@ router.put('/update', isLoggedIn, upload_s3_test(type, fileSize).single('portrai
 * @param {String} nickname user nickname
 * @returns {json} json data of response result.
 */
-router.patch('/update/nickname', isLoggedIn, async (req, res, next) => {
+router.patch('/update/nickname', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        const user_uid = req.user.user_uid;
+        const {user_uid, user_email} = req.user;
         const nickname = req.body.nickname;
 
-        console.log(`마이페이지 nickname ${nickname} 수정 요청`);
+        winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] 마이페이지 별명 수정 Request`);
+        winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] nickname : ${nickname}`);
+
 
         // 닉네임 검사 (필수값)
         if (!nickname) {
             result.success = false;
             result.data = 'NONE';
             result.message = '닉네임은 반드시 입력해야 합니다.';
-            return res.status(403).json(result);
+            winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            return res.status(200).json(result);
         }
         // 닉네임 업데이트
         const updateUser = await User.update({
@@ -146,13 +150,10 @@ router.patch('/update/nickname', isLoggedIn, async (req, res, next) => {
         });
         result.success = true;
         result.message = "마이페이지 nickname 수정 성공";
-        console.log(`Update One User's nickname`, JSON.stringify(result));
+        winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
         res.status(200).json(result);
     } catch (e) {
-        result.success = false;
-        result.message = "마이페이지 nickname 수정 실패"
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[MYPAGE][${req.clientIp}|${req.user.email}] 마이페이지 별명 수정 Exception`);
         return next(e);
     }
 });
@@ -163,12 +164,14 @@ router.patch('/update/nickname', isLoggedIn, async (req, res, next) => {
 * @param {String} introduction user introduction
 * @returns {json} json data of response result.
 */
-router.patch('/update/introduction', isLoggedIn, async (req, res, next) => {
+router.patch('/update/introduction', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        const user_uid = req.user.user_uid;
+        const {user_uid, user_email} = req.user;
         const introduction = req.body.introduction;
-        
-        console.log(`마이페이지 introduction ${introduction} 수정 요청`);
+
+        winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] 마이페이지 소개 수정 Request`);
+        winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] introduction : ${introduction}`);
+
         // 상태메시지 업데이트
         const updateUser = await User.update({
             introduction
@@ -184,13 +187,10 @@ router.patch('/update/introduction', isLoggedIn, async (req, res, next) => {
         });
         result.success = true;
         result.message = "마이페이지 introduction 수정 성공";
-        console.log(`Update One User's introduction`, JSON.stringify(result));
+        winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
         res.status(200).json(result);
     } catch (e) {
-        result.success = false;
-        result.message = "마이페이지 introduction 수정 실패"
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[MYPAGE][${req.clientIp}|${req.user.email}] 마이페이지 소개 수정 Exception`);
         return next(e);
     }
 });
@@ -203,13 +203,14 @@ router.patch('/update/introduction', isLoggedIn, async (req, res, next) => {
 * @param {file} portrait user profile picture
 * @returns {json} json data of response result.
 */
-router.patch('/update/portrait', isLoggedIn, upload_s3_test(type, fileSize).single('portrait'), async (req, res, next) => {
+router.patch('/update/portrait', clientIp, isLoggedIn, upload_s3_test(type, fileSize).single('portrait'), async (req, res, next) => {
     try {
         if(!req.file) console.log(`보낸 파일 없음`); 
-        const user_uid = req.user.user_uid;
+
+        const {user_uid, user_email} = req.user;
         let portrait = "";
 
-        console.log(`마이페이지 portrait 수정 요청`);
+        winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] 마이페이지 사진 수정 Request`);
 
         // 기존 유저 정보 조회
         const exUser = await User.findOne({
@@ -244,13 +245,10 @@ router.patch('/update/portrait', isLoggedIn, upload_s3_test(type, fileSize).sing
         });
         result.success = true;
         result.message = "마이페이지 portrait 수정 성공";
-        console.log(`Update One User's portrait`, JSON.stringify(result));
+        winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
         res.status(200).json(result);
     } catch (e) {
-        result.success = false;
-        result.message = "마이페이지 portrait 수정 실패"
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[MYPAGE][${req.clientIp}|${req.user.email}] 마이페이지 사진 수정 Exception`);
         return next(e);
     }
 });
@@ -259,9 +257,11 @@ router.patch('/update/portrait', isLoggedIn, upload_s3_test(type, fileSize).sing
 * Delete One User's portrait.
 * @returns {json} json data of response result.
 */
-router.delete('/delete/portrait', isLoggedIn, async (req, res, next) => {
+router.delete('/delete/portrait', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        const user_uid = req.user.user_uid;
+        const {user_uid, user_email} = req.user;
+        
+        winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] 마이페이지 사진 삭제 Request`);
 
         // 기존 유저 정보 조회
         const exUser = await User.findOne({
@@ -289,13 +289,10 @@ router.delete('/delete/portrait', isLoggedIn, async (req, res, next) => {
         });
         result.success = true;
         result.message = "마이페이지 portrait 삭제 성공";
-        console.log(`Delete One User's portrait`, JSON.stringify(result));
+        winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
         res.status(200).json(result);
     } catch (e) {
-        result.success = false;
-        result.message = "마이페이지 portrait 삭제 실패"
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[MYPAGE][${req.clientIp}|${req.user.email}] 마이페이지 사진 삭제 Exception`);
         return next(e);
     }
 });

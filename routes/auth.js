@@ -1,10 +1,10 @@
 const winston = require('../config/winston');
+const { clientIp, isLoggedIn, isNotLoggedIn } = require('./middlewares');
 
 const express = require('express');
 const bcrypt = require('bcrypt');
 const { User } = require('../models');
 const passport = require('passport');
-const { clientIp, isLoggedIn } = require('./middlewares');
 const router = express.Router();
 const { deleteS3Obj, upload_s3 } = require('./S3');
 

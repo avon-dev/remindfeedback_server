@@ -1,9 +1,9 @@
 const winston = require('../config/winston');
+const { clientIp, isLoggedIn, isNotLoggedIn } = require('./middlewares');
 
 const express = require('express');
 const { User, Friend } = require('../models');
 const passport = require('passport');
-const { clientIp, isLoggedIn, isNotLoggedIn } = require('./middlewares');
 const router = express.Router();
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
@@ -25,21 +25,21 @@ if (config.use_env_variable) {
  
 // Friend CRUD API
 
-// Search(친구 검색)
+// 친구 검색
 router.post ('/search', clientIp, isLoggedIn, async function (req, res, next) {
     try {
-        console.log('[SEARCH] 친구 검색 요청');
-
-        const user_uid = req.user.user_uid;
-        const user_email = req.user.email;
+        const {user_uid, user_email} = req.user;
         const email = req.body.email;
+
+        winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] 친구 검색 Request`);
+        winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] email : ${email}`);
 
         // 본인 이메일 검색 시 에러 출력
         if (email == user_email) {
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
-            result.message = '[SEARCH] 나 자신은 인생의 영원한 친구입니다.';
+            result.message = '나 자신은 인생의 영원한 친구입니다.';
             console.log(result);
             return res.status(200).send(result);
         }
@@ -53,22 +53,16 @@ router.post ('/search', clientIp, isLoggedIn, async function (req, res, next) {
             }
         }).then((user) => {
             // 사용자 테이블 조회를 성공한 경우
-            console.log('[SEARCH] 사용자 테이블 조회 성공');
-
             if (user == null) {
                 // 사용자 테이블에서 사용자 검색에 실패한 경우
-                console.log('[SEARCH] 사용자 검색 실패');
-
                 const result = new Object();
                 result.success = false;
                 result.data = 'NONE';
-                result.message = '[SEARCH] 사용자를 찾을 수 없습니다.';
-                console.log(result);
+                result.message = '사용자를 찾을 수 없습니다.';
+                winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                 return res.status(200).send(result);
             } else {
                 // 사용자 테이블에서 사용자 검색에 성공한 경우
-                console.log('[SEARCH] 사용자 검색 성공');
-
                 // 프론트에 돌려줄 검색 데이터 객체 새로 생성
                 const searchData = new Object();
                 searchData.user_uid = user.user_uid;
@@ -90,24 +84,18 @@ router.post ('/search', clientIp, isLoggedIn, async function (req, res, next) {
                     }
                 }).then((friend) => {
                     // 친구 테이블 조회를 성공한 경우
-                    console.log('[SEARCH] 친구 테이블 조회 성공');
-
                     if (friend == null) {
                         // 검색 후 결과 값이 NULL인 경우(친구 테이블에 친구 데이터가 없는 경우) 
-                        console.log('[SEARCH] 친구 검색 실패');
-
                         searchData.type = -1;
 
                         const result = new Object();
                         result.success = true;
                         result.data = searchData;
-                        result.message = '[SEARCH] 아직 친구 요청을 하지 않은 사용자입니다.';
-                        console.log(result);
+                        result.message = '아직 친구 요청을 하지 않은 사용자입니다.';
+                        winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                         return res.status(200).send(result);
                     } else {
                         // 검색 후 결과 값이 NOT NULL인 경우(친구 테이블에 친구 데이터가 있는 경우)
-                        console.log('[SEARCH] 친구 검색 성공');
-
                         // 타입에 따라 다른 리턴값 반환
                         if (friend.type == 0 | friend.type == 1) {
                             // 내가 친구 요청을 한 경우
@@ -117,9 +105,9 @@ router.post ('/search', clientIp, isLoggedIn, async function (req, res, next) {
                             result.success = true;
                             result.data = searchData;
                             if (friend.user_uid == user_uid) {
-                                result.message = '[SEARCH] 내가 친구 요청을 한 사용자입니다.';
+                                result.message = '내가 친구 요청을 한 사용자입니다.';
                             } else {
-                                result.message = '[SEARCH] 내가 친구 요청을 받은 사용자입니다.';
+                                result.message = '내가 친구 요청을 받은 사용자입니다.';
                             }
                             console.log(result);
                             return res.status(200).send(result);
@@ -130,8 +118,8 @@ router.post ('/search', clientIp, isLoggedIn, async function (req, res, next) {
                             const result = new Object();
                             result.success = true;
                             result.data = searchData;
-                            result.message = '[SEARCH] 이미 친구로 등록된 사용자입니다.';
-                            console.log(result);
+                            result.message = '이미 친구로 등록된 사용자입니다.';
+                            winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                             return res.status(200).send(result);
                         } else if (friend.type == 3) {
                             // 내가 차단한 친구인 경우
@@ -142,11 +130,11 @@ router.post ('/search', clientIp, isLoggedIn, async function (req, res, next) {
                             result.success = true;
                             result.data = searchData;
                             if (friend.user_uid == user_uid) {
-                                result.message = '[SEARCH] 내가 차단한 사용자입니다.';
+                                result.message = '내가 차단한 사용자입니다.';
                             } else {
-                                result.message = '[SEARCH] 나를 차단한 사용자입니다.';
+                                result.message = '나를 차단한 사용자입니다.';
                             }
-                            console.log(result);
+                            winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                             return res.status(200).send(result);
                         } else if (friend.type == 4) {
                             // 친구가 나를 차단한 경우
@@ -156,11 +144,11 @@ router.post ('/search', clientIp, isLoggedIn, async function (req, res, next) {
                             result.success = true;
                             result.data = searchData;
                             if (friend.user_uid == user_uid) {
-                                result.message = '[SEARCH] 나를 차단한 사용자입니다.';
+                                result.message = '나를 차단한 사용자입니다.';
                             } else {
-                                result.message = '[SEARCH] 내가 차단한 사용자입니다.';
+                                result.message = '내가 차단한 사용자입니다.';
                             }
-                            console.log(result);
+                            winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                             return res.status(200).send(result);
                         } else if (friend.type == 5) {
                             // 서로 차단한 경우
@@ -169,56 +157,57 @@ router.post ('/search', clientIp, isLoggedIn, async function (req, res, next) {
                             const result = new Object();
                             result.success = true;
                             result.data = searchData;
-                            result.message = '[SEARCH] 서로 차단한 상태입니다.';
-                            console.log(result);
+                            result.message = '서로 차단한 상태입니다.';
+                            winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                             return res.status(200).send(result);
                         }
                     }
                 }).catch(error => {
                     // 친구 테이블 조회를 실패한 경우
-                    console.log('[SEARCH] 친구 테이블 조회 실패', error);
-
+                    winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] 친구 테이블 조회 실패 \n ${error.stack}`);
+                    
                     const result = new Object();
                     result.success = false;
                     result.data = 'NONE';
-                    result.message = '[SEARCH] 친구 조회 과정에서 에러가 발생하였습니다.';
-                    console.log(result);
+                    result.message = '친구 조회 과정에서 에러가 발생하였습니다.';
+                    winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                     return res.status(500).send(result);
                 });
             }
         }).catch(error => {
             // 사용자 테이블 조회를 실패한 경우
-            console.log('[SEARCH] 사용자 테이블 조회 실패', error);
+            winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] 사용자 테이블 조회 실패 \n ${error.stack}`);
 
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
-            result.message = '[SEARCH] 사용자 조회 과정에서 에러가 발생하였습니다.';
-            console.log(result);
+            result.message = '사용자 조회 과정에서 에러가 발생하였습니다.';
+            winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             return res.status(500).send(result);
         });
     } catch (e) {
-        console.error(e);
+        winston.log('error', `[FRIEND][${req.clientIp}|${req.user.email}] 친구 검색 Exception`);
         return next(e);
     }
 });
 
-// Create(친구 추가)
-router.post('/create', isLoggedIn, async function (req, res, next) {
+// 친구 추가
+router.post('/create', clientIp, isLoggedIn, async function (req, res, next) {
     try {
-        console.log('[CREATE] 친구 추가 요청');
-
-        const user_uid = req.user.user_uid;
+        const {user_uid, user_email, user_nickname} = req.user;
         const friend_uid = req.body.user_uid;
-        const user_nickname = req.user.nickname;
+
+        winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] 친구 추가 Request`);
+        winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] friend_uid : ${friend_uid}`);
+
 
         // 본인을 친구 추가 시 에러 출력
         if (friend_uid == user_uid) {
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
-            result.message = '[CREATE] 나 자신을 추가할 수 없습니다. 나 자신은 인생의 영원한 친구입니다.';
-            console.log(result);
+            result.message = '나 자신을 추가할 수 없습니다. 나 자신은 인생의 영원한 친구입니다.';
+            winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             return res.status(200).send(result);
         }
 
@@ -231,22 +220,16 @@ router.post('/create', isLoggedIn, async function (req, res, next) {
             }
         }).then((user) => {
             // 사용자 테이블 조회를 성공한 경우
-            console.log('[CREATE] 사용자 테이블 조회 성공');
-
             if (user == null) {
                 // 사용자 테이블에서 사용자 검색에 실패한 경우
-                console.log('[CREATE] 사용자 검색 실패');
-
                 const result = new Object();
                 result.success = false;
                 result.data = 'NONE';
-                result.message = '[CREATE] 사용자를 찾을 수 없습니다.';
-                console.log(result);
+                result.message = '사용자를 찾을 수 없습니다.';
+                winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                 return res.status(200).send(result);
             } else {
                 // 사용자 테이블에서 사용자 검색에 성공한 경우
-                console.log('[CREATE] 사용자 검색 성공');
-
                 // 프론트에 돌려줄 검색 데이터 객체 새로 생성
                 const searchData = new Object();
                 searchData.user_uid = user.user_uid;
@@ -268,12 +251,8 @@ router.post('/create', isLoggedIn, async function (req, res, next) {
                     }
                 }).then((friend) => {
                     // 친구 테이블 조회를 성공한 경우
-                    console.log('[CREATE] 친구 테이블 조회 성공');
-
                     if (friend == null) {
                         // 검색 후 결과 값이 NULL인 경우(친구 테이블에 친구 데이터가 없는 경우) 
-                        console.log('[CREATE] 친구 검색 실패');
-
                         // 친구 테이블에 친구 데이터 추가
                         // INSERT INTO friends VALUES(:user_uid, :friend_uid, :type);
                         Friend.create({
@@ -282,32 +261,28 @@ router.post('/create', isLoggedIn, async function (req, res, next) {
                             type: 1,
                         }).then((create) => {
                             // 친구 추가를 성공한 경우
-                            console.log('[CREATE] 친구 추가 성공');
-
                             searchData.type = 1;
 
                             const result = new Object();
                             result.success = true;
                             result.data = searchData;
-                            result.message = '[CREATE] ' + user_nickname + '이 ' + searchData.nickname + '에게 친구 요청을 보냈습니다.';
-                            console.log(result);
+                            result.message = user_nickname + '이 ' + searchData.nickname + '에게 친구 요청을 보냈습니다.';
+                            winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                             return res.status(201).send(result);
                         }).catch(error => {
                             // 친구 추가를 실패한 경우
-                            console.log('[CREATE] 친구 추가 실패', error);
+                            winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] 친구 추가 실패 \n ${error.stack}`);
 
                             const result = new Object();
                             result.success = false;
                             result.data = 'NONE';
-                            result.message = '[CREATE] 친구 요청 과정에서 에러가 발생하였습니다.';
-                            console.log(result);
+                            result.message = '친구 요청 과정에서 에러가 발생하였습니다.';
+                            winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                             return res.status(500).send(result);
                         });
 
                     } else {
                         // 검색 후 결과 값이 NOT NULL인 경우(친구 테이블에 친구 데이터가 있는 경우)
-                        console.log('[CREATE] 친구 검색 성공');
-
                         if (friend.type == 0) {
                             // 친구 요청을 보냈으나 거절당한 경우
                             // UPDATE friends SET type=:type WHERE (user_uid=:user_uid AND friend_uid=:friend_uid) OR (user_uid=:friend_uid AND friend_uid=:user_uid); 
@@ -325,25 +300,23 @@ router.post('/create', isLoggedIn, async function (req, res, next) {
                                 }
                             }).then(() => {
                                 // 친구 추가를 성공한 경우
-                                console.log('[CREATE] 친구 추가 성공');
-
                                 searchData.type = 1;
 
                                 const result = new Object();
                                 result.success = true;
                                 result.data = searchData;
-                                result.message = '[CREATE] ' + user_nickname + '이 ' + searchData.nickname + '에게 친구 요청을 보냈습니다.';
-                                console.log(result);
+                                result.message = user_nickname + '이 ' + searchData.nickname + '에게 친구 요청을 보냈습니다.';
+                                winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                                 return res.status(200).send(result);
                             }).catch(error => {
                                 // 친구 추가를 실패한 경우
-                                console.log('[CREATE] 친구 추가 실패', error);
+                                winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] 친구 추가 실패 \n ${error.stack}`);
 
                                 const result = new Object();
                                 result.success = false;
                                 result.data = 'NONE';
-                                result.message = '[CREATE] 친구 요청 과정에서 에러가 발생하였습니다.';
-                                console.log(result);
+                                result.message = '친구 요청 과정에서 에러가 발생하였습니다.';
+                                winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                                 return res.status(500).send(result);
                             });
                         }
@@ -351,13 +324,11 @@ router.post('/create', isLoggedIn, async function (req, res, next) {
                             // 친구 요청을 보낸 경우
                             if (friend.user_uid == user_uid) {
                                 // 내가 LEFT인 경우
-                                console.log('[CREATE] 친구 추가 실패');
-
                                 const result = new Object();
                                 result.success = false;
                                 result.data = 'NONE';
-                                result.message = '[CREATE] 이미 친구 요청을 보낸 사용자입니다.';
-                                console.log(result);
+                                result.message = '이미 친구 요청을 보낸 사용자입니다.';
+                                winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                                 return res.status(200).send(result);
                             } else {
                                 // 내가 RIGHT인 경우
@@ -377,86 +348,82 @@ router.post('/create', isLoggedIn, async function (req, res, next) {
                                     }
                                 }).then(() => {
                                     // 친구 추가를 성공한 경우
-                                    console.log('[CREATE] 친구 추가 성공');
-
                                     searchData.type = 2;
 
                                     const result = new Object();
                                     result.success = true;
                                     result.data = searchData;
-                                    result.message = '[CREATE] ' + user_nickname + '이 ' + searchData.nickname + '의 친구 요청을 수락해서 친구가 되었습니다.';
-                                    console.log(result);
+                                    result.message = user_nickname + '이 ' + searchData.nickname + '의 친구 요청을 수락해서 친구가 되었습니다.';
+                                    winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                                     return res.status(200).send(result);
                                 }).catch(error => {
                                     // 친구 추가를 실패한 경우
-                                    console.log('[CREATE] 친구 추가 실패', error);
+                                    winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] 친구 추가 실패 \n ${error.stack}`);
 
                                     const result = new Object();
                                     result.success = false;
                                     result.data = 'NONE';
-                                    result.message = '[CREATE] 친구 요청 수락 과정에서 에러가 발생하였습니다.';
-                                    console.log(result);
+                                    result.message = '친구 요청 수락 과정에서 에러가 발생하였습니다.';
+                                    winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                                     return res.status(500).send(result);
                                 });
                             }
                         } else {
                             // 서로 친구 관계이거나 차단한 경우
-                            console.log('[CREATE] 친구 추가 실패');
-
                             const result = new Object();
                             result.success = false;
                             result.data = 'NONE';
-                            result.message = '[CREATE] 서로 친구이거나 차단한 사용자입니다.';
-                            console.log(result);
+                            result.message = '서로 친구이거나 차단한 사용자입니다.';
+                            winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                             return res.status(200).send(result);
                         }
                     }
                 }).catch(error => {
                     // 친구 테이블 조회를 실패한 경우
-                    console.log('[CREATE] 친구 테이블 조회 실패', error);
+                    winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] 친구 테이블 조회 실패 \n ${error.stack}`);
 
                     const result = new Object();
                     result.success = false;
                     result.data = 'NONE';
-                    result.message = '[CREATE] 친구 조회 과정에서 에러가 발생하였습니다.';
-                    console.log(result);
+                    result.message = '친구 조회 과정에서 에러가 발생하였습니다.';
+                    winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                     return res.status(500).send(result);
                 });
 
             }
         }).catch(error => {
             // 사용자 테이블 조회를 실패한 경우
-            console.log('[CREATE] 사용자 테이블 조회 실패', error);
+            winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] 사용자 테이블 조회 실패 \n ${error.stack}`);
 
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
-            result.message = '[CREATE] 사용자 조회 과정에서 에러가 발생하였습니다.';
-            console.log(result);
+            result.message = '사용자 조회 과정에서 에러가 발생하였습니다.';
+            winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             return res.status(500).send(result);
         });
     } catch (e) {
-        console.error(e);
+        winston.log('error', `[FRIEND][${req.clientIp}|${req.user.email}] 친구 추가 Exception`);
         return next(e);
     }
 });
 
-// Reject(친구 거절)
-router.put('/reject', isLoggedIn, async function (req, res, next) {
+// 친구 거절
+router.put('/reject', clientIp, isLoggedIn, async function (req, res, next) {
     try {
-        console.log('[REJECT] 친구 거절 요청');
-
-        const user_uid = req.user.user_uid;
+        const {user_uid, user_email, user_nickname} = req.user;
         const friend_uid = req.body.user_uid;
-        const user_nickname = req.user.nickname;
+
+        winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] 친구 거절 Request`);
+        winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] friend_uid : ${friend_uid}`);
 
         // 본인을 친구 거절 시 에러 출력
         if (friend_uid == user_uid) {
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
-            result.message = '[REJECT] 나 자신을 거절할 수 없습니다. 나 자신은 인생의 영원한 친구입니다.';
-            console.log(result);
+            result.message = '나 자신을 거절할 수 없습니다. 나 자신은 인생의 영원한 친구입니다.';
+            winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             return res.status(200).send(result);
         }
 
@@ -469,22 +436,16 @@ router.put('/reject', isLoggedIn, async function (req, res, next) {
             }
         }).then((user) => {
             // 사용자 테이블 조회를 성공한 경우
-            console.log('[REJECT] 사용자 테이블 조회 성공');
-
             if (user == null) {
                 // 사용자 테이블에서 사용자 검색에 실패한 경우
-                console.log('[REJECT] 사용자 검색 실패');
-
                 const result = new Object();
                 result.success = false;
                 result.data = 'NONE';
-                result.message = '[REJECT] 사용자를 찾을 수 없습니다.';
-                console.log(result);
+                result.message = '사용자를 찾을 수 없습니다.';
+                winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                 return res.status(200).send(result);
             } else {
                 // 사용자 테이블에서 사용자 검색에 성공한 경우
-                console.log('[REJECT] 사용자 검색 성공');
-
                 // 프론트에 돌려줄 검색 데이터 객체 새로 생성
                 const searchData = new Object();
                 searchData.user_uid = user.user_uid;
@@ -506,34 +467,26 @@ router.put('/reject', isLoggedIn, async function (req, res, next) {
                     }
                 }).then((friend) => {
                     // 친구 테이블 조회를 성공한 경우
-                    console.log('[REJECT] 친구 테이블 조회 성공');
-
                     if (friend == null) {
                         // 검색 후 결과 값이 NULL인 경우(친구 테이블에 친구 데이터가 없는 경우) 
-                        console.log('[REJECT] 친구 검색 실패');
-
                         const result = new Object();
                         result.success = false;
                         result.data = 'NONE';
-                        result.message = '[REJECT] 친구를 찾을 수 없습니다.';
-                        console.log(result);
+                        result.message = '친구를 찾을 수 없습니다.';
+                        winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                         return res.status(200).send(result);
                     } else {
                         // 검색 후 결과 값이 NOT NULL인 경우(친구 테이블에 친구 데이터가 있는 경우)
-                        console.log('[REJECT] 친구 검색 성공');
-
                         if (friend.type == 1) {
                             // LEFT가 RIGHT에게 친구 요청을 보낸 경우
                             if (friend.user_uid == user_uid) {
                                 // 내가 LEFT인 경우
                                 //내가 보낸 요청을 거절할 수 없음
-                                console.log('[REJECT] 친구 거절 실패');
-
                                 const result = new Object();
                                 result.success = false;
                                 result.data = 'NONE';
-                                result.message = '[REJECT] 내가 보낸 요청을 거절할 수 없습니다.';
-                                console.log(result);
+                                result.message = '내가 보낸 요청을 거절할 수 없습니다.';
+                                winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                                 return res.status(200).send(result);
                             } else {
                                 // 내가 RIGHT인 경우
@@ -553,73 +506,71 @@ router.put('/reject', isLoggedIn, async function (req, res, next) {
                                     }
                                 }).then(() => {
                                     // 친구 거절을 성공한 경우
-                                    console.log('[REJECT] 친구 거절 성공');
-
                                     searchData.type = 0;
 
                                     const result = new Object();
                                     result.success = true;
                                     result.data = searchData;
-                                    result.message = '[REJECT] ' + user_nickname + '이 ' + searchData.nickname + '의 친구 요청을 거절했습니다.';
-                                    console.log(result);
+                                    result.message = user_nickname + '이 ' + searchData.nickname + '의 친구 요청을 거절했습니다.';
+                                    winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                                     return res.status(200).send(result);
                                 }).catch(error => {
                                     // 친구 추가를 실패한 경우
-                                    console.log('[REJECT] 친구 거절 실패', error);
+                                    winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] 친구 거절 실패 \n ${error.stack}`);
 
                                     const result = new Object();
                                     result.success = false;
                                     result.data = 'NONE';
-                                    result.message = '[REJECT] 친구 거절 과정에서 에러가 발생하였습니다.';
-                                    console.log(result);
+                                    result.message = '친구 거절 과정에서 에러가 발생하였습니다.';
+                                    winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                                     return res.status(500).send(result);
                                 });
                             }
                         } else {
                             // 친구 요청을 보낸 사용자가 아닌 경우
-                            console.log('[REJECT] 친구 거절 실패');
-
                             const result = new Object();
                             result.success = false;
                             result.data = 'NONE';
-                            result.message = '[REJECT] 친구 요청을 보낸 사용자가 아닙니다.';
-                            console.log(result);
+                            result.message = '친구 요청을 보낸 사용자가 아닙니다.';
+                            winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                             return res.status(200).send(result);
                         }
                     }
                 }).catch(error => {
                     // 친구 테이블 조회를 실패한 경우
-                    console.log('[REJECT] 친구 테이블 조회 실패', error);
+                    winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] 친구 테이블 조회 실패 \n ${error.stack}`);
 
                     const result = new Object();
                     result.success = false;
                     result.data = 'NONE';
-                    result.message = '[REJECT] 친구 조회 과정에서 에러가 발생하였습니다.';
-                    console.log(result);
+                    result.message = '친구 조회 과정에서 에러가 발생하였습니다.';
+                    winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                     return res.status(500).send(result);
                 });
             }
         }).catch(error => {
             // 사용자 테이블 조회를 실패한 경우
-            console.log('[REJECT] 사용자 테이블 조회 실패', error);
+            winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] 사용자 테이블 조회 실패 \n ${error.stack}`);
 
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
-            result.message = '[REJECT] 사용자 조회 과정에서 에러가 발생하였습니다.';
-            console.log(result);
+            result.message = '사용자 조회 과정에서 에러가 발생하였습니다.';
+            winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             return res.status(500).send(result);
         });
     } catch (e) {
-        console.error(e);
+        winston.log('error', `[FRIEND][${req.clientIp}|${req.user.email}] 친구 거절 Exception`);
         return next(e);
     }
 });
 
-// Read All Request Send(모든 보낸 친구 요청 목록)
-router.get('/allrequest/send', isLoggedIn, async function (req, res, next) {
+// 보낸 친구 요청 목록
+router.get('/allrequest/send', clientIp, isLoggedIn, async function (req, res, next) {
     try {
-        const user_uid = req.user.user_uid;
+        const {user_uid, user_email} = req.user;
+
+        winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] 보낸 친구 요청 목록 Request`);
 
         // 쿼리문 수정 후 테스트(페이징 적용)
         let query =
@@ -639,45 +590,46 @@ router.get('/allrequest/send', isLoggedIn, async function (req, res, next) {
             raw: true
         }).then((friendList) => {
             // 정상적으로 친구 요청 목록을 불러온 경우
-            console.log('[ALL REQUEST|SEND] 친구 요청 목록 불러오기 성공');
-
             if (friendList[0] == null) {
                 const result = new Object();
                 result.success = true;
                 result.data = '';
-                result.message = '[ALL REQUEST|SEND] 가져올 보낸 친구 요청 목록이 없습니다.';
-                console.log(result);
+                result.message = '가져올 보낸 친구 요청 목록이 없습니다.';
+                winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                 return res.status(200).send(result);
             } else {
                 // 친구 목록을 그대로 리턴
                 const result = new Object();
                 result.success = true;
                 result.data = friendList;
-                result.message = '[ALL REQUEST|SEND] 보낸 친구 요청 목록을 성공적으로 가져왔습니다.';
-                console.log(result);
+                result.message = '보낸 친구 요청 목록을 성공적으로 가져왔습니다.';
+                winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                 return res.status(200).send(result);
             }
         }).catch(error => {
             // 친구 요청 목록 조회를 실패한 경우
-            console.log('[ALL REQUEST|SEND] 보낸 친구 요청 목록 조회 실패', error);
+            winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] 보낸 친구 요청 목록 조회 실패 \n ${error.stack}`);
 
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
-            result.message = '[ALL REQUEST|SEND] 보낸 친구 요청 목록 조회 과정에서 에러가 발생하였습니다.';
-            console.log(result);
+            result.message = '보낸 친구 요청 목록 조회 과정에서 에러가 발생하였습니다.';
+            winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             return res.status(500).send(result);
         });
     } catch (e) {
-        console.error(e);
+        winston.log('error', `[FRIEND][${req.clientIp}|${req.user.email}] 보낸 친구 요청 목록 Exception`);
         return next(e);
     }
 });
 
-// Read All Request Receive(모든 받은 친구 요청 목록)
-router.get('/allrequest/receive', isLoggedIn, async function (req, res, next) {
+// 받은 친구 요청 목록
+router.get('/allrequest/receive', clientIp, isLoggedIn, async function (req, res, next) {
     try {
-        const user_uid = req.user.user_uid;
+        const {user_uid, user_email} = req.user;
+
+        winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] 받은 친구 요청 목록 Request`);
+
         let query =
             'SELECT u.user_uid, u.email, u.nickname, u.portrait, u.introduction, f.type ' +
             'FROM users AS u, (' +
@@ -695,45 +647,46 @@ router.get('/allrequest/receive', isLoggedIn, async function (req, res, next) {
             raw: true
         }).then((friendList) => {
             // 정상적으로 친구 요청 목록을 불러온 경우
-            console.log('[ALL REQUEST|RECEIVE] 친구 요청 목록 불러오기 성공');
-
             if (friendList[0] == null) {
                 const result = new Object();
                 result.success = true;
                 result.data = '';
-                result.message = '[ALL REQUEST|RECEIVE] 가져올 받은 친구 요청 목록이 없습니다.';
-                console.log(result);
+                result.message = '가져올 받은 친구 요청 목록이 없습니다.';
+                winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                 return res.status(200).send(result);
             } else {
                 // 친구 목록을 그대로 리턴
                 const result = new Object();
                 result.success = true;
                 result.data = friendList;
-                result.message = '[ALL REQUEST|RECEIVE] 받은 친구 요청 목록을 성공적으로 가져왔습니다.';
-                console.log(result);
+                result.message = '받은 친구 요청 목록을 성공적으로 가져왔습니다.';
+                winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                 return res.status(200).send(result);
             }
         }).catch(error => {
             // 친구 요청 목록 조회를 실패한 경우
-            console.log('[ALL REQUEST|RECEIVE] 받은 친구 요청 목록 조회 실패', error);
+            winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] 받은 친구 요청 목록 조회 실패 \n ${error.stack}`);
 
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
-            result.message = '[ALL REQUEST|RECEIVE] 받은 친구 요청 목록 조회 과정에서 에러가 발생하였습니다.';
-            console.log(result);
+            result.message = '받은 친구 요청 목록 조회 과정에서 에러가 발생하였습니다.';
+            winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             return res.status(500).send(result);
         });
     } catch (e) {
-        console.error(e);
+        winston.log('error', `[FRIEND][${req.clientIp}|${req.user.email}] 받은 친구 요청 목록 Exception`);
         return next(e);
     }
 });
 
-// Read All Friend(모든 친구 목록)
-router.get('/allfriend', isLoggedIn, async function (req, res, next) {
+// 친구 목록
+router.get('/allfriend', clientIp, isLoggedIn, async function (req, res, next) {
     try {
-        const user_uid = req.user.user_uid;
+        const {user_uid, user_email} = req.user;
+
+        winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] 친구 목록 Request`);
+
         let query =
             'SELECT u.user_uid, u.email, u.nickname, u.portrait, u.introduction, f.type ' +
             'FROM users AS u, ' +
@@ -756,45 +709,46 @@ router.get('/allfriend', isLoggedIn, async function (req, res, next) {
             raw: true
         }).then((friendList) => {
             // 정상적으로 친구 목록을 불러온 경우
-            console.log('[ALL FRIEND] 친구 목록 불러오기 성공');
-
             if (friendList[0] == null) {
                 const result = new Object();
                 result.success = true;
                 result.data = '';
-                result.message = '[ALL FRIEND] 가져올 친구 목록이 없습니다.';
-                console.log(result);
+                result.message = '가져올 친구 목록이 없습니다.';
+                winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                 return res.status(200).send(result);
             } else {
                 // 친구 목록을 그대로 리턴
                 const result = new Object();
                 result.success = true;
                 result.data = friendList;
-                result.message = '[ALL FRIEND] 친구 목록을 성공적으로 가져왔습니다.';
-                console.log(result);
+                result.message = '친구 목록을 성공적으로 가져왔습니다.';
+                winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                 return res.status(200).send(result);
             }
         }).catch(error => {
             // 친구 목록 조회를 실패한 경우
-            console.log('[ALL FRIEND] 친구 목록 조회 실패', error);
+            winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] 친구 목록 조회 실패 \n ${error.stack}`);
 
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
-            result.message = '[ALL FRIEND] 친구 목록 조회 과정에서 에러가 발생하였습니다.';
-            console.log(result);
+            result.message = '친구 목록 조회 과정에서 에러가 발생하였습니다.';
+            winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             return res.status(500).send(result);
         });
     } catch (e) {
-        console.error(e);
+        winston.log('error', `[FRIEND][${req.clientIp}|${req.user.email}] 모든 친구 목록 Exception`);
         return next(e);
     }
 });
 
-// Read All Adviser(모든 조언자 목록)
-router.get('/alladviser', isLoggedIn, async function (req, res, next){
+// 조언자 목록
+router.get('/alladviser', clientIp, isLoggedIn, async function (req, res, next){
     try {
-        const user_uid = req.user.user_uid;
+        const {user_uid, user_email} = req.user;
+
+        winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] 조언자 목록 Request`);
+
         let query =
             'SELECT u.user_uid, u.email, u.nickname, u.portrait, u.introduction, f.type ' +
             'FROM users AS u, ' +
@@ -817,45 +771,46 @@ router.get('/alladviser', isLoggedIn, async function (req, res, next){
             raw: true
         }).then((friendList) => {
             // 정상적으로 조언자 목록을 불러온 경우
-            console.log('[ALL ADVISER] 조언자 목록 불러오기 성공');
-
             if (friendList[0] == null) {
                 const result = new Object();
                 result.success = true;
                 result.data = '';
-                result.message = '[ALL ADVISER] 가져올 조언자 목록이 없습니다.';
-                console.log(result);
+                result.message = '가져올 조언자 목록이 없습니다.';
+                winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                 return res.status(200).send(result);
             } else {
                 // 친구 목록을 그대로 리턴
                 const result = new Object();
                 result.success = true;
                 result.data = friendList;
-                result.message = '[ALL ADVISER] 조언자 목록을 성공적으로 가져왔습니다.';
-                console.log(result);
+                result.message = '조언자 목록을 성공적으로 가져왔습니다.';
+                winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                 return res.status(200).send(result);
             }
         }).catch(error => {
             // 친구 목록 조회를 실패한 경우
-            console.log('[ALL ADVISER] 조언자 목록 조회 실패', error);
+            winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] 조언자 목록 조회 실패 \n ${error.stack}`);
 
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
-            result.message = '[ALL ADVISER] 조언자 목록 조회 과정에서 에러가 발생하였습니다.';
-            console.log(result);
+            result.message = '조언자 목록 조회 조회 과정에서 에러가 발생하였습니다.';
+            winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             return res.status(500).send(result);
         });
     } catch (e) {
-        console.error(e);
+        winston.log('error', `[FRIEND][${req.clientIp}|${req.user.email}] 모든 조언자 목록 Exception`);
         return next(e);
     }
 });
 
-// Read All Block(모든 친구 차단 목록)
-router.get('/allblock', isLoggedIn, async function (req, res, next) {
+// 친구 차단 목록
+router.get('/allblock', clientIp, isLoggedIn, async function (req, res, next) {
     try {
-        const user_uid = req.user.user_uid;
+        const {user_uid, user_email} = req.user;
+
+        winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] 친구 차단 목록 Request`);
+
         let query =
             'SELECT u.user_uid, u.email, u.nickname, u.portrait, u.introduction, f.type ' +
             'FROM users AS u, (' +
@@ -877,56 +832,54 @@ router.get('/allblock', isLoggedIn, async function (req, res, next) {
             raw: true
         }).then((friendList) => {
             // 정상적으로 친구 차단 목록을 불러온 경우
-            console.log('[ALL BLOCK] 친구 차단 목록 불러오기 성공');
-
             if (friendList[0] == null) {
                 const result = new Object();
                 result.success = true;
                 result.data = '';
-                result.message = '[ALL BLOCK] 가져올 친구 차단 목록이 없습니다.';
-                console.log(result);
+                result.message = '가져올 친구 차단 목록이 없습니다.';
+                winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                 return res.status(200).send(result);
             } else {
                 // 친구 차단 목록을 그대로 리턴
                 const result = new Object();
                 result.success = true;
                 result.data = friendList;
-                result.message = '[ALL BLOCK] 친구 차단 목록을 성공적으로 가져왔습니다.';
-                console.log(result);
+                result.message = '친구 차단 목록을 성공적으로 가져왔습니다.';
+                winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                 return res.status(200).send(result);
             }
         }).catch(error => {
             // 친구 차단 목록 조회를 실패한 경우
-            console.log('[ALL BLOCK] 친구 목록 조회 실패', error);
+            winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] 친구 차단 목록 조회 실패 \n ${error.stack}`);
 
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
-            result.message = '[ALL BLOCK] 친구 차단 목록 조회 과정에서 에러가 발생하였습니다.';
-            console.log(result);
+            result.message = '친구 차단 목록 조회 과정에서 에러가 발생하였습니다.';
+            winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             return res.status(500).send(result);
         });
     } catch (e) {
-        console.error(e);
+        winston.log('error', `[FRIEND][${req.clientIp}|${req.user.email}] 모든 친구 차단 목록 Exception`);
         return next(e);
     }
 });
 
 // Block(친구 차단)
-router.put('/block', isLoggedIn, async function (req, res, next) {
+router.put('/block', clientIp, isLoggedIn, async function (req, res, next) {
     try {
-        console.log('[BLOCK] 친구 차단 요청');
-
-        const user_uid = req.user.user_uid;
+        const {user_uid, user_email, user_nickname} = req.user;
         const friend_uid = req.body.user_uid;
-        const user_nickname = req.user.nickname;
+
+        winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] 친구 차단 Request`);
+        winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] friend_uid : ${friend_uid}`);
 
         // 본인 이메일 차단 시 에러 출력
         if (user_uid == friend_uid) {
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
-            result.message = '[BLOCK] 스스로를 차단할 수 없습니다. 나 자신은 인생의 영원한 친구입니다.';
+            result.message = '스스로를 차단할 수 없습니다. 나 자신은 인생의 영원한 친구입니다.';
             console.log(result);
             return res.status(200).send(result);
         }
@@ -940,22 +893,16 @@ router.put('/block', isLoggedIn, async function (req, res, next) {
             }
         }).then((user) => {
             // 사용자 테이블 조회를 성공한 경우
-            console.log('[BLOCK] 사용자 테이블 조회 성공');
-
             if (user == null) {
                 // 사용자 테이블에서 사용자 검색에 실패한 경우
-                console.log('[BLOCK] 사용자 검색 실패');
-
                 const result = new Object();
                 result.success = false;
                 result.data = 'NONE';
-                result.message = '[BLOCK] 사용자를 찾을 수 없습니다.';
-                console.log(result);
+                result.message = '사용자를 찾을 수 없습니다.';
+                winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                 return res.status(200).send(result);
             } else {
                 // 사용자 테이블에서 사용자 검색에 성공한 경우
-                console.log('[BLOCK] 사용자 검색 성공');
-
                 // 프론트에 돌려줄 검색 데이터 객체 새로 생성
                 const searchData = new Object();
                 searchData.user_uid = user.user_uid;
@@ -977,32 +924,24 @@ router.put('/block', isLoggedIn, async function (req, res, next) {
                     }
                 }).then((friend) => {
                     // 친구 테이블 조회를 성공한 경우
-                    console.log('[BLOCK] 친구 테이블 조회 성공');
-
                     if (friend == null) {
                         // 검색 후 결과 값이 NULL인 경우(친구 테이블에 친구 데이터가 없는 경우) 
-                        console.log('[BLOCK] 친구 검색 실패');
-
                         const result = new Object();
                         result.success = false;
                         result.data = 'NONE';
-                        result.message = '[BLOCK] 친구를 찾을 수 없습니다.';
-                        console.log(result);
+                        result.message = '친구를 찾을 수 없습니다.';
+                        winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                         return res.status(200).send(result);
                     } else {
                         // 검색 후 결과 값이 NOT NULL인 경우(친구 테이블에 친구 데이터가 있는 경우)
-                        console.log('[BLOCK] 친구 검색 성공');
-
                         // 친구 관계에 따라 수정 내용 변경
                         if (friend.type == 5) {
                             // 이미 서로 차단한 상태인 경우
-                            console.log('[BLOCK] 이미 서로 차단한 상태');
-
                             const result = new Object();
                             result.success = false;
                             result.data = 'NONE';
-                            result.message = '[BLOCK] 이미 차단한 사용자입니다.';
-                            console.log(result);
+                            result.message = '이미 차단한 사용자입니다.';
+                            winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                             return res.status(200).send(result);
                         } else {
                             /* 
@@ -1020,13 +959,11 @@ router.put('/block', isLoggedIn, async function (req, res, next) {
 
                             if (friend.type == 0 | friend.type == 1) {
                                 // 한 쪽에서 친구 요청을 한 상태인 경우
-                                console.log('[BLOCK] 친구 요청 상태');
-
                                 const result = new Object();
                                 result.success = false;
                                 result.data = 'NONE';
-                                result.message = '[BLOCK] 친구가 아니므로 차단할 수 없습니다.';
-                                console.log(result);
+                                result.message = '친구가 아니므로 차단할 수 없습니다.';
+                                winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                                 return res.status(200).send(result);
                             } else if (friend.type == 2) {
                                 // 친구 상태인 경우
@@ -1043,8 +980,8 @@ router.put('/block', isLoggedIn, async function (req, res, next) {
                                     const result = new Object();
                                     result.success = false;
                                     result.data = 'NONE';
-                                    result.message = '[BLOCK] 이미 차단한 사용자입니다.';
-                                    console.log(result);
+                                    result.message = '이미 차단한 사용자입니다.';
+                                    winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);;
                                     return res.status(200).send(result);
                                 } else {
                                     updateInfo.type = 5;
@@ -1059,8 +996,8 @@ router.put('/block', isLoggedIn, async function (req, res, next) {
                                     const result = new Object();
                                     result.success = false;
                                     result.data = 'NONE';
-                                    result.message = '[BLOCK] 이미 차단한 사용자입니다.';
-                                    console.log(result);
+                                    result.message = '이미 차단한 사용자입니다.';
+                                    winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                                     return res.status(200).send(result);
                                 }
                             }
@@ -1079,24 +1016,23 @@ router.put('/block', isLoggedIn, async function (req, res, next) {
                                 }
                             }).then(() => {
                                 // 친구 차단을 성공한 경우
-                                console.log('[BLOCK] 친구 차단 성공');
-
                                 searchData.type = updateInfo.type;
 
                                 const result = new Object();
                                 result.success = true;
                                 result.data = searchData;
-                                result.message = '[BLOCK] 성공적으로 ' + user_nickname + '이 ' + searchData.nickname + '을 차단하였습니다.';
+                                result.message = '성공적으로 ' + user_nickname + '이 ' + searchData.nickname + '을 차단하였습니다.';
                                 console.log(result);
                                 return res.status(200).send(result);
                             }).catch(error => {
                                 // 친구 차단을 실패한 경우
-                                console.log('[BLOCK] 친구 차단 실패', error);
+                                winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] 친구 차단 실패 \n ${error.stack}`);
 
                                 const result = new Object();
                                 result.success = false;
                                 result.data = 'NONE';
-                                result.message = '[BLOCK] 친구 차단 과정에서 에러가 발생하였습니다.';
+                                result.message = '친구 차단 과정에서 에러가 발생하였습니다.';
+                                winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                                 console.log(result);
                                 return res.status(500).send(result);
                             });
@@ -1104,49 +1040,50 @@ router.put('/block', isLoggedIn, async function (req, res, next) {
                     }
                 }).catch(error => {
                     // 친구 테이블 조회를 실패한 경우
-                    console.log('[BLOCK] 친구 테이블 조회 실패', error);
+                    winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] 친구 테이블 조회 실패 \n ${error.stack}`);
 
                     const result = new Object();
                     result.success = false;
                     result.data = 'NONE';
-                    result.message = '[BLOCK] 친구 조회 과정에서 에러가 발생하였습니다.';
+                    result.message = '친구 조회 과정에서 에러가 발생하였습니다.';
+                    winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                     console.log(result);
                     return res.status(500).send(result);
                 });
             }
         }).catch(error => {
             // 사용자 테이블 조회를 실패한 경우
-            console.log('[SEARCH] 사용자 테이블 조회 실패', error);
+            winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] 사용자 테이블 조회 실패 \n ${error.stack}`);
 
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
-            result.message = '[SEARCH] 사용자 조회 과정에서 에러가 발생하였습니다.';
-            console.log(result);
+            result.message = '사용자 조회 과정에서 에러가 발생하였습니다.';
+            winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             return res.status(500).send(result);
         });
     } catch (e) {
-        console.error(e);
+        winston.log('error', `[FRIEND][${req.clientIp}|${req.user.email}] 친구 차단 Exception`);
         return next(e);
     }
 });
 
 // Unblock(친구 차단 해제)
-router.put('/unblock', isLoggedIn, async function (req, res, next) {
+router.put('/unblock', clientIp, isLoggedIn, async function (req, res, next) {
     try {
-        console.log('[UNBLOCK] 친구 차단 해제 요청');
-
-        const user_uid = req.user.user_uid;
+        const {user_uid, user_email, user_nickname} = req.user;
         const friend_uid = req.body.user_uid;
-        const user_nickname = req.user.nickname;
+
+        winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] 친구 차단 해제 Request`);
+        winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] friend_uid : ${friend_uid}`);
 
         // 본인 차단 해제 시 에러 출력
         if (user_uid == friend_uid) {
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
-            result.message = '[UNBLOCK] 스스로를 차단 해제할 수 없습니다. 나 자신은 인생의 영원한 친구입니다.';
-            console.log(result);
+            result.message = '스스로를 차단 해제할 수 없습니다. 나 자신은 인생의 영원한 친구입니다.';
+            winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             return res.status(200).send(result);
         }
 
@@ -1159,22 +1096,16 @@ router.put('/unblock', isLoggedIn, async function (req, res, next) {
             }
         }).then((user) => {
             // 사용자 테이블 조회를 성공한 경우
-            console.log('[UNBLOCK] 사용자 테이블 조회 성공');
-
             if (user == null) {
                 // 사용자 테이블에서 사용자 검색에 실패한 경우
-                console.log('[UNBLOCK] 사용자 검색 실패');
-
                 const result = new Object();
                 result.success = false;
                 result.data = 'NONE';
-                result.message = '[UNBLOCK] 사용자를 찾을 수 없습니다.';
-                console.log(result);
+                result.message = '사용자를 찾을 수 없습니다.';
+                winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                 return res.status(200).send(result);
             } else {
                 // 사용자 테이블에서 사용자 검색에 성공한 경우
-                console.log('[UNBLOCK] 사용자 검색 성공');
-
                 // 프론트에 돌려줄 검색 데이터 객체 새로 생성
                 const searchData = new Object();
                 searchData.user_uid = user.user_uid;
@@ -1196,42 +1127,32 @@ router.put('/unblock', isLoggedIn, async function (req, res, next) {
                     }
                 }).then((friend) => {
                     // 친구 테이블 조회를 성공한 경우
-                    console.log('[UNBLOCK] 친구 테이블 조회 성공');
-
                     if (friend == null) {
                         // 검색 후 결과 값이 NULL인 경우(친구 테이블에 친구 데이터가 없는 경우) 
-                        console.log('[UNBLOCK] 친구 검색 실패');
-
                         const result = new Object();
                         result.success = false;
                         result.data = 'NONE';
-                        result.message = '[UNBLOCK] 친구를 찾을 수 없습니다.';
-                        console.log(result);
+                        result.message = '친구를 찾을 수 없습니다.';
+                        winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                         return res.status(200).send(result);
                     } else {
                         // 검색 후 결과 값이 NOT NULL인 경우(친구 테이블에 친구 데이터가 있는 경우)
-                        console.log('[UNBLOCK] 친구 검색 성공');
-
                         // 친구 관계에 따라 수정 내용 변경
                         if (friend.type == 0 | friend.type == 1) {
                             // 친구 요청 상태인 경우
-                            console.log('[UNBLOCK] 친구 요청 상태');
-
                             const result = new Object();
                             result.success = false;
                             result.data = 'NONE';
-                            result.message = '[UNBLOCK] 친구가 아니므로 차단 해제할 수 없습니다.';
-                            console.log(result);
+                            result.message = '친구가 아니므로 차단 해제할 수 없습니다.';
+                            winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                             return res.status(200).send(result);
                         } else if (friend.type == 2) {
                             // 친구 상태인 경우
-                            console.log('[UNBLOCK] 친구 상태');
-
                             const result = new Object();
                             result.success = false;
                             result.data = 'NONE';
-                            result.message = '[UNBLOCK] 아직 차단하지 않은 친구입니다.';
-                            console.log(result);
+                            result.message = '아직 차단하지 않은 친구입니다.';
+                            winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                             return res.status(200).send(result);
                         } else {
                             /* 
@@ -1252,26 +1173,22 @@ router.put('/unblock', isLoggedIn, async function (req, res, next) {
                                     updateInfo.type = 2;
                                 } else {
                                     // 나는 차단한 적이 없으므로 차단 해제 에러 처리
-                                    console.log('[UNBLOCK] 아직 차단하지 않은 상태');
-
                                     const result = new Object();
                                     result.success = false;
                                     result.data = 'NONE';
-                                    result.message = '[UNBLOCK] 아직 차단하지 않은 친구입니다.';
-                                    console.log(result);
+                                    result.message = '아직 차단하지 않은 친구입니다.';
+                                    winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                                     return res.status(200).send(result);
                                 }
                             } else if (friend.type == 4) {
                                 // RIGHT가 LEFT를 차단한 경우
                                 if (updateInfo.position == 'LEFT') {
                                     // 나는 차단한 적이 없으므로 차단 해제 에러 처리
-                                    console.log('[UNBLOCK] 아직 차단하지 않은 상태');
-
                                     const result = new Object();
                                     result.success = false;
                                     result.data = 'NONE';
-                                    result.message = '[UNBLOCK] 아직 차단하지 않은 친구입니다.';
-                                    console.log(result);
+                                    result.message = '아직 차단하지 않은 친구입니다.';
+                                    winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                                     return res.status(200).send(result);
                                 } else {
                                     updateInfo.type = 2;
@@ -1301,24 +1218,23 @@ router.put('/unblock', isLoggedIn, async function (req, res, next) {
                                 }
                             }).then(() => {
                                 // 친구 차단 해제를 성공한 경우
-                                console.log('[UNBLOCK] 친구 차단 해제 성공');
-
                                 searchData.type = updateInfo.type;
 
                                 const result = new Object();
                                 result.success = true;
                                 result.data = searchData;
-                                result.message = '[UNBLOCK] 성공적으로 ' + user_nickname + '이 ' + searchData.nickname + '의 차단을 해제하였습니다.';
-                                console.log(result);
+                                result.message = '성공적으로 ' + user_nickname + '이 ' + searchData.nickname + '의 차단을 해제하였습니다.';
+                                winston.log('info', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                                 return res.status(200).send(result);
                             }).catch(error => {
                                 // 친구 차단 해제를 실패한 경우
-                                console.log('[UNBLOCK] 친구 차단 해제 실패', error);
+                                winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] 친구 차단 해제 실패 \n ${error.stack}`);
 
                                 const result = new Object();
                                 result.success = false;
                                 result.data = 'NONE';
-                                result.message = '[UNBLOCK] 친구 차단 해제 과정에서 에러가 발생했습니다.';
+                                result.message = '친구 차단 해제 과정에서 에러가 발생하였습니다.';
+                                winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                                 console.log(result);
                                 return res.status(500).send(result);
                             });
@@ -1326,29 +1242,29 @@ router.put('/unblock', isLoggedIn, async function (req, res, next) {
                     }
                 }).catch(error => {
                     // 친구 테이블 조회를 실패한 경우
-                    console.log('[UNBLOCK] 친구 테이블 조회 실패', error);
+                    winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] 친구 테이블 조회 실패 \n ${error.stack}`);
 
                     const result = new Object();
                     result.success = false;
                     result.data = 'NONE';
-                    result.message = '[UNBLOCK] 친구 조회 과정에서 에러가 발생하였습니다.';
-                    console.log(result);
+                    result.message = '친구 조회 과정에서 에러가 발생하였습니다.';
+                    winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                     return res.status(500).send(result);
                 });
             }
         }).catch(error => {
             // 사용자 테이블 조회를 실패한 경우
-            console.log('[UNBLOCK] 사용자 테이블 조회 실패', error);
+            winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] 사용자 테이블 조회 실패 \n ${error.stack}`);
 
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
-            result.message = '[UNBLOCK] 사용자 조회 과정에서 에러가 발생하였습니다.';
-            console.log(result);
+            result.message = '사용자 조회 과정에서 에러가 발생하였습니다.';
+            winston.log('error', `[FRIEND][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             return res.status(500).send(result);
         });
     } catch (e) {
-        console.error(e);
+        winston.log('error', `[FRIEND][${req.clientIp}|${req.user.email}] 친구 차단 해제 Exception`);
         return next(e);
     }
 });

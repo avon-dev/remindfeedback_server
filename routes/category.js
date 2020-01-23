@@ -1,9 +1,8 @@
 const winston = require('../config/winston');
+const { clientIp, isLoggedIn, isNotLoggedIn } = require('./middlewares');
 
 const express = require('express');
 const { Feedback, User } = require('../models');
-const { clientIp, isLoggedIn } = require('./middlewares');
-
 const router = express.Router();
 
 
@@ -337,7 +336,7 @@ router.put('/update/:category_id', clientIp, isLoggedIn, async (req, res, next) 
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
-            result.message = '[UPDATE] 사용자 조회 과정에서 에러가 발생하였습니다.';
+            result.message = '사용자 조회 과정에서 에러가 발생하였습니다.';
             winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             return res.status(500).send(result);
         });
@@ -436,7 +435,7 @@ router.delete('/delete/:category_id', clientIp, isLoggedIn, async (req, res, nex
                             const result = new Object();
                             result.success = false;
                             result.data = 'NONE';
-                            result.message = '[DELETE] 피드백 수정 과정에서 에러가 발생하였습니다.';
+                            result.message = '피드백 수정 과정에서 에러가 발생하였습니다.';
                             winston.log('error', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                             return res.status(500).send(result);
                         });
@@ -448,7 +447,7 @@ router.delete('/delete/:category_id', clientIp, isLoggedIn, async (req, res, nex
                     const result = new Object();
                     result.success = false;
                     result.data = 'NONE';
-                    result.message = '[DELETE] 선택한 카테고리를 찾을 수 없습니다.';
+                    result.message = '선택한 카테고리를 찾을 수 없습니다.';
                     winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                     return res.status(200).json(result);
                 }
@@ -460,7 +459,7 @@ router.delete('/delete/:category_id', clientIp, isLoggedIn, async (req, res, nex
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
-            result.message = '[DELETE] 사용자 조회 과정에서 에러가 발생하였습니다.';
+            result.message = '사용자 조회 과정에서 에러가 발생하였습니다.';
             winston.log('error', `[CATEGORY][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             return res.status(500).send(result);
         });
