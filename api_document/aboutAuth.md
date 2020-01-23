@@ -265,7 +265,7 @@
     {
         "success": true,
         "data": 1,
-        "message": "[DELETE] 성공적으로 회원 탈퇴를 하였습니다."
+        "message": "성공적으로 회원 탈퇴를 하였습니다."
     }
     ```
 
@@ -275,7 +275,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[DELETE] 사용자 조회 과정에서 에러가 발생하였습니다."
+        "message": "사용자 조회 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -285,7 +285,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[DELETE] 게시글 조회 과정에서 에러가 발생하였습니다."
+        "message": "게시글 조회 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -295,6 +295,6 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[DELETE] 회원 탈퇴 실행 과정에서 에러가 발생하였습니다."
+        "message": "회원 탈퇴 실행 과정에서 에러가 발생하였습니다."
     }
     ```

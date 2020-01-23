@@ -1,3 +1,5 @@
+const winston = require('./config/winston');
+
 var cluster = require('cluster');
 var os = require('os');
 var uuid = require('uuid');
@@ -12,10 +14,8 @@ var workerCount = cpuCount / 2; //2개의 컨테이너에 돌릴 예정 CPU수 /
 
 //마스터일 경우
 if (cluster.isMaster) {
-  console.log('서버 ID : ' + instance_id);
-  console.log('서버 CPU 수 : ' + cpuCount);
-  console.log('생성할 워커 수 : ' + workerCount);
-  console.log(workerCount + '개의 워커가 생성됩니다\n');
+  winston.log('info', '서버 ID : ' + instance_id);
+  winston.log('info', '서버 CPU 수 : ' + cpuCount + ', 생성할 워커 수 : ' + workerCount);
 
   //워커 메시지 리스너
   var workerMsgListener = function (msg) {
@@ -29,7 +29,7 @@ if (cluster.isMaster) {
 
   //CPU 수 만큼 워커 생성
   for (var i = 0; i < workerCount; i++) {
-    console.log("워커 생성 [" + (i + 1) + "/" + workerCount + "]");
+    winston.log('info', "워커 생성 [" + (i + 1) + "/" + workerCount + "]");
     var worker = cluster.fork();
 
     //워커의 요청메시지 리스너
@@ -38,13 +38,13 @@ if (cluster.isMaster) {
 
   //워커가 online상태가 되었을때
   cluster.on('online', function (worker) {
-    console.log('워커 온라인 - 워커 ID : [' + worker.process.pid + ']');
+    winston.log('info', '워커 온라인 - 워커 ID : [' + worker.process.pid + ']');
   });
 
   //워커가 죽었을 경우 다시 살림
   cluster.on('exit', function (worker) {
-    console.log('워커 사망 - 사망한 워커 ID : [' + worker.process.pid + ']');
-    console.log('다른 워커를 생성합니다.');
+    winston.log('info', '워커 사망 - 사망한 워커 ID : [' + worker.process.pid + ']');
+    winston.log('info', '다른 워커를 생성합니다.');
 
     var worker = cluster.fork();
     //워커의 요청메시지 리스너
@@ -69,7 +69,27 @@ if (cluster.isMaster) {
        if (msg.cmd === 'MASTER_ID') {
            master_id = msg.master_id;
        }
-   });
+   }).on('unhandledRejection', (reason, p) => {
+    winston.log('error', reason, ' [Unhandled Rejection at Promise] ', p);
+  }).on('uncaughtException', (err) => {
+    try{
+      // 에러가 발생하면 3초 이내에 process를 죽인다.
+      const killtimer = setTimeout(function() {
+        process.exit(1);
+      }, 3000);
+
+      // setTimeout을 현재 process와 독립적으로 동작하도록 레퍼런스 제거
+      killtimer.unref();
+
+      // 워커가 죽은 것을 마스터에게 알린다.
+      cluster.worker.disconnect();
+
+      // 에러 로그 남김
+      winston.log('error', '[Uncaught Exception thrown] ' + err.stack);
+    }catch (e) {
+      winston.log('error', '프로세스 종료 과정에서 에러 발생 ' + e.stack);
+    }
+  });
 
   const session = require('express-session');
   const flash = require('connect-flash');
@@ -178,13 +198,16 @@ if (cluster.isMaster) {
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};
 
+    // 에러 로그 기록
+    winston.log('error', err.stack);
+
     // render the error page
     res.status(err.status || 500);
     res.render('error');
   });
 
   app.listen(prod ? app.get('port') : 8000, () => {
-    console.log(`${app.get('port')}번 포트에서 서버 실행중입니다.`);
+    winston.log('info', `${app.get('port')}번 포트에서 서버 실행중입니다.`);
   });
 
   module.exports = app;

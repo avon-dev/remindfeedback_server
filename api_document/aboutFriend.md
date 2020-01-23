@@ -91,7 +91,7 @@
             "introduction": "",
             "type": -1
         },
-        "message": "[SEARCH] 아직 친구 요청을 하지 않은 사용자입니다."
+        "message": "아직 친구 요청을 하지 않은 사용자입니다."
     }
     ```
 
@@ -108,7 +108,7 @@
             "introduction": "",
             "type": 0
         },
-        "message": "[SEARCH] 내가 친구 요청을 한(받은) 사용자입니다."
+        "message": "내가 친구 요청을 한(받은) 사용자입니다."
     }
     ```
 
@@ -125,7 +125,7 @@
             "introduction": "",
             "type": 1
         },
-        "message": "[SEARCH] 내가 친구 요청을 한(받은) 사용자입니다."
+        "message": "내가 친구 요청을 한(받은) 사용자입니다."
     }
     ```
 
@@ -142,7 +142,7 @@
             "introduction": "",
             "type": 2
         },
-        "message": "[SEARCH] 이미 친구로 등록된 사용자입니다."
+        "message": "이미 친구로 등록된 사용자입니다."
     }
     ```
 
@@ -159,7 +159,7 @@
             "introduction": "",
             "type": 3
         },
-        "message": "[SEARCH] 내가(나를) 차단한 사용자입니다."
+        "message": "내가(나를) 차단한 사용자입니다."
     }
     ```
 
@@ -176,7 +176,7 @@
             "introduction": "",
             "type": 4
         },
-        "message": "[SEARCH] 내가(나를) 차단한 사용자입니다."
+        "message": "내가(나를) 차단한 사용자입니다."
     }
     ```
 
@@ -193,7 +193,7 @@
             "introduction": "",
             "type": 5
         },
-        "message": "[SEARCH] 서로 차단한 상태입니다."
+        "message": "서로 차단한 상태입니다."
     }
     ```
 
@@ -205,7 +205,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[SEARCH] 나 자신은 인생의 영원한 친구입니다."
+        "message": "나 자신은 인생의 영원한 친구입니다."
     }
     ```
 
@@ -215,7 +215,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[SEARCH] 사용자를 찾을 수 없습니다."
+        "message": "사용자를 찾을 수 없습니다."
     }
     ```
 
@@ -225,7 +225,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[SEARCH] 사용자 조회 과정에서 에러가 발생하였습니다."
+        "message": "사용자 조회 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -235,7 +235,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[SEARCH] 친구 조회 과정에서 에러가 발생하였습니다."
+        "message": "친구 조회 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -278,7 +278,7 @@
             "introduction": "",
             "type": 1
         },        
-        "message": "[CREATE] test1이 test2에게 친구 요청을 보냈습니다."
+        "message": "test1이 test2에게 친구 요청을 보냈습니다."
     }
     ```
 
@@ -295,7 +295,7 @@
             "introduction": "",
             "type": 2
         },
-        "message": "[CREATE] test1이 test2의 친구 요청을 수락해서 친구가 되었습니다."
+        "message": "test1이 test2의 친구 요청을 수락해서 친구가 되었습니다."
     }
     ```
 
@@ -307,7 +307,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[CREATE] 나 자신을 추가할 수 없습니다. 나 자신은 인생의 영원한 친구입니다."
+        "message": "나 자신을 추가할 수 없습니다. 나 자신은 인생의 영원한 친구입니다."
     }
     ```
 
@@ -317,7 +317,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[CREATE] 서로 친구이거나 차단한 사용자입니다."
+        "message": "서로 친구이거나 차단한 사용자입니다."
     }
     ```
 
@@ -327,7 +327,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[CREATE] 사용자를 찾을 수 없습니다."
+        "message": "사용자를 찾을 수 없습니다."
     }
     ```
 
@@ -337,7 +337,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[CREATE] 사용자 조회 과정에서 에러가 발생하였습니다."
+        "message": "사용자 조회 과정에서 에러가 발생하였습니다."
     }
     ```
     
@@ -347,7 +347,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[CREATE] 친구 조회 과정에서 에러가 발생하였습니다."
+        "message": "친구 조회 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -357,7 +357,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[CREATE] 친구 요청 과정에서 에러가 발생하였습니다."
+        "message": "친구 요청 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -367,7 +367,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[CREATE] 친구 요청 수락 과정에서 에러가 발생하였습니다."
+        "message": "친구 요청 수락 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -408,7 +408,7 @@
             "introduction": "",
             "type": 0
         },
-        "message": "[REJECT] test1이 test2의 친구 요청을 거절했습니다."
+        "message": "test1이 test2의 친구 요청을 거절했습니다."
     }
     ```
 
@@ -420,7 +420,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[REJECT] 나 자신을 거절할 수 없습니다. 나 자신은 인생의 영원한 친구입니다."
+        "message": "나 자신을 거절할 수 없습니다. 나 자신은 인생의 영원한 친구입니다."
     }
     ```
 
@@ -430,7 +430,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[REJECT] 내가 보낸 요청을 거절할 수 없습니다."
+        "message": "내가 보낸 요청을 거절할 수 없습니다."
     }
     ```
 
@@ -440,7 +440,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[REJECT] 친구 요청을 보낸 사용자가 아닙니다."
+        "message": "친구 요청을 보낸 사용자가 아닙니다."
     }
     ```
 
@@ -450,7 +450,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[REJECT] 사용자를 찾을 수 없습니다."
+        "message": "사용자를 찾을 수 없습니다."
     }
     ```
 
@@ -460,7 +460,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[REJECT] 친구를 찾을 수 없습니다."
+        "message": "친구를 찾을 수 없습니다."
     }
     ```
 
@@ -470,7 +470,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[REJECT] 사용자 조회 과정에서 에러가 발생하였습니다."
+        "message": "사용자 조회 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -480,7 +480,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[REJECT] 친구 조회 과정에서 에러가 발생하였습니다."
+        "message": "친구 조회 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -490,7 +490,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[REJECT] 친구 거절 과정에서 에러가 발생하였습니다."
+        "message": "친구 거절 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -524,7 +524,7 @@
     {
         "success": true,
         "data": "",
-        "message": "[ALL REQUEST|SEND] 가져올 보낸 친구 요청 목록이 없습니다."
+        "message": "가져올 보낸 친구 요청 목록이 없습니다."
     }
     ```
 
@@ -564,7 +564,7 @@
                 "type": 1
             }
         ],
-        "message": "[ALL REQUEST|SEND] 보낸 친구 요청 목록을 성공적으로 가져왔습니다."
+        "message": "보낸 친구 요청 목록을 성공적으로 가져왔습니다."
     }
     ```
 
@@ -576,7 +576,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[ALL REQUEST|SEND] 보낸 친구 요청 목록 조회 과정에서 에러가 발생하였습니다."
+        "message": "보낸 친구 요청 목록 조회 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -610,7 +610,7 @@
     {
         "success": true,
         "data": "",
-        "message": "[ALL REQUEST|RECEIVE] 가져올 보낸 친구 요청 목록이 없습니다."
+        "message": "가져올 보낸 친구 요청 목록이 없습니다."
     }
     ```
 
@@ -648,7 +648,7 @@
                 "type": 1
             }
         ],
-        "message": "[ALL REQUEST|RECEIVE] 받은 친구 요청 목록을 성공적으로 가져왔습니다."
+        "message": "받은 친구 요청 목록을 성공적으로 가져왔습니다."
     }
     ```
 
@@ -660,7 +660,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[ALL REQUEST|RECEIVE] 받은 친구 요청 목록 조회 과정에서 에러가 발생하였습니다."
+        "message": "받은 친구 요청 목록 조회 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -695,7 +695,7 @@
     {
         "success": true,
         "data": "",
-        "message": "[ALL FRIEND] 가져올 친구 목록이 없습니다."
+        "message": "가져올 친구 목록이 없습니다."
     }
     ```
 
@@ -735,7 +735,7 @@
                 "type": 4
             }
         ],
-        "message": "[ALL FRIEND] 친구 목록을 성공적으로 가져왔습니다."
+        "message": "친구 목록을 성공적으로 가져왔습니다."
     }
     ```
 
@@ -747,7 +747,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[ALL FRIEND] 친구 목록 조회 과정에서 에러가 발생하였습니다."
+        "message": "친구 목록 조회 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -781,7 +781,7 @@
     {
         "success": true,
         "data": "",
-        "message": "[ALL ADVISER] 가져올 조언자 목록이 없습니다."
+        "message": "가져올 조언자 목록이 없습니다."
     }
     ```
 
@@ -811,7 +811,7 @@
                 "type": 2
             }
         ],
-        "message": "[ALL ADVISER] 조언자 목록을 성공적으로 가져왔습니다."
+        "message": "조언자 목록을 성공적으로 가져왔습니다."
     }
     ```
 
@@ -823,7 +823,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[ALL ADVISER] 조언자 목록 조회 과정에서 에러가 발생하였습니다."
+        "message": "조언자 목록 조회 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -857,7 +857,7 @@
     {
         "success": true,
         "data": "",
-        "message": "[ALL BLOCK] 가져올 친구 차단 목록이 없습니다."
+        "message": "가져올 친구 차단 목록이 없습니다."
     }
     ```
 
@@ -897,7 +897,7 @@
                 "type": 5
             }
         ],
-        "message": "[ALL BLOCK] 친구 차단 목록을 성공적으로 가져왔습니다."
+        "message": "친구 차단 목록을 성공적으로 가져왔습니다."
     }
     ```
 
@@ -909,7 +909,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[ALL BLOCK] 친구 차단 목록 조회 과정에서 에러가 발생하였습니다."
+        "message": "친구 차단 목록 조회 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -950,7 +950,7 @@
             "introduction": "",
             "type": 3
         },
-        "message": "[BLOCK] 성공적으로 test1이 test2를 차단하였습니다."
+        "message": "성공적으로 test1이 test2를 차단하였습니다."
     }
     ```
 
@@ -967,7 +967,7 @@
             "introduction": "",
             "type": 4
         },
-        "message": "[BLOCK] 성공적으로 test1이 test2를 차단하였습니다."
+        "message": "성공적으로 test1이 test2를 차단하였습니다."
     }
     ```
 
@@ -984,7 +984,7 @@
             "introduction": "",
             "type": 5
         },
-        "message": "[BLOCK] 성공적으로 성공적으로 test1이 test2를 차단하였습니다."
+        "message": "성공적으로 성공적으로 test1이 test2를 차단하였습니다."
     }
     ```
 
@@ -996,7 +996,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[BLOCK] 스스로를 차단할 수 없습니다. 나 자신은 인생의 영원한 친구입니다."
+        "message": "스스로를 차단할 수 없습니다. 나 자신은 인생의 영원한 친구입니다."
     }
     ```
 
@@ -1006,7 +1006,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[BLOCK] 친구가 아니므로 차단할 수 없습니다."
+        "message": "친구가 아니므로 차단할 수 없습니다."
     }
     ```
 
@@ -1016,7 +1016,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[BLOCK] 이미 차단한 사용자입니다."
+        "message": "이미 차단한 사용자입니다."
     }
     ```
 
@@ -1026,7 +1026,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[BLOCK] 사용자를 찾을 수 없습니다."
+        "message": "사용자를 찾을 수 없습니다."
     }
     ```
 
@@ -1036,7 +1036,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[BLOCK] 친구를 찾을 수 없습니다."
+        "message": "친구를 찾을 수 없습니다."
     }
     ```
 
@@ -1046,7 +1046,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[BLOCK] 사용자 조회 과정에서 에러가 발생하였습니다."
+        "message": "사용자 조회 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -1056,7 +1056,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[BLOCK] 친구 조회 과정에서 에러가 발생하였습니다."
+        "message": "친구 조회 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -1066,7 +1066,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[BLOCK] 친구 차단 과정에서 에러가 발생하였습니다."
+        "message": "친구 차단 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -1107,7 +1107,7 @@
             "introduction": "",
             "type": 4
         },
-        "message": "[UNBLOCK] 성공적으로 test1이 test2의 차단을 해제하였습니다."
+        "message": "성공적으로 test1이 test2의 차단을 해제하였습니다."
     }
     ```
 
@@ -1124,7 +1124,7 @@
             "introduction": "",
             "type": 3
         },
-        "message": "[UNBLOCK] 성공적으로 test1이 test2의 차단을 해제하였습니다."
+        "message": "성공적으로 test1이 test2의 차단을 해제하였습니다."
     }
     ```
 
@@ -1141,7 +1141,7 @@
             "introduction": "",
             "type": 2
         },
-        "message": "[UNBLOCK] 성공적으로 test1이 test2의 차단을 해제하였습니다."
+        "message": "성공적으로 test1이 test2의 차단을 해제하였습니다."
     }
     ```
 
@@ -1153,7 +1153,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[UNBLOCK] 스스로를 차단 해제할 수 없습니다. 나 자신은 인생의 영원한 친구입니다."
+        "message": "스스로를 차단 해제할 수 없습니다. 나 자신은 인생의 영원한 친구입니다."
     }
     ```
 
@@ -1163,7 +1163,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[UNBLOCK] 친구가 아니므로 차단 해제할 수 없습니다."
+        "message": "친구가 아니므로 차단 해제할 수 없습니다."
     }
     ```
 
@@ -1173,7 +1173,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[UNBLOCK] 아직 차단하지 않은 친구입니다."
+        "message": "아직 차단하지 않은 친구입니다."
     }
     ```
 
@@ -1183,7 +1183,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[UNBLOCK] 사용자를 찾을 수 없습니다."
+        "message": "사용자를 찾을 수 없습니다."
     }
     ```
 
@@ -1193,7 +1193,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[UNBLOCK] 친구를 찾을 수 없습니다."
+        "message": "친구를 찾을 수 없습니다."
     }
     ```
 
@@ -1203,7 +1203,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[UNBLOCK] 사용자 조회 과정에서 에러가 발생하였습니다."
+        "message": "사용자 조회 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -1213,7 +1213,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[UNBLOCK] 친구 조회 과정에서 에러가 발생하였습니다."
+        "message": "친구 조회 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -1223,6 +1223,6 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[UNBLOCK] 친구 차단 해제 과정에서 에러가 발생했습니다."
+        "message": "친구 차단 해제 과정에서 에러가 발생했습니다."
     }
     ```

@@ -1,8 +1,10 @@
+const winston = require('../config/winston');
+const { clientIp, isLoggedIn, isNotLoggedIn } = require('./middlewares');
+
 const express = require('express');
 const bcrypt = require('bcrypt');
 const { User } = require('../models');
 const passport = require('passport');
-const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
 const router = express.Router();
 const { deleteS3Obj, upload_s3 } = require('./S3');
 
@@ -22,28 +24,27 @@ if (config.use_env_variable) {
     );
 }
 
-let result = { // response form
-    success: true,
-    data: '',
-    message: ""
-}
-
 let type = 'portrait';
 let fileSize = 50 * 1024 * 1024;
 
-/* Sign Up API
- * - parameter email
- * - parameter nickname
- * - parameter password
- */
-router.post('/signup', async (req, res, next) => {
+// Auth CRUD API
+
+// 회원가입
+router.post('/signup', clientIp, async (req, res, next) => {
     try {
-        const { email, password, nickname } = req.body;
-        console.log('회원가입 요청', email, password, nickname);
+        const { email, nickname, password } = req.body;
+
+        winston.log('info', `[AUTH][${req.clientIp}|${user_email}] 회원가입 Request`);
+        winston.log('info', `[AUTH][${req.clientIp}|${user_email}] email : ${email}, nickname : ${nickname}, password : ${password}`);
 
         const exUser = await User.findOne({ where: { email } });
         if (exUser) {
-            return res.status(201).json({ msg: '이미 가입된 이메일 입니다.' });
+            const result = new Object();
+            result.success = false;
+            result.data = 'NONE';
+            result.message = '이미 가입한 이메일입니다.';
+            winston.log('info', `[AUTH][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            return res.status(200).send(result);
         }
         const uid = await bcrypt.hash(email, 12);
         const pw = await bcrypt.hash(password, 12);
@@ -55,39 +56,40 @@ router.post('/signup', async (req, res, next) => {
             portrait: '',
             introduction: '',
             tutorial: false,
-        })
-
-        // let text = {password,pw}
-        console.log('newUser', newUser.nickname);
-        res.status(201).json(newUser);
+        });
+        const result = new Object();
+        result.success = true;
+        result.data = newUser;
+        result.message = '회원 가입에 성공했습니다.';
+        winston.log('info', `[AUTH][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        return res.status(201).send(result);
     } catch (e) {
-        console.error(e);
+        winston.log('error', `[AUTH][${req.clientIp}|${req.user.email}] 회원가입 Exception`);
         return next(e);
     }
 });
 
-router.delete('/unregister', isLoggedIn, async (req, res, next) => {
+// 회원 탈퇴
+router.delete('/unregister', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        console.log('[DELETE] 회원 탈퇴 요청');
+        const {user_uid, user_email} = req.user;
 
-        const user_uid = req.user.user_uid;
+        winston.log('info', `[AUTH][${req.clientIp}|${user_email}] 회원 탈퇴 Request`);
+
         // 기존 유저 정보 조회
         await User.findOne({
             attributes: ['portrait'], // 이메일, 닉네임, 프로필사진 주소, 소개글
             where: {
                 user_uid: user_uid
             }
-        }).then(user => { 
+        }).then(user => {
             // 사용자 테이블 조회를 성공한 경우
-            console.log('[DELETE] 사용자 테이블 조회 성공');
             let deleteItems = []; // 삭제할 파일명 저장할 배열
-            
+
             // 사진 경로 있으면 기존 파일 삭제
-            if (user.portrait) { deleteItems.push({Key:user.portrait})}
+            if (user.portrait) { deleteItems.push({ Key: user.portrait }) }
 
             let query_select = 'SELECT * FROM boards WHERE fk_feedbackId=ANY(SELECT id FROM feedbacks WHERE user_uid=:user_uid)';
-
-            
             // 게시글 테이블에서 board_id로 검색
             sequelize.query(query_select, {
                 replacements: {
@@ -97,19 +99,16 @@ router.delete('/unregister', isLoggedIn, async (req, res, next) => {
                 raw: true
             }).then((board) => {
                 // 게시글 테이블 조회를 성공한 경우
-                console.log('[DELETE] 게시글 테이블 조회 성공');
-
                 if (board[0] != null) {
                     // 게시글 테이블에서 게시글 검색에 성공한 경우
-                    console.log('[DELETE] 게시글 검색 성공');
-                    board.forEach(element=>{
-                        if(element.board_file1){
+                    board.forEach(element => {
+                        if (element.board_file1) {
                             deleteItems.push({ Key: element.board_file1 })
                         }
-                        if(element.board_file2){
+                        if (element.board_file2) {
                             deleteItems.push({ Key: element.board_file2 })
                         }
-                        if(element.board_file3){
+                        if (element.board_file3) {
                             deleteItems.push({ Key: element.board_file3 })
                         }
                     })
@@ -131,113 +130,151 @@ router.delete('/unregister', isLoggedIn, async (req, res, next) => {
                     raw: true
                 }).then(() => {
                     // 정상적으로 회원 탈퇴 쿼리를 수행한 경우
-                    console.log('[DELETE] 회원 탈퇴 성공');
-
                     // 친구 차단 목록을 그대로 리턴
                     const result = new Object();
                     result.success = true;
                     result.data = 'NONE';
-                    result.message = '[DELETE] 성공적으로 회원 탈퇴를 하였습니다.';
-                    console.log(result);
+                    result.message = '성공적으로 회원 탈퇴를 하였습니다.';
+                    winston.log('info', `[AUTH][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                     return res.status(200).send(result);
                 }).catch(error => {
                     // 삭제 쿼리 실행을 실패한 경우
-                    console.log('[DELETE] 회원 탈퇴 쿼리 실행 실패', error);
+                    winston.log('error', `[AUTH][${req.clientIp}|${user_email}] 회원 탈퇴 쿼리 실행 실패 \n ${error.stack}`);
 
                     const result = new Object();
                     result.success = false;
                     result.data = 'NONE';
-                    result.message = '[DELETE] 회원 탈퇴 실행 과정에서 에러가 발생하였습니다.';
-                    console.log(result);
+                    result.message = '회원 탈퇴 실행 과정에서 에러가 발생하였습니다.';
+                    winston.log('error', `[AUTH][${user_uid}] ${JSON.stringify(result)}`);
                     return res.status(500).send(result);
                 });
             }).catch(error => {
                 // 게시글 테이블 조회를 실패한 경우
-                console.log('[DELETE] 게시글 테이블 조회 실패', error);
+                winston.log('error', `[AUTH][${req.clientIp}|${user_email}] 게시글 테이블 조회 실패 \n ${error.stack}`);
 
                 const result = new Object();
                 result.success = false;
                 result.data = 'NONE';
-                result.message = '[DELETE] 게시글 조회 과정에서 에러가 발생하였습니다.';
-                console.log(result);
+                result.message = '게시글 조회 과정에서 에러가 발생하였습니다.';
+                winston.log('error', `[AUTH][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
                 return res.status(500).send(result);
             });
         }).catch(error => {
             // 사용자 테이블 조회를 실패한 경우
-            console.log('[DELETE] 사용자 테이블 조회 실패', error);
+            winston.log('error', `[AUTH][${req.clientIp}|${user_email}] 사용자 테이블 조회 실패 \n ${error.stack}`);
 
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
-            result.message = '[DELETE] 사용자 조회 과정에서 에러가 발생하였습니다.';
-            console.log(result);
+            result.message = '사용자 조회 과정에서 에러가 발생하였습니다.';
+            winston.log('error', `[AUTH][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
             return res.status(500).send(result);
         });
     } catch (e) {
-        result.success = false;
-        result.message = e;
-        res.status(500).json(result);
-        console.error(e);
+        winston.log('error', `[AUTH][${req.clientIp}|${req.user.email}] 회원 탈퇴 Exception`);
         return next(e);
     }
 });
 
-router.post('/login', async (req, res, next) => {
+// Login(로그인)
+router.post('/login', clientIp, async (req, res, next) => {
     try {
+        const { email, password } = req.body;
+
+        winston.log('info', `[AUTH][${req.clientIp}|${user_email}] 로그인 Request`);
+        winston.log('info', `[AUTH][${req.clientIp}|${user_email}] email : ${email}, password : ${password}`);
+
         passport.authenticate('local', (authError, user, info) => { //done(에러, 성공, 실패)
             if (authError) {
-                console.error(authError);
+                winston.log('error', authError);
                 return next(authError);
             }
             if (!user) {
-                return res.status(201).send(info.message);
+                winston.log('info', info.message);
+                return res.status(200).send(info.message);
             }
             return req.login(user, (loginError) => { // req.user 사용자 정보가 들어있다.
                 if (loginError) {
-                    console.error(loginError);
+                    winston.log('error', loginError);
                     return next(loginError);
                 }
                 if (user.tutorial === false) {
                     User.update({ tutorial: true }, { where: { user_uid: user.user_uid } });
                 }
-                console.log('로그인 요청시도')
-                console.log('로그인??', req.isAuthenticated());
-                let jsonuser = {
+                // 정상적으로 로그인에 성공한 경우
+                winston.log('debug', `[AUTH][${req.clientIp}|${user_email}] 로그인 성공`);
+                winston.log('debug', `[AUTH][${req.clientIp}|${user_email}] 로그인 인증 여부 : ${req.isAuthenticated()}`);
+
+                let json_user = {
                     email: user.email,
                     nickname: user.nickname,
                     tutorial: user.tutorial,
                 }
-                return res.status(201).json(jsonuser);
+
+                // 로그인 한 사용자 데이터 리턴
+                const result = new Object();
+                result.success = true;
+                result.data = json_user;
+                result.message = '성공적으로 로그인했습니다.';
+                winston.log('info', `[AUTH][${req.clientIp}|${user_email}}] ${JSON.stringify(result)}`);
+                return res.status(200).send(result);
             });
         })(req, res, next); // 미들웨어 내의 미들웨어에는 (req, res, next)를 붙입니다.
-
     } catch (e) {
-        console.error(e);
+        winston.log('error', `[AUTH][${req.clientIp}|${req.user.email}] 로그인 Exception`);
         return next(e);
     }
 });
 
-router.get('/me', isLoggedIn, async (req, res, next) => {
+// Me(내 정보)
+router.get('/me', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        const user = await User.findOne({ where: { user_uid: req.user.user_uid } });
-        let sendUser = await {
-            email: user.email,
-            nickname: user.nickname,
-            portrait: user.portrait,
-            introduction: user.introduction,
-            tutorial: user.tutorial,
+        const {user_uid, user_email} = req.user;
+
+        winston.log('info', `[AUTH][${req.clientIp}|${user_email}] 내 정보 Request`);
+
+        let json_user = {
+            email: req.user.email,
+            nickname: req.user.nickname,
+            portrait: req.user.portrait,
+            introduction: req.user.introduction,
+            tutorial: req.user.tutorial
         }
-        res.status(201).json(sendUser);
+
+        // 로그인 성공 메세지 리턴
+        const result = new Object();
+        result.success = true;
+        result.data = json_user;
+        result.message = '로그인 한 사용자의 데이터를 불러왔습니다.';
+        winston.log('info', `[AUTH][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        return res.status(200).send(result);
     } catch (e) {
-        console.error(e);
+        winston.log('error', `[AUTH][${req.clientIp}|${req.user.email}] 내 정보 Exception`);
         return next(e);
     }
-}
-);
+});
 
-router.get('/logout', isLoggedIn, (req, res) => {
-    req.logout();
-    res.status(200).json('logout');
-})
+// Logout(로그아웃)
+router.get('/logout', clientIp, isLoggedIn, (req, res) => {
+    try {
+        const user_email = req.user;
+
+        winston.log('info', `[AUTH][${req.clientIp}|${user_email}] 로그아웃 Request`);
+
+        // 로그아웃
+        req.logout();
+
+        // 로그아웃 성공 메세지 리턴
+        const result = new Object();
+        result.success = true;
+        result.data = 'NONE';
+        result.message = '로그아웃을 완료했습니다.';
+        winston.log('info', `[AUTH][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        return res.status(200).send(result);
+    } catch (e) {
+        winston.log('error', `[AUTH][${req.clientIp}|${req.user.email}] 로그아웃 Exception`);
+        return next(e);
+    }
+});
 
 module.exports = router;

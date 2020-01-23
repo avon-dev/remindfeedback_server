@@ -59,7 +59,7 @@
                 "category_color": "#222222"
             }
         ],
-        "message": "[CREATE] 새로운 카테고리를 생성했습니다."
+        "message": "새로운 카테고리를 생성했습니다."
     }
     ```
 
@@ -71,7 +71,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[CREATE] 카테고리 제한 개수를 초과했습니다."
+        "message": "카테고리 제한 개수를 초과했습니다."
     }
     ```
 
@@ -81,7 +81,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[CREATE] 기본 카테고리 이름으로 생성할 수 없습니다."
+        "message": "기본 카테고리 이름으로 생성할 수 없습니다."
     }
     ```
 
@@ -91,7 +91,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[CREATE] 이미 생성된 카테고리입니다."
+        "message": "이미 생성된 카테고리입니다."
     }
     ```
 
@@ -101,7 +101,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[CREATE] 사용자를 찾을 수 없습니다."
+        "message": "사용자를 찾을 수 없습니다."
     }
     ```
 
@@ -111,7 +111,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[CREATE] 사용자 조회 과정에서 에러가 발생하였습니다."
+        "message": "사용자 조회 과정에서 에러가 발생하였습니다."
     }
     ```
     
@@ -121,7 +121,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[CREATE] 카테고리 생성 과정에서 에러가 발생하였습니다."
+        "message": "카테고리 생성 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -171,7 +171,7 @@
                 "category_color": "#222222"
             }
         ],
-        "message": "[SELECTALL] 카테고리 목록을 성공적으로 가져왔습니다."
+        "message": "카테고리 목록을 성공적으로 가져왔습니다."
     }
     ```
 
@@ -183,7 +183,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[SELECTALL] 사용자를 찾을 수 없습니다."
+        "message": "사용자를 찾을 수 없습니다."
     }
     ```
 
@@ -193,7 +193,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[SELECTALL] 사용자 조회 과정에서 에러가 발생하였습니다."
+        "message": "사용자 조회 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -232,7 +232,7 @@
             "category_title": "Default",
             "category_color": "#000000"
         },
-        "message": "[SELECTONE] 선택한 카테고리를 가져왔습니다."
+        "message": "선택한 카테고리를 가져왔습니다."
     }
     ```
 
@@ -244,7 +244,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[SELECTONE] 사용자를 찾을 수 없습니다."
+        "message": "사용자를 찾을 수 없습니다."
     }
     ```
 
@@ -254,7 +254,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[SELECTONE] 선택한 카테고리를 찾을 수 없습니다."
+        "message": "선택한 카테고리를 찾을 수 없습니다."
     }
     ```
 
@@ -264,7 +264,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[SELECTONE] 사용자 조회 과정에서 에러가 발생하였습니다."
+        "message": "사용자 조회 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -303,7 +303,7 @@
             "category_title": "category1",
             "category_color": "update_1"
         },
-        "message": "[UPDATE] 선택한 카테고리를 수정했습니다."
+        "message": "선택한 카테고리를 수정했습니다."
     }
     ```
 
@@ -315,7 +315,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[UPDATE] 기본 카테고리는 수정할 수 없습니다."
+        "message": "기본 카테고리는 수정할 수 없습니다."
     }
     ```
 
@@ -325,7 +325,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[UPDATE] 사용자를 찾을 수 없습니다."
+        "message": "사용자를 찾을 수 없습니다."
     }
     ```
 
@@ -335,7 +335,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[UPDATE] 선택한 카테고리를 찾을 수 없습니다."
+        "message": "선택한 카테고리를 찾을 수 없습니다."
     }
     ```
 
@@ -345,7 +345,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[UPDATE] 사용자 조회 과정에서 에러가 발생하였습니다."
+        "message": "사용자 조회 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -355,7 +355,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[UPDATE] 카테고리 수정 과정에서 에러가 발생하였습니다."
+        "message": "카테고리 수정 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -390,7 +390,7 @@
     {
         "success": true,
         "data": "1",
-        "message": "[DELETE] 선택한 카테고리를 삭제했습니다."
+        "message": "선택한 카테고리를 삭제했습니다."
     }
     ```
 
@@ -402,7 +402,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[DELETE] 기본 카테고리는 삭제할 수 없습니다."
+        "message": "기본 카테고리는 삭제할 수 없습니다."
     }
     ```
 
@@ -412,7 +412,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[DELETE] 사용자를 찾을 수 없습니다."
+        "message": "사용자를 찾을 수 없습니다."
     }
     ```
 
@@ -422,7 +422,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[UPDATE] 선택한 카테고리를 찾을 수 없습니다."
+        "message": "선택한 카테고리를 찾을 수 없습니다."
     }
     ```
 
@@ -432,7 +432,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[DELETE] 사용자 조회 과정에서 에러가 발생하였습니다."
+        "message": "사용자 조회 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -442,7 +442,7 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[UPDATE] 피드백 수정 과정에서 에러가 발생하였습니다."
+        "message": "피드백 수정 과정에서 에러가 발생하였습니다."
     }
     ```
 
@@ -452,6 +452,6 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "[UPDATE] 카테고리 삭제 과정에서 에러가 발생하였습니다."
+        "message": "카테고리 삭제 과정에서 에러가 발생하였습니다."
     }
     ```
