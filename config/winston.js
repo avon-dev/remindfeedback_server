@@ -41,8 +41,8 @@ const transport_file = new transports.File({
         appendTimestamp({ tz: 'Asia/Seoul' }),
         myFormat
     ),
-    maxsize: 200000, // 단위는 바이트
-    maxFiles: 100 // 자동으로 분리되어 생성되는 파일 개수
+    maxsize: 10485760, // 단위는 바이트(10MB)
+    maxFiles: 10 // 자동으로 분리되어 생성되는 파일 개수
 });
 
 // 콘솔 출력 옵션 설정
