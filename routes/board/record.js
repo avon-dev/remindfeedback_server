@@ -51,7 +51,7 @@ router.post('/create', clientIp, isLoggedIn, upload_s3_test(type, fileSize).sing
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[BOARD|RECORD][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[BOARD|RECORD][${req.clientIp}|${req.user.email}] ${JSON.stringify(result)}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -110,7 +110,7 @@ router.put('/update/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileS
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[BOARD|RECORD][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[BOARD|RECORD][${req.clientIp}|${req.user.email}] ${JSON.stringify(result)}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -159,7 +159,7 @@ router.patch('/file/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileS
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[BOARD|RECORD][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[BOARD|RECORD][${req.clientIp}|${req.user.email}] ${JSON.stringify(result)}`);
         res.status(500).send(result);
         return next(e);
     }
