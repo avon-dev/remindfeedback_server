@@ -82,58 +82,25 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "마이페이지 조회 실패"
+        "message": "INTERNAL SERVER ERROR"
     }
     ```
 
-  * **Code:** 404 NOT FOUND <br />
-    **Content:** 
-    ```json
-    {
-        "success": false,
-        "data": "NONE",
-        "message": "ERROR[404 NOT FOUND]"
-    }
-    ```
-    
-  OR
-
-  * **Code:** 401 UNAUTHORIZED <br />
-    **Content:** 
-    ```json
-    {
-        "success": false,
-        "data": "NONE",
-        "message": "ERROR[401 UNAUTHORIZED] You are unauthorized to make this request."
-    }
-    ```
-
-* **Sample Call:**
-
-  ```javascript
-    $.ajax({
-      url: "/mypage",
-      dataType: "json",
-      type : "GET",
-      success : function(r) {
-        console.log(r);
-      }
-    });
-  ```
 
 
-**Modify MyPage(All User data)**
+**Modify MyPage (All data)**
 ----
   Receive **multipart/form-data** of a single user from client, modify and return json data of the the user. <br>
   클라이언트로부터 **multipart/form-data** 형식의 유저 정보를 받아 수정 후 수정된 유저 객체를 json 형태로 반환.
 
 * **URL**
 
-  /update
+  /
+  >*주소 변경됨: `/mypage/update` -> `/mypage`*
 
 * **Method:**
 
-  `POST`
+  `PUT`
   
 *  **URL Params**
 
@@ -149,6 +116,8 @@
     **Optional:**
     * `portrait=[string]` 프로필 사진 파일명, null[o]
     * `introduction=[string]` 유저 소개글, null[o]
+    * `updatefile=[boolean]` 프로필 사진 파일 변경 및 삭제 여부, null[o]
+    > updatefile 변수로 사진 업데이트 여부 판단 후 클라이언트가 보낸 새 파일 있으면 사진 수정, 없으면 사진 삭제로 간주함. updatefile변수가 false일 경우 기존 파일 그대로 사용
 
 * **Success Response:**
 
@@ -185,45 +154,11 @@
     {
         "success": false,
         "data": "NONE",
-        "message": "마이페이지 수정 실패"
+        "message": "INTERNAL SERVER ERROR"
     }
     ```
 
-  * **Code:** 404 NOT FOUND <br />
-    **Content:** 
-    ```json
-    {
-        "success": false,
-        "data": "NONE",
-        "message": "ERROR[404 NOT FOUND]"
-    }
-    ```
-    
-  OR
-
-  * **Code:** 401 UNAUTHORIZED <br />
-    **Content:** 
-    ```json
-    {
-        "success": false,
-        "data": "NONE",
-        "message": "ERROR[401 UNAUTHORIZED] You are unauthorized to make this request."
-    }
-    ```
-
-
-* **Sample Call:**
-
-  ```javascript
-    $.ajax({
-      url: "/mypage/update",
-      dataType: "json",
-      type : "POST",
-      success : function(r) {
-        console.log(r);
-      }
-    });
-  ```
+  
 
   **Modify MyPage( nickname only)**
 ----
@@ -232,7 +167,8 @@
 
 * **URL**
 
-  /update/nickname
+  /nickname
+  >*주소 변경됨: `/mypage/update/nickname` -> `/mypage/nickname`*
 
 * **Method:**
 
@@ -268,7 +204,7 @@
  
 * **Error Response:**
 
-  * **Code:** 403 FORBIDDEN : nickname 변수에 값이 없을 때 <br />
+  * **Code:**  nickname 변수에 값이 없을 때 <br />
     **Content:** 
      ```json
     {
@@ -288,41 +224,7 @@
     }
     ```
 
-  * **Code:** 404 NOT FOUND <br />
-    **Content:** 
-    ```json
-    {
-        "success": false,
-        "data": "NONE",
-        "message": "ERROR[404 NOT FOUND]"
-    }
-    ```
-    
-  OR
 
-  * **Code:** 401 UNAUTHORIZED <br />
-    **Content:** 
-    ```json
-    {
-        "success": false,
-        "data": "NONE",
-        "message": "ERROR[401 UNAUTHORIZED] You are unauthorized to make this request."
-    }
-    ```
-
-
-* **Sample Call:**
-
-  ```javascript
-    $.ajax({
-      url: "/mypage/update/nickname",
-      dataType: "json",
-      type : "PATCH",
-      success : function(r) {
-        console.log(r);
-      }
-    });
-  ```
 
   **Modify MyPage( introduction only)**
 ----
@@ -331,7 +233,8 @@
 
 * **URL**
 
-  /update/introduction
+  /introduction
+  >*주소 변경됨: `/mypage/update/introduction` -> `/mypage/introduction`*
 
 * **Method:**
 
@@ -380,50 +283,17 @@
     }
     ```
 
-  * **Code:** 404 NOT FOUND <br />
-    **Content:** 
-    ```json
-    {
-        "success": false,
-        "data": "NONE",
-        "message": "ERROR[404 NOT FOUND]"
-    }
-    ```
-    
-  OR
 
-  * **Code:** 401 UNAUTHORIZED <br />
-    **Content:** 
-    ```json
-    {
-        "success": false,
-        "data": "NONE",
-        "message": "ERROR[401 UNAUTHORIZED] You are unauthorized to make this request."
-    }
-    ```
-
-
-* **Sample Call:**
-
-  ```javascript
-    $.ajax({
-      url: "/mypage/update/introduction",
-      dataType: "json",
-      type : "PATCH",
-      success : function(r) {
-        console.log(r);
-      }
-    });
-  ```
 
   **Modify MyPage( portrait only)**
 ----
   Receive **multipart/form-data** of a single user's **portrait** from client, modify and return json data of the the user. <br>
-  클라이언트로부터 **multipart/form-data** 형식의 유저 **프로필 사진** 정보를 받아 수정 후 수정된 유저 객체를 json 형태로 반환. *현재 파일 객체가 없으면 에러 발생 (추후 수정)*
+  클라이언트로부터 **multipart/form-data** 형식의 유저 **프로필 사진** 정보를 받아 수정 후 수정된 유저 객체를 json 형태로 반환.
 
 * **URL**
 
-  /update/portrait
+  /portrait
+  >*주소 변경됨: `/mypage/update/portrait` -> `/mypage/portrait`*
 
 * **Method:**
 
@@ -442,6 +312,8 @@
 
     **Optional:**
     * `portrait=[string]` 프로필 사진 파일명, null[o]
+    * `updatefile=[boolean]` 프로필 사진 파일 변경 및 삭제 여부, null[o]
+    > updatefile 변수로 사진 업데이트 여부 판단 후 클라이언트가 보낸 새 파일 있으면 사진 수정, 없으면 사진 삭제로 간주함. updatefile변수가 false일 경우 기존 파일 그대로 사용
 
 * **Success Response:**
 
@@ -471,129 +343,3 @@
         "message": "마이페이지 portrait 수정 실패"
     }
     ```
-
-  * **Code:** 404 NOT FOUND <br />
-    **Content:** 
-    ```json
-    {
-        "success": false,
-        "data": "NONE",
-        "message": "ERROR[404 NOT FOUND]"
-    }
-    ```
-    
-  OR
-
-  * **Code:** 401 UNAUTHORIZED <br />
-    **Content:** 
-    ```json
-    {
-        "success": false,
-        "data": "NONE",
-        "message": "ERROR[401 UNAUTHORIZED] You are unauthorized to make this request."
-    }
-    ```
-
-
-* **Sample Call:**
-
-  ```javascript
-    $.ajax({
-      url: "/mypage/update/portrait",
-      dataType: "json",
-      type : "PATCH",
-      success : function(r) {
-        console.log(r);
-      }
-    });
-  ```
-
-
-    **Delete portrait only**
-----
-  Delete single user's **portrait** from client, nd return json data of the the user. <br>
-  유저 **프로필 사진** 정보 및 파일 삭제 후 수정된 유저 객체를 json 형태로 반환.
-
-* **URL**
-
-  /delete/portrait
-
-* **Method:**
-
-  `DELETE`
-  
-*  **URL Params**
-
-   **Required:**
- 
-   None
-
-* **Data Params**
-
-    **Required:**
-    None
-
-* **Success Response:**
-
-  * **Code:** 200 <br />
-    **Content:** 기존 사진 파일 삭제 후 업데이트 된 유저 정보 json으로 리턴
-    ```json
-    {
-        "success": true,
-        "data": {
-            "email": "marge@naver.com",
-            "nickname": "marge222",
-            "portrait": "", //portrait 변수에  ""공백 들어감
-            "introduction": "I am marge344"
-        },
-        "message": "마이페이지 portrait 삭제 성공"
-    }
-    ```
- 
-* **Error Response:**
-
-  * **Code:** 500 SERVER ERROR <br />
-    **Content:** 
-    ```json
-    {
-        "success": false,
-        "data": "NONE",
-        "message": "마이페이지 portrait 삭제 실패"
-    }
-    ```
-
-  * **Code:** 404 NOT FOUND <br />
-    **Content:** 
-    ```json
-    {
-        "success": false,
-        "data": "NONE",
-        "message": "ERROR[404 NOT FOUND]"
-    }
-    ```
-    
-  OR
-
-  * **Code:** 401 UNAUTHORIZED <br />
-    **Content:** 
-    ```json
-    {
-        "success": false,
-        "data": "NONE",
-        "message": "ERROR[401 UNAUTHORIZED] You are unauthorized to make this request."
-    }
-    ```
-
-
-* **Sample Call:**
-
-  ```javascript
-    $.ajax({
-      url: "/mypage/delete/portrait",
-      dataType: "json",
-      type : "DELETE",
-      success : function(r) {
-        console.log(r);
-      }
-    });
-  ```

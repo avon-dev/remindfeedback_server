@@ -7,6 +7,7 @@
 * **API call:**<br>
   http://localhost:8000/comment<br>
   http://54.180.118.35/comment
+  *추후 변경 예정: `/comment`->`/comments`*
 
 * **Sample JSON data:**
   ```json
@@ -61,102 +62,6 @@
   <!--회원정보 JSON 형태 + 변수 설명 -->
 
 
-----
-
-**Create Comment**
-----
-게시물에 댓글 생성.
-Create a comment to a single post.
-
-* **URL**
-
-  http://54.180.118.35/comment/create
-
-* **Method:**
-
-  `POST`
-  
-*  **URL Params**
-
-   **Required:**
- 
-   None
-
-* **Data Params**
-
-    **Required:**
-    
-    * `board_id=[integer]` 게시물 번호(ID)
-    * `comment_content=[string]` 댓글 내용
-
-    <!--필요한 form field 명시 + 설명-->
-
-
-* **Success Response:**
-
-  * **Code:** 201 
-    **Content:** 사용자 정보 및 사용자가 생성한 댓글 객체 반환<br/>
-
-    * **Sample request JSON data:**
-    ```json
-    {
-        "success": true,
-        "data": {
-            "user": {
-                "user_uid": "sdfgh^&^$%@@#qrwgsh@%%uiukjhht%&iujhgfe%y&iuyhgfd",
-                "email": "test@naver.com",
-                "nickname": "test",
-                "portrait": "",
-                "introduction": ""
-            },
-            "comment": {
-                "confirm": false,
-                "id": 40,
-                "fk_board_id": 10,
-                "fk_user_uid": "sdfgh^&^$%@@#qrwgsh@%%uiukjhht%&iujhgfe%y&iuyhgfdq",
-                "comment_content": "content",
-                "updatedAt": "2020-01-01T09:12:20.178Z",
-                "createdAt": "2020-01-01T09:12:20.178Z"
-            }
-        },
-        "message": "[201 CREATED] 댓글 생성 완료"
-    }
-    ```
-
-* **Error Response:**
-
-  * **Code:** 403 FORBIDDEN : 댓글 내용(comment_content)값이 비어있을 때 <br />
-    **Content:** 
-     ```json
-    {
-        "success": false,
-        "data": "NONE",
-        "message": "[403 FORBIDDEN] 댓글 생성 실패: 댓글 내용(comment_content)는 반드시 입력해야 합니다."
-    }
-    ```
-
-  * **Code:** 401 UNAUTHORIZED : 게시물 작성자 혹은 조언자가 아닌 사람이 댓글 작성 시도할 때(권한 없음) <br />
-    **Content:** 
-     ```json
-    {
-        "success": false,
-        "data": "",
-        "message": "[401 UNAUTHORIZED] 댓글 작성 실패: 게시물 주인 및 조언자만 댓글을 작성할 수 있습니다."
-    }
-    ```
-
-  * **Code:** 404 NOT FOUND : 존재하지 않는 게시물에 댓글 작성 시도할 때 <br />
-    **Content:** 
-     ```json
-    {
-        "success": false,
-        "data": "",
-        "message": "[404 NOT FOUND] 댓글 작성 실패: 존재하지 않는 게시물입니다."
-    }
-    ```
-
-
-
 ---
 **Show all comments of a single post**
 ----
@@ -165,7 +70,9 @@ Show all comments of a single post. Return full data of the comments and user's 
 
 * **URL**
 
-  http://54.180.118.35/comment/selectall/:board_id
+  /:board_id
+  >*변경됨: `/comment/selectall/:board_id` -> `/comments/all/:board_id`*
+  
 
 * **Method:**
 
@@ -238,7 +145,7 @@ Show all comments of a single post. Return full data of the comments and user's 
                 }
             }
         ],
-        "message": "[200 OK] 해당 게시물의 전체 댓글 조회 성공"
+        "message": "해당 게시물의 전체 댓글 조회 성공"
     }
     ```
 
@@ -250,18 +157,18 @@ Show all comments of a single post. Return full data of the comments and user's 
         {
             "success": true,
             "data": "",
-            "message": "[200 OK] 해당 게시물에 댓글이 없습니다."
+            "message": "해당 게시물에 댓글이 없습니다."
         }
     ```
 
 * **Error Response:**
-  * **Code:** 404 NOT FOUND : 존재하지 않는 게시물의 댓글들을 조회하려고 할 때<br/>
+  * **Code:** 존재하지 않는 게시물의 댓글들을 조회하려고 할 때<br/>
     **Content:** 
      ```json
     {
         "success": false,
         "data": "",
-        "message": "[404 NOT FOUND] 존재하지 않는 게시물의 댓글은 조회할 수 없습니다."
+        "message": "존재하지 않는 게시물의 댓글은 조회할 수 없습니다."
     }
     ```
 
@@ -274,7 +181,8 @@ Return full data of a single comment and user(commenter)'s nickname, portrait.
 
 * **URL**
 
-  http://54.180.118.35/comment/selectone/:comment_id
+  /:comment_id
+    >*주소 변경됨: `/comment/selectone/:comment_id` -> `/comments/:comment_id`*
 
 * **Method:**
 
@@ -317,21 +225,111 @@ Return full data of a single comment and user(commenter)'s nickname, portrait.
                     "portrait": "1576479564662round_logo_512px_dark.png"
                 }
             },
-            "message": "[200 OK] 댓글 조회 성공"
+            "message": "댓글 조회 성공"
         }
     ```
 
 * **Error Response:**
-  * **Code:** 404 NOT FOUND : 존재하지 않는 댓글을 조회하려고 할 때<br/>
+  * **Code:** 존재하지 않는 댓글을 조회하려고 할 때<br/>
     **Content:** 
      ```json
     {
         "success": false,
         "data": "",
-        "message": "[404 NOT FOUND] 댓글 조회 실패: 존재하지 않는 댓글입니다."
+        "message": "댓글 조회 실패: 존재하지 않는 댓글입니다."
     }
     ```
 
+
+----
+
+**Create Comment**
+----
+게시물에 댓글 생성.
+Create a comment to a single post.
+
+* **URL**
+  
+  /:board_id
+  >*주소 변경됨: `/comment/create` -> `/comments/:board_id`*
+
+* **Method:**
+
+  `POST`
+  
+*  **URL Params**
+
+   **Required:**
+   * `board_id=[integer]` 게시물 번호(ID)
+
+* **Data Params**
+
+    **Required:**
+    * `comment_content=[string]` 댓글 내용
+
+
+* **Success Response:**
+
+  * **Code:** 201 
+    **Content:** 사용자 정보 및 사용자가 생성한 댓글 객체 반환<br/>
+
+    * **Sample request JSON data:**
+    ```json
+    {
+        "success": true,
+        "data": {
+            "user": {
+                "user_uid": "sdfgh^&^$%@@#qrwgsh@%%uiukjhht%&iujhgfe%y&iuyhgfd",
+                "email": "test@naver.com",
+                "nickname": "test",
+                "portrait": "",
+                "introduction": ""
+            },
+            "comment": {
+                "confirm": false,
+                "id": 40,
+                "fk_board_id": 10,
+                "fk_user_uid": "sdfgh^&^$%@@#qrwgsh@%%uiukjhht%&iujhgfe%y&iuyhgfdq",
+                "comment_content": "content",
+                "updatedAt": "2020-01-01T09:12:20.178Z",
+                "createdAt": "2020-01-01T09:12:20.178Z"
+            }
+        },
+        "message": "댓글 생성 완료"
+    }
+    ```
+
+* **Error Response:**
+
+  * **Code:** 403 FORBIDDEN : 댓글 내용(comment_content)값이 비어있을 때 <br />
+    **Content:** 
+     ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "댓글 생성 실패: 댓글 내용(comment_content)는 반드시 입력해야 합니다."
+    }
+    ```
+
+  * **Code:** 401 UNAUTHORIZED : 게시물 작성자 혹은 조언자가 아닌 사람이 댓글 작성 시도할 때(권한 없음) <br />
+    **Content:** 
+     ```json
+    {
+        "success": false,
+        "data": "",
+        "message": "댓글 작성 실패: 게시물 주인 및 조언자만 댓글을 작성할 수 있습니다."
+    }
+    ```
+
+  * **Code:** 404 NOT FOUND : 존재하지 않는 게시물에 댓글 작성 시도할 때 <br />
+    **Content:** 
+     ```json
+    {
+        "success": false,
+        "data": "",
+        "message": "댓글 작성 실패: 존재하지 않는 게시물입니다."
+    }
+    ```
 
 ---
 **Modify one comment**
@@ -341,7 +339,8 @@ Update a single comment of the loggedin user and return the modified comment in 
 
 * **URL**
 
-  http://54.180.118.35/comment/update/:comment_id
+  /:comment_id
+  >*주소 변경됨: `/comment/update/:comment_id` -> `/comments/:comment_id`*
 
 * **Method:**
 
@@ -379,7 +378,7 @@ Update a single comment of the loggedin user and return the modified comment in 
                 "fk_user_uid": "$2b$12$lUfAwWAZ73QNVqM7w3Iy.O//l3Mas0l7WEtsBJp3yuAqv2kitOeSS",
                 "fk_board_id": 3
             },
-            "message": "[200 OK] 댓글 수정 성공"
+            "message": "댓글 수정 성공"
         }
     ```
 
@@ -391,7 +390,7 @@ Update a single comment of the loggedin user and return the modified comment in 
     {
         "success": false,
         "data": "NONE",
-        "message": "[403 FORBIDDEN] 댓글 수정 실패: 댓글 내용(comment_content)는 반드시 입력해야 합니다."
+        "message": "댓글 수정 실패: 댓글 내용(comment_content)는 반드시 입력해야 합니다."
     }
     ```
 
@@ -401,7 +400,7 @@ Update a single comment of the loggedin user and return the modified comment in 
     {
         "success": false,
         "data": "NONE",
-        "message": "[401 UNAUTHORIZED] 댓글 수정 실패: 본인의 댓글만 수정할 수 있습니다."
+        "message": "댓글 수정 실패: 본인의 댓글만 수정할 수 있습니다."
     }
     ```
 
@@ -411,7 +410,7 @@ Update a single comment of the loggedin user and return the modified comment in 
     {
         "success": false,
         "data": "NONE",
-        "message": "[404 NOT FOUND] 댓글 수정 실패: 존재하지 않는 댓글입니다."
+        "message": "댓글 수정 실패: 존재하지 않는 댓글입니다."
     }
     ```
 
@@ -424,7 +423,8 @@ Delete a single comment of the loggedin user and return the deleted comment_id a
 
 * **URL**
 
-  http://54.180.118.35/comment/delete/:comment_id
+  /:comment_id
+  >*주소 변경됨: `/comment/delete/:comment_id` -> `/comments/:comment_id`*
 
 * **Method:**
 
@@ -457,7 +457,7 @@ Delete a single comment of the loggedin user and return the deleted comment_id a
                 "board_id": 4,
                 "comment_id": "5"
             },
-            "message": "[200 OK] 댓글 삭제 성공"
+            "message": "댓글 삭제 성공"
         }
     ```
 
@@ -469,7 +469,7 @@ Delete a single comment of the loggedin user and return the deleted comment_id a
     {
         "success": false,
         "data": "NONE",
-        "message": "[401 UNAUTHORIZED] 댓글 삭제 실패: 본인의 댓글만 삭제할 수 있습니다."
+        "message": "댓글 삭제 실패: 본인의 댓글만 삭제할 수 있습니다."
     }
     ```
 
@@ -479,7 +479,7 @@ Delete a single comment of the loggedin user and return the deleted comment_id a
     {
         "success": false,
         "data": "NONE",
-        "message": "[404 NOT FOUND] 댓글 삭제 실패: 존재하지 않는 댓글입니다."
+        "message": "댓글 삭제 실패: 존재하지 않는 댓글입니다."
     }
     ```
 

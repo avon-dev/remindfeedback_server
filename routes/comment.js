@@ -15,13 +15,12 @@ let result = { // response form
  * - parameter user_id : 로그인 한 회원 uuid
  * - parameter friend_id : 친구 추가할 회원 uuid
  */
-router.get('/selectall/:board_id', clientIp, isLoggedIn, async(req, res, next)=>{
+router.get('/all/:board_id', clientIp, isLoggedIn, async(req, res, next)=>{
     const user_email = req.user.email;
     const board_id = parseInt(req.params.board_id);
 
     winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] 게시물의 전체 댓글 목록 Request`);
     winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] board_id : ${board_id}`);
-
 
     result.data = '';
     try{
@@ -75,7 +74,7 @@ router.get('/selectall/:board_id', clientIp, isLoggedIn, async(req, res, next)=>
  * - parameter user_uid : 로그인 한 회원 uuid
  * - parameter friend_id : 친구 추가할 회원 uuid
  */
-router.get('/selectone/:comment_id', clientIp, isLoggedIn, async(req, res, next)=>{
+router.get('/:comment_id', clientIp, isLoggedIn, async(req, res, next)=>{
     const user_email = req.user.email;
     const comment_id = parseInt(req.params.comment_id);
 
@@ -121,12 +120,12 @@ router.get('/selectone/:comment_id', clientIp, isLoggedIn, async(req, res, next)
  * - parameter user_id : 로그인 한 회원 uuid
  * - parameter friend_id : 친구 추가할 회원 uuid
  */
-router.post('/create', clientIp, isLoggedIn, async (req, res, next)=>{
+router.post('/:board_id', clientIp, isLoggedIn, async (req, res, next)=>{
     try{
         const user_uid = req.user.user_uid;
         const user_email = req.user.email;
         const comment_content = req.body.comment_content;
-        const board_id = parseInt(req.body.board_id);
+        const board_id = req.params.board_id;
     
         winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] 댓글 생성 Request`);
         winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] comment_content : ${comment_content}, board_id : ${board_id}`);
@@ -134,8 +133,8 @@ router.post('/create', clientIp, isLoggedIn, async (req, res, next)=>{
         result.data = '';
         if(!comment_content) {
             result.success = false;
-            result.message = "[403 FORBIDDEN] 댓글 생성 실패: 댓글 내용(comment_content)는 반드시 입력해야 합니다.";
-            return res.status(403).json(result);
+            result.message = "댓글 생성 실패: 댓글 내용(comment_content)는 반드시 입력해야 합니다.";
+            return res.status(200).json(result);
         }
         console.log(`새 댓글 생성 요청 들어옴 = ${board_id}, ${comment_content}`);
         // board_id값은 들어오는데 
@@ -148,7 +147,7 @@ router.post('/create', clientIp, isLoggedIn, async (req, res, next)=>{
                 attributes: ['user_uid','adviser_uid'],
             }]
         }).then(async board=>{
-            console.log(`로그인 uid=${user_uid}, 주인 uid= ${board.feedback.adviser_uiduser_uid}, 조언자uid=${board.feedback.adviser_uid}`);
+            console.log(`로그인 uid=${user_uid}, 주인 uid= ${board.feedback.user_uid}, 조언자uid=${board.feedback.adviser_uid}`);
             if(board){
                 if(user_uid!=board.feedback.user_uid && user_uid!=board.feedback.adviser_uid){
                     result.success = false;
@@ -197,17 +196,15 @@ router.post('/create', clientIp, isLoggedIn, async (req, res, next)=>{
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[COMMENT][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[COMMENT][${req.clientIp}|${req.user.email}] ${JSON.stringify(result)}`);
         res.status(500).send(result);
         return next(e);
     }
 });
 
-/* update one comment = 전체 댓글보기가 곧 해당 게시물 보기와 같음.
- * - parameter user_id : 로그인 한 회원 uuid
- * - parameter friend_id : 친구 추가할 회원 uuid
+/* update one comment = 댓글 하나 수정
  */
-router.put('/update/:comment_id', clientIp, isLoggedIn, async (req, res, next)=>{
+router.put('/:comment_id', clientIp, isLoggedIn, async (req, res, next)=>{
     const user_uid = req.user.user_uid;
     const user_email = req.user.email;
     const comment_id = parseInt(req.params.comment_id);
@@ -277,7 +274,7 @@ router.put('/update/:comment_id', clientIp, isLoggedIn, async (req, res, next)=>
  * - parameter user_id : 로그인 한 회원 uuid
  * - parameter friend_id : 친구 추가할 회원 uuid
  */
-router.delete('/delete/:comment_id', clientIp, isLoggedIn, async (req, res, next)=>{
+router.delete('/:comment_id', clientIp, isLoggedIn, async (req, res, next)=>{
     const user_uid = req.user.user_uid;
     const user_email = req.user.email;
     const comment_id = parseInt(req.params.comment_id);
