@@ -3,7 +3,7 @@ const { clientIp, isLoggedIn, isNotLoggedIn } = require('./middlewares');
 
 const express = require('express');
 const bcrypt = require('bcrypt');
-const { User } = require('../models');
+const { User, Auth, Sequelize: { Op } } = require('../models');
 const passport = require('passport');
 const router = express.Router();
 const { deleteS3Obj, upload_s3 } = require('./S3');
@@ -11,6 +11,9 @@ const { deleteS3Obj, upload_s3 } = require('./S3');
 const Sequelize = require('sequelize');
 const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../config/config.json')[env];
+
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 
 let sequelize;
 if (config.use_env_variable) {
@@ -312,5 +315,146 @@ router.get('/logout', clientIp, isLoggedIn, (req, res) => {
         return next(e);
     }
 });
+
+
+// 비밀번호 분실 신고
+router.post('/forgetpassword', clientIp, async (req, res, next) => {
+    try {
+        const user_email = req.body.email;
+
+        winston.log('info', `[AUTH][${req.clientIp}|${user_email}] 비밀번호 초기화 요청`);
+
+        //이메일 존재여부 파악
+        User.findOne({
+            where: {email: user_email}
+        }).then(exuser => {
+            //존재시 토큰 생성 후
+            const token = crypto.randomBytes(20).toString('hex'); // token 생성
+            const data = { // 데이터 정리
+                token,
+                email: exuser.email,
+                ttl: 300 // ttl 값 설정 (5분)
+            };
+            Auth.create(data); // 데이터베이스 Auth 테이블에 데이터 입력
+
+            //메일로 토큰 보내기
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                port: 456,
+                secure: true,
+                auth: {
+                    user: 'avon.commu@gmail.com',
+                    pass: 'dpdlqhs0609!'
+                }
+            });
+            const emailOptions = { // 옵션값 설정
+                from: 'test@gmail.com',
+                to: user_email,
+                subject: `[RemindFeedback] 비밀번호 재설정을 위한 안내메일 입니다. `,
+                html: '비밀번호 초기화를 위해 토큰을 입력하여 주세요.'
+                + `<br>token 정보 : ${token}`+ `<br>유효시간 5분`,
+            };
+            transporter.sendMail(emailOptions, res); //전송
+
+            // 토큰 생성 성공 메세지 리턴
+            const result = new Object();
+            result.success = true;
+            result.data = exuser;
+            result.message = '토큰을 생성하여 이메일로 발신했습니다.';
+            winston.log('info', `[AUTH][${req.clientIp}|${user_email}] ${JSON.stringify(result)} ${token}`);
+            return res.status(200).send(result);
+        }).catch(error => {
+            const result = new Object();
+            result.success = false;
+            result.data = 'NONE';
+            result.message = '잘못된 이메일 입니다.';
+            winston.log('info', `[AUTH][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            return res.status(200).send(result);
+        })
+        
+    } catch (e) {
+        winston.log('error', `[AUTH][${req.clientIp}|${req.user.email}] 비밀번호 초기화 요청 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[AUTH][${req.clientIp}|${req.user.email}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
+        return next(e);
+    }
+});
+
+// 비밀번호 초기화 요청
+router.post('/resetpassword', async (req, res, next) => {
+    try {
+        const {token, password} = req.body;
+
+        // winston.log('info', `[AUTH][${req.clientIp}|${token}] 비밀번호 초기화 요청`);
+        console.log('시간', new Date()-300)
+
+        //이메일 존재여부 파악
+        let flag = false;
+        const exauth = await Auth.findOne({
+            where: {
+                token,
+            }
+        })
+
+        //console.log('시간계산', auth.createdAt, new Date(), auth.ttl, auth.createdAt - new Date() - (auth.createdAt - ttl))
+        let created = exauth.createdAt.getTime();
+        let now = new Date().getTime();
+        let ttl = exauth.ttl * 1000;
+        let authemail = exauth.email.toString();
+        console.log('이프문 여기까지 타는것 확인', created, now, ttl, authemail)
+        console.log(created > now - ttl)
+        if(created > now - ttl){
+            flag = true;
+            // console.log(exauth)
+        }
+
+        if(flag){
+            await console.log('여기다여기',authemail)
+            const newpw = await bcrypt.hash(password, 12);
+            const 유조 = await User.findOne({where: {email: authemail}})
+            console.log('유조',유조.user_uid);
+            await User.update({
+                password: newpw
+            }, {where: {user_uid: 유조.user_uid}}).then().catch(err => {console.error(err)});
+
+            // 비밀번호 변경 성공 메세지 리턴
+            const result = new Object();
+            result.success = true;
+            result.data = 'NONE';
+            result.message = '비밀번호를 변경하였습니다 다시 로그인해주세요.';
+            winston.log('info', `[AUTH][${req.clientIp}|] ${JSON.stringify(result)}`);
+            return await res.status(200).send(result);
+        }else{
+            const result = new Object();
+            result.success = false;
+            result.data = 'NONE';
+            result.message = '유효한 토큰이 아닙니다.';
+            winston.log('info', `[AUTH][${req.clientIp}|] ${JSON.stringify(result)}`);
+            return res.status(200).send(result);
+        }
+        // then(async exauth => {
+            
+        // }).catch(error => {
+            
+        // })
+        
+    } catch (e) {
+        winston.log('error', `[AUTH][${req.clientIp}] 비밀번호 초기화 요청 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[AUTH][${req.clientIp}] ${JSON.stringify(result)}`);
+        res.status(500).send(result);
+        return next(e);
+    }
+});
+
 
 module.exports = router;

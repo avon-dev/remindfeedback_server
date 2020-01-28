@@ -31,6 +31,7 @@ db.Feedback = require('./feedback')(sequelize, Sequelize);
 db.Board = require('./board')(sequelize, Sequelize);
 db.Comment = require('./comment')(sequelize, Sequelize);
 db.Friend = require('./friend')(sequelize, Sequelize);
+db.Auth = require('./auth')(sequelize, Sequelize);
 
 //TABLE 관계 맺기
 db.Feedback.hasMany(db.Board, {
