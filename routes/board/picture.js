@@ -16,7 +16,6 @@ router.post('/create', clientIp, isLoggedIn, upload_s3_test(type, fileSize).fiel
 
         winston.log('info', `[BOARD|PICTURE][${req.clientIp}|${user_email}] 게시글(사진) 생성 Request`);
         winston.log('info', `[BOARD|PICTURE][${req.clientIp}|${user_email}] feedback_id : ${feedback_id}, board_title : ${board_title},  board_content : ${board_content}`);
-        winston.log('info', `[BOARD|PICTURE][${req.clientIp}|${user_email}] files : ${req.files}`);
 
         // req.files.map((v, i) => files[i] = v.key);
         let file1, file2, file3;
