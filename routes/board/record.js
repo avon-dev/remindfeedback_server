@@ -17,7 +17,6 @@ router.post('/create', clientIp, isLoggedIn, upload_s3_test(type, fileSize).sing
 
         winston.log('info', `[BOARD|RECORD][${req.clientIp}|${user_email}] 게시글(음성) 생성 Request`);
         winston.log('info', `[BOARD|RECORD][${req.clientIp}|${user_email}] feedback_id : ${feedback_id}, board_title : ${board_title},  board_content : ${board_content}`);
-        winston.log('info', `[BOARD|RECORD][${req.clientIp}|${user_email}] files : ${req.file}`);
 
         let file;
         if(req.file)file = await req.file.key;
