@@ -1,23 +1,11 @@
 ## About Auth
 ----
-  <_회원가입 로그인 (유저 생성, 로그인, 확인)_>
-<!-- * **API call:**
-  localhost:3000/users
-
-* **Sample JSON data:**
-  ```json
-  {
-    "email":"homer@naver.com",
-    "nickname":"호머 심슨",
-    "password":"1234",
-  }
-  ```
-  * `email=[string]` 회원 이메일. 로그인 할 때 사용됨, null[x]
-  * `nickname=[string]` 회원이 직접 설정한 회원 이름, null[x]
-  * `password=[string]` 회원 비밀번호, null[x] -->
-  <!--회원정보 JSON 형태 + 변수 설명 -->
+  <_회원 인증 관련: 회원 가입, 회원 탈퇴, 로그인, 로그아웃, 유저 정보 확인_>
+* **API call:**
+  localhost:8000/auth
 
 
+---
 
 **SignUp**
 ----
@@ -25,7 +13,7 @@
 
 * **URL**
 
-  http://54.180.118.35/auth/signup
+  /signup
 
 * **Method:**
 
@@ -46,38 +34,23 @@
     * `password=[string]` 암호화된 회원 비밀번호, null[x]
 
 
-   
-    <!--필요한 form field 명시 + 설명-->
-
-
 * **Success Response:**
 
   * **Code:** 201 <br />
     **Content:** 회원 한 명에 대한 json데이터 전체
         <!--회원정보 JSON 그대로 들어감-->
- 
-* **Sample javascript Call:**
 
-  <!-- ```javascript
-    axios
-    .post(`http://54.180.118.35/auth/signup`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      email: "email@example.com",
-      nickname: "지석",
-      password : "1234",
-    });
-  ``` -->
 * **Sample JSON data:**
   ```json
   {
-      "headers": {
-        "Content-Type": "application/json",
+      "success": true,
+      "data": {
+          "user_uid": "$2b$12$vAPL5iEkkpAheaAd2ssbXeEofDvGvgrbIHKr8qQ8YKcE7okyTBDlm",
+          "email": "d",
+          "nickname": "d",
+          "tutorial": false
       },
-      "email": "email@example.com",
-      "nickname": "지석",
-      "password" : "1234",
+      "message": "회원 가입에 성공했습니다."
   }
   ```
 
@@ -89,7 +62,7 @@
 
 * **URL**
 
-  http://54.180.118.35/auth/login
+  /login
 
 * **Method:**
 
@@ -123,26 +96,16 @@
       - `value` connect.sid=value "쿠키"로 보내야 로그인 여부 확인가능 (토큰역할)
 
 
-<!-- * **Sample Call:** -->
-
-  <!-- ```javascript
-    axios
-    .post(`http://54.180.118.35/auth/login`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      email: "email@example.com",
-      password : "1234",
-    });
-  ``` -->
 * **Sample request JSON data:**
   ```json
   {
-      "headers": {
-        "Content-Type": "application/json",
+      "success": true,
+      "data": {
+          "email": "1",
+          "nickname": "aa",
+          "tutorial": true
       },
-      "email": "email@example.com",
-      "password" : "1234",
+      "message": "성공적으로 로그인했습니다."
   }
   ```
 
@@ -152,7 +115,7 @@
 
 * **URL**
 
-  http://54.180.118.35/auth/me
+  /me
 
 * **Method:**
 
@@ -185,9 +148,15 @@
   * **Sample request JSON data:**
   ```json
   {
-      "cookie": {
-        "connect.sid": "s%3AfxZgKcirzD_d0zAHVTEnf9DQu9FVI2rO.Ijf7scJ%2Buj6YtprVUB6Vcuf1QVNXDIR64MP43366CaQ",
-      }
+      "success": true,
+      "data": {
+          "email": "1",
+          "nickname": "aa",
+          "portrait": "",
+          "introduction": "aa",
+          "tutorial": true
+      },
+      "message": "로그인 한 사용자의 데이터를 불러왔습니다."
   }
   ```
 
@@ -200,7 +169,7 @@
 
 * **URL**
 
-  http://54.180.118.35/auth/logout
+  /logout
 
 * **Method:**
 
@@ -228,9 +197,9 @@
   * **Sample request JSON data:**
   ```json
   {
-      "cookie": {
-        "connect.sid": "s%3AfxZgKcirzD_d0zAHVTEnf9DQu9FVI2rO.Ijf7scJ%2Buj6YtprVUB6Vcuf1QVNXDIR64MP43366CaQ",
-      }
+      "success": true,
+      "data": "NONE",
+      "message": "로그아웃을 완료했습니다."
   }
   ```
 
@@ -243,7 +212,7 @@
 
 * **URL**
 
-  `http://54.180.118.35/auth/unregister`
+  /unregister
 
 * **Method:**
 
