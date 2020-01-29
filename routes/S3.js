@@ -1,11 +1,9 @@
 const winston = require('../config/winston');
-
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const AWS = require('aws-sdk');
 const multerS3 = require('multer-s3');
-const winston = require('../config/winston');
 
 AWS.config.update({
     //서울리전
