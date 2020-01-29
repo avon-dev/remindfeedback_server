@@ -28,14 +28,14 @@ router.get('/all/:board_id', clientIp, isLoggedIn, async(req, res, next)=>{
         if(!exBoard){
             result.success = false;
             result.message = "존재하지 않는 게시물의 댓글은 조회할 수 없습니다.";
-            winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
             return res.status(200).json(result);
         }
         await Comment.findAll({
             where:{fk_board_id: board_id},
             include: [{ // 댓글 작성자의 nickname, portrait 정보 가져오기
                 model: User,
-                attributes: ['nickname', 'portrait'],
+                attributes: ['email', 'nickname', 'portrait'],
             }],
             paranoid: false // 삭제된 데이터도 반환
         }).then(comments=>{
@@ -48,12 +48,12 @@ router.get('/all/:board_id', clientIp, isLoggedIn, async(req, res, next)=>{
                     result.data = '';
                 }
                 result.success = true;
-                winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+                winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
                 return res.status(200).json(result);
             }else{
                 result.success = false;
                 result.message = "해당 게시물의 전체 댓글 조회 실패";
-                winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+                winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
                 return res.status(200).json(result);
             }
         });
@@ -64,7 +64,7 @@ router.get('/all/:board_id', clientIp, isLoggedIn, async(req, res, next)=>{
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[COMMENT][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[COMMENT][${req.clientIp}|${req.body.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -87,19 +87,19 @@ router.get('/:comment_id', clientIp, isLoggedIn, async(req, res, next)=>{
             where:{id: comment_id},
             include: [{
                 model: User,
-                attributes: ['nickname', 'portrait'],
+                attributes: ['email', 'nickname', 'portrait'],
             }]
         }).then(comment=>{
             if(comment){
                 result.data = comment;
                 result.success = true;
                 result.message = "댓글 조회 성공";
-                winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+                winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
                 return res.status(200).json(result);
             }else{
                 result.success = false;
                 result.message = "댓글 조회 실패: 존재하지 않는 댓글입니다.";
-                winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+                winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
                 return res.status(200).json(result);
             }
         });
@@ -110,13 +110,13 @@ router.get('/:comment_id', clientIp, isLoggedIn, async(req, res, next)=>{
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[COMMENT][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[COMMENT][${req.clientIp}|${req.body.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
 });
 
-/* update one comment = 전체 댓글보기가 곧 해당 게시물 보기와 같음.
+/* create one comment = 전체 댓글보기가 곧 해당 게시물 보기와 같음.
  * - parameter user_id : 로그인 한 회원 uuid
  * - parameter friend_id : 친구 추가할 회원 uuid
  */
@@ -124,8 +124,8 @@ router.post('/:board_id', clientIp, isLoggedIn, async (req, res, next)=>{
     try{
         const user_uid = req.user.user_uid;
         const user_email = req.user.email;
-        const comment_content = req.body.comment_content;
         const board_id = req.params.board_id;
+        const comment_content  = req.body.comment_content;
     
         winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] 댓글 생성 Request`);
         winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] comment_content : ${comment_content}, board_id : ${board_id}`);
@@ -152,7 +152,7 @@ router.post('/:board_id', clientIp, isLoggedIn, async (req, res, next)=>{
                 if(user_uid!=board.feedback.user_uid && user_uid!=board.feedback.adviser_uid){
                     result.success = false;
                     result.message = "댓글 작성 실패: 게시물 주인 및 조언자만 댓글을 작성할 수 있습니다.";
-                    winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+                    winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
                     return res.status(401).json(result);
                 }
                 const comment = await Comment.create({
@@ -175,18 +175,18 @@ router.post('/:board_id', clientIp, isLoggedIn, async (req, res, next)=>{
                     result.data = returnData;
                     result.success = true;
                     result.message = '댓글 생성 완료';
-                    winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+                    winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
                     return res.status(201).json(result);
                 }else{
                     result.success = false;
                     result.message = '댓글 생성 실패';
-                    winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+                    winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
                     return res.status(200).json(result);
                 }
             }
             result.success = false;
             result.message = "댓글 작성 실패: 존재하지 않는 게시물입니다.";
-            winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
             return res.status(200).json(result);
         });
     }catch(e){
@@ -196,7 +196,7 @@ router.post('/:board_id', clientIp, isLoggedIn, async (req, res, next)=>{
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[COMMENT][${req.clientIp}|${req.user.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[COMMENT][${req.clientIp}|${req.user.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -207,7 +207,7 @@ router.post('/:board_id', clientIp, isLoggedIn, async (req, res, next)=>{
 router.put('/:comment_id', clientIp, isLoggedIn, async (req, res, next)=>{
     const user_uid = req.user.user_uid;
     const user_email = req.user.email;
-    const comment_id = parseInt(req.params.comment_id);
+    const comment_id = req.params.comment_id;
     const comment_content = req.body.comment_content;
 
     winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] 댓글 수정 Request`);
@@ -217,7 +217,7 @@ router.put('/:comment_id', clientIp, isLoggedIn, async (req, res, next)=>{
     if(!comment_content) {
         result.success = false;
         result.message = "댓글 수정 실패: 댓글 내용(comment_content)는 반드시 입력해야 합니다.";
-        winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
         return res.status(200).json(result);
     }
     console.log(`기존 댓글 수정 요청 들어옴 = ${comment_id} / ${comment_content}`);
@@ -227,7 +227,7 @@ router.put('/:comment_id', clientIp, isLoggedIn, async (req, res, next)=>{
             where: {id: comment_id},
             include: [{
                 model: User,
-                attributes: ['nickname', 'portrait'],
+                attributes: ['email', 'nickname', 'portrait'],
             }]
         }).then(comment=>{
             if(comment){
@@ -238,19 +238,19 @@ router.put('/:comment_id', clientIp, isLoggedIn, async (req, res, next)=>{
                     result.data = comment; //삭제된 댓글 id 반환
                     result.success = true;
                     result.message = "댓글 수정 성공";
-                    winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+                    winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
                     return res.status(200).json(result);
     
                 }else{
                     result.success = false;
                     result.message = "댓글 수정 실패: 본인의 댓글만 수정할 수 있습니다.";
-                    winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+                    winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
                     return res.status(200).json(result);
                 }
             }else{
                 result.success = false;
                 result.message = "댓글 수정 실패: 존재하지 않는 댓글입니다.";
-                winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+                winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
                 return res.status(200).json(result);
             }
             
@@ -263,7 +263,7 @@ router.put('/:comment_id', clientIp, isLoggedIn, async (req, res, next)=>{
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[COMMENT][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[COMMENT][${req.clientIp}|${req.body.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -305,18 +305,18 @@ router.delete('/:comment_id', clientIp, isLoggedIn, async (req, res, next)=>{
                     result.data = deletedCom; //삭제된 댓글 id, 게시물 id 반환
                     result.success = true;
                     result.message = "댓글 삭제 성공";
-                    winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+                    winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
                     return res.status(200).json(result);
                 }else{
                     result.success = false;
                     result.message = "댓글 삭제 실패: 본인의 댓글만 삭제할 수 있습니다.";
-                    winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+                    winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
                     return res.status(200).json(result);
                 }
             }else{
                 result.success = false;
                 result.message = "댓글 삭제 실패: 존재하지 않는 댓글입니다.";
-                winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+                winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
                 return res.status(200).json(result);
             }
         });        
@@ -327,7 +327,7 @@ router.delete('/:comment_id', clientIp, isLoggedIn, async (req, res, next)=>{
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[COMMENT][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[COMMENT][${req.clientIp}|${req.body.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }

@@ -35,7 +35,7 @@ router.get('/', clientIp, isLoggedIn, async (req, res, next) => {
         });
         result.success = true;
         result.message="마이페이지 조회 성공"
-        winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] ${result.message}`);
         return res.status(200).json(result);
 
     } catch (e) {
@@ -45,7 +45,7 @@ router.get('/', clientIp, isLoggedIn, async (req, res, next) => {
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[MYPAGE][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[MYPAGE][${req.clientIp}|${req.body.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -73,7 +73,7 @@ router.put('/', clientIp, isLoggedIn, upload_s3_test(type, fileSize).single('por
             result.success = false;
             result.data = 'NONE';
             result.message = '닉네임은 반드시 입력해야 합니다.';
-            winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] ${result.message}`);
             return res.status(200).json(result);
         }
         // 기존 유저 정보 조회
@@ -118,7 +118,7 @@ router.put('/', clientIp, isLoggedIn, upload_s3_test(type, fileSize).single('por
         });
         result.success = true;
         result.message = "마이페이지 수정 성공"
-        winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] ${result.message}`);
         return res.status(200).json(result);
     } catch (e) {
         winston.log('error', `[MYPAGE][${req.clientIp}|${req.user.email}] 마이페이지 수정 Exception`);
@@ -127,7 +127,7 @@ router.put('/', clientIp, isLoggedIn, upload_s3_test(type, fileSize).single('por
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[MYPAGE][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[MYPAGE][${req.clientIp}|${req.body.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -154,7 +154,7 @@ router.patch('/nickname', clientIp, isLoggedIn, async (req, res, next) => {
             result.success = false;
             result.data = 'NONE';
             result.message = '닉네임(nickname)은 반드시 입력해야 합니다.';
-            winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] ${result.message}`);
             return res.status(200).json(result);
         }
         // 닉네임 업데이트
@@ -172,7 +172,7 @@ router.patch('/nickname', clientIp, isLoggedIn, async (req, res, next) => {
         });
         result.success = true;
         result.message = "마이페이지 nickname 수정 성공";
-        winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
     } catch (e) {
         winston.log('error', `[MYPAGE][${req.clientIp}|${req.user.email}] 마이페이지 별명 수정 Exception`);
@@ -181,7 +181,7 @@ router.patch('/nickname', clientIp, isLoggedIn, async (req, res, next) => {
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[MYPAGE][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[MYPAGE][${req.clientIp}|${req.body.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -217,7 +217,7 @@ router.patch('/introduction', clientIp, isLoggedIn, async (req, res, next) => {
         });
         result.success = true;
         result.message = "마이페이지 introduction 수정 성공";
-        winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
     } catch (e) {
         winston.log('error', `[MYPAGE][${req.clientIp}|${req.user.email}] 마이페이지 소개 수정 Exception`);
@@ -226,7 +226,7 @@ router.patch('/introduction', clientIp, isLoggedIn, async (req, res, next) => {
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[MYPAGE][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[MYPAGE][${req.clientIp}|${req.body.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -291,7 +291,7 @@ router.patch('/portrait', clientIp, isLoggedIn, upload_s3_test(type, fileSize).s
         });
         result.success = true;
         result.message = "마이페이지 portrait 수정 성공";
-        winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('info', `[MYPAGE][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
     } catch (e) {
         winston.log('error', `[MYPAGE][${req.clientIp}|${req.user.email}] 마이페이지 사진 수정 Exception`);
@@ -300,7 +300,7 @@ router.patch('/portrait', clientIp, isLoggedIn, upload_s3_test(type, fileSize).s
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[MYPAGE][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[MYPAGE][${req.clientIp}|${req.body.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
