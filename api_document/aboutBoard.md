@@ -1,17 +1,29 @@
-----
 ## About Board
   <_게시물 (가져오기, 삭제, 수정)_>
+
+* **전제**
+    ```
+    로그인 후 쿠키 정보를 이용한 인증 필요
+    ```
+
+* **API call:**
+    ```
+    http://localhost:8000/board/cards
+    http://54.180.118.35/board/cards
+    ```
 
 
 
 ----
 **GET All Board**
 ----
+Return posts of feedback.
+특정 피드백의 게시물 반환.
 
 * **URL**
 
-  http://54.180.118.35/board/(feedbackid)/(lastid)
-  http://54.180.118.35/board/(feedbackid)/(lastid)/(limit)
+  /(feedbackid)/(lastid)
+  /(feedbackid)/(lastid)/(limit)
 
 * **Method:**
 
@@ -19,7 +31,7 @@
   
 *  **URL Params**
     **feedbackid:**
-    * `feedbackid` 피드백 아이디
+    * `feedbackid=[integer]` 피드백 아이디
 
 
     **lastid:**
@@ -30,17 +42,17 @@
     **limit:**
     * `limit` 몇개의 데이터를 반환받을지에 대한 정보
 
-    **cookie:**
-    * `connect.sid` 로그인 시 발급된 cookie 정보
-
-    
 
 * **Data Params**
   
   None
 
-* **Success Response:**
-  <!--삭제 성공 시 http code 뭐할지?-->
+* **Response:**
+
+    <details>
+    <summary>Success Response</summary>
+    <div markdown="1">
+
   * **Code:** 200 <br />
     **Response:**
     * `id=[integer]` board의 아이디
@@ -57,16 +69,123 @@
     * `fk_feedbackId=[date]` (foreign key) 소속 피드백 아이디
       <br/>
 
-  * **Sample request JSON data:**
+  * **Sample response JSON data:**
   ```json
   {
-    "cookie": {
-      "connect.sid": "s%3AfxZgKcirzD_d0zAHVTEnf9DQu9FVI2rO.Ijf7scJ%2Buj6YtprVUB6Vcuf1QVNXDIR64MP43366CaQ",
-    },
-    "feedbackid": 13,
-    "lastid": 0,
+    "success": true,
+    "data": [
+        {
+            "id": 26,
+            "board_category": 1,
+            "board_title": "asdf",
+            "board_content": "asdfff",
+            "board_file1": "picture/1579508387097̔X3.jpg",
+            "board_file2": null,
+            "board_file3": null,
+            "confirm": false,
+            "createdAt": "2020-01-20T07:15:29.000Z",
+            "updatedAt": "2020-01-20T08:19:47.000Z",
+            "deletedAt": null,
+            "fk_feedbackId": 2
+        },
+        {
+            "id": 22,
+            "board_category": 1,
+            "board_title": "title",
+            "board_content": "content",
+            "board_file1": "picture/15795083870.jpg",
+            "board_file2": null,
+            "board_file3": null,
+            "confirm": false,
+            "createdAt": "2020-01-15T07:15:29.000Z",
+            "updatedAt": "2020-01-15T08:19:47.000Z",
+            "deletedAt": null,
+            "fk_feedbackId": 2
+        }
+    ],
+    "message": ""
   }
   ```
+    </div>
+    </details>
+
+
+
+
+----
+**GET One Board**
+----
+Return post.
+특정 게시물 정보.
+
+* **URL**
+
+  /(board_id)
+
+* **Method:**
+
+  `GET`
+  
+*  **URL Params**
+    **board_id:**
+    * `board_id=[integer]` 게시물 아이디
+
+
+* **Data Params**
+  
+  None
+
+* **Response:**
+
+    <details>
+    <summary>Success Response</summary>
+    <div markdown="1">
+
+  * **Code:** 200 <br />
+    **Response:**
+    * `id=[integer]` board의 아이디
+    * `board_category=[integer]` 0(글), 1(사진), 2(영상), 3(녹음)
+    * `board_title=[string]` 게시물 제목
+    * `board_content=[string]` 게시물 내용
+    * `board_file1=[string]` 1번째 사진파일, 영상, 녹음파일
+    * `board_file2=[string]` (사진게시물) 2번째 사진파일
+    * `board_file3=[string]` (사진게시물) 3번째 사진파일
+    * `confirm=[boolean]` 게시물 확인 여부
+    * `createdAt=[date]` 게시물 생성일
+    * `updatedAt=[date]` 게시물 수정일
+    * `deletedAt=[date]` 게시물 삭제일
+    * `fk_feedback=[object]` 작성자, 조언자 정보 반환
+      <br/>
+
+  * **Sample response JSON data:**
+  ```json
+  {
+    "success": true,
+    "data": [
+        {
+            "id": 26,
+            "board_category": 1,
+            "board_title": "asdf",
+            "board_content": "asdfff",
+            "board_file1": "picture/1579508387097̔X3.jpg",
+            "board_file2": null,
+            "board_file3": null,
+            "confirm": false,
+            "createdAt": "2020-01-20T07:15:29.000Z",
+            "updatedAt": "2020-01-20T08:19:47.000Z",
+            "deletedAt": null,
+            "fk_feedbackId": 2,
+            "feedback": {
+                "user_uid": "$2b$12$ZEyhKBzgaTjJr.2yCYJ5p.5I2gYSgH.3WiiO7nNzXCSauvm0MOQUS",
+                "adviser_uid": "$2b$12$nvoe5rDa/ocQ5oweF/Ydu.8n8eeO0DJoWVbdWOLqTUCSv1lHEYsKe"
+            }
+        }
+    ],
+    "message": ""
+  }
+  ```
+    </div>
+    </details>
 
 
 
@@ -76,7 +195,7 @@
 
 * **URL**
 
-  `http://54.180.118.35/board/(board_id)`
+  `/(board_id)`
 
 * **Method:**
 
@@ -90,7 +209,11 @@
 
   `NONE`
 
-* **Success Response:**
+* **Response:**
+
+    <details>
+    <summary>Success Response</summary>
+    <div markdown="1">
 
   * **Code:** `200` SUCCESS : 게시글을 삭제한 경우 삭제한 게시글 아이디 반환 <br>
     **Content:** 
@@ -141,6 +264,8 @@
         "message": "[DELETE] 게시글 삭제 실행 과정에서 에러가 발생하였습니다."
     }
     ```
+    </div>
+    </details>
 
 
 ----
@@ -150,7 +275,7 @@
 
 * **URL**
 
-  http://54.180.118.35/board/board_title/(board_id)
+  /board_title/(board_id)
 
 * **Method:**
 
@@ -171,25 +296,40 @@
     <!--필요한 form field 명시 + 설명-->
 
 
-* **Success Response:**
+* **Response:**
+
+    <details>
+    <summary>Success Response</summary>
+    <div markdown="1">
 
   * **Code:** 200 
     **Content:** 사용자가 수정한 게시물 데이터
- <br />
+  <br />
 
-* **Sample request JSON data:**
+  * **Sample response JSON data:**
   ```json
   {
-    "headers": {
-      "Content-Type": "application/json",
+    "success": true,
+    "data": {
+        "id": 26,
+        "board_category": 1,
+        "board_title": "수정",
+        "board_content": "asdfff",
+        "board_file1": "picture/1579508387097̔X3.jpg",
+        "board_file2": null,
+        "board_file3": null,
+        "confirm": false,
+        "createdAt": "2020-01-20T07:15:29.000Z",
+        "updatedAt": "2020-01-30T11:23:57.000Z",
+        "deletedAt": null,
+        "fk_feedbackId": 2
     },
-    "cookie": {
-      "connect.sid": "s%3AfxZgKcirzD_d0zAHVTEnf9DQu9FVI2rO.Ijf7scJ%2Buj6YtprVUB6Vcuf1QVNXDIR64MP43366CaQ",
-    },
-    "board_id" : 9,
-    "board_title":"게시물 제목 수정",
+    "message": "board update 성공"
   }
   ```
+
+    </div>
+    </details>
 
 
 
@@ -200,7 +340,7 @@
 
 * **URL**
 
-  http://54.180.118.35/board/board_content/(board_id)
+  /board_content/(board_id)
 
 * **Method:**
 
@@ -221,22 +361,38 @@
     <!--필요한 form field 명시 + 설명-->
 
 
-* **Success Response:**
+* **Response:**
+
+    <details>
+    <summary>Success Response</summary>
+    <div markdown="1">
 
   * **Code:** 200 
     **Content:** 사용자가 수정한 게시물 데이터
- <br />
+  <br />
 
-* **Sample request JSON data:**
+  * **Sample response JSON data:**
   ```json
   {
-    "headers": {
-      "Content-Type": "application/json",
+    "success": true,
+    "data": {
+        "id": 26,
+        "board_category": 1,
+        "board_title": "asdf",
+        "board_content": "수정",
+        "board_file1": "picture/1579508387097̔X3.jpg",
+        "board_file2": null,
+        "board_file3": null,
+        "confirm": false,
+        "createdAt": "2020-01-20T07:15:29.000Z",
+        "updatedAt": "2020-01-30T11:23:57.000Z",
+        "deletedAt": null,
+        "fk_feedbackId": 2
     },
-    "cookie": {
-      "connect.sid": "s%3AfxZgKcirzD_d0zAHVTEnf9DQu9FVI2rO.Ijf7scJ%2Buj6YtprVUB6Vcuf1QVNXDIR64MP43366CaQ",
-    },
-    "board_id" : 9,
-    "board_content":"게시물 제목 수정",
+    "message": "board update 성공"
   }
   ```
+
+    </div>
+    </details>
+

@@ -9,7 +9,8 @@ const router = express.Router();
 let type = 'picture';
 let fileSize = 50 * 1024 * 1024;
 
-router.post('/create', clientIp, isLoggedIn, upload_s3_test(type, fileSize).fields([{ name: 'file1' }, { name: 'file2' }, { name: 'file3' }]), async (req, res, next) => {
+//게시물 생성
+router.post('/', clientIp, isLoggedIn, upload_s3_test(type, fileSize).fields([{ name: 'file1' }, { name: 'file2' }, { name: 'file3' }]), async (req, res, next) => {
     try{
         const user_email = req.user.email;
         const { feedback_id, board_title, board_content } = req.body;
@@ -60,7 +61,8 @@ router.post('/create', clientIp, isLoggedIn, upload_s3_test(type, fileSize).fiel
     }
 });
 
-router.put('/update/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileSize).fields([{ name: 'file1' }, { name: 'file2' }, { name: 'file3' }]), async (req, res, next) => {
+//게시물 수정 (전체)
+router.put('/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileSize).fields([{ name: 'file1' }, { name: 'file2' }, { name: 'file3' }]), async (req, res, next) => {
     try{
         const user_email = req.user.email;
         const board_id = req.params.board_id;
@@ -131,6 +133,7 @@ router.put('/update/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileS
     }
 });
 
+//게시물 수정 (사진파일들)
 router.patch('/files/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileSize).fields([{ name: 'file1' }, { name: 'file2' }, { name: 'file3' }]), async (req, res, next) => {
     try{
         const user_email = req.user.email;
