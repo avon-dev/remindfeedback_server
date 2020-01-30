@@ -120,12 +120,11 @@ router.get('/:comment_id', clientIp, isLoggedIn, async(req, res, next)=>{
  * - parameter user_id : 로그인 한 회원 uuid
  * - parameter friend_id : 친구 추가할 회원 uuid
  */
-router.post('/:board_id', clientIp, isLoggedIn, async (req, res, next)=>{
+router.post('/', clientIp, isLoggedIn, async (req, res, next)=>{
     try{
         const user_uid = req.user.user_uid;
         const user_email = req.user.email;
-        const board_id = req.params.board_id;
-        const comment_content  = req.body.comment_content;
+        const {board_id, comment_content } = req.body;
     
         winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] 댓글 생성 Request`);
         winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] comment_content : ${comment_content}, board_id : ${board_id}`);

@@ -8,9 +8,9 @@ const {deleteS3Obj, upload_s3_test} = require('../S3');
 const router = express.Router();
 
 let type = 'record';
-let fileSize = 500 * 1024 * 1024;
+let fileSize = 5000 * 1024 * 1024;
 
-router.post('/create', clientIp, isLoggedIn, upload_s3_test(type, fileSize).single('recordfile'), async (req, res, next) => {
+router.post('/', clientIp, isLoggedIn, upload_s3_test(type, fileSize).single('recordfile'), async (req, res, next) => {
     try{
         const user_email = req.user.email;
         const { feedback_id, board_title, board_content } = req.body;
@@ -19,7 +19,7 @@ router.post('/create', clientIp, isLoggedIn, upload_s3_test(type, fileSize).sing
         winston.log('info', `[BOARD|RECORD][${req.clientIp}|${user_email}] feedback_id : ${feedback_id}, board_title : ${board_title},  board_content : ${board_content}`);
 
         let file;
-        if(req.file)file = await req.file.key;
+        if(req.file) file = await req.file.key;
 
         const exBoard = await Board.create({
             board_title,
@@ -31,16 +31,16 @@ router.post('/create', clientIp, isLoggedIn, upload_s3_test(type, fileSize).sing
         let result = {
             success: true,
             data: '',
-            message: '게시글 생성 완료',
+            message: '게시글(음성) 생성 완료',
         }
         if(exBoard) {
             result.data= exBoard;
-            winston.log('info', `[BOARD|RECORD][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            winston.log('info', `[BOARD|RECORD][${req.clientIp}|${user_email}] ${result.message}`);
             res.status(201).json(result);
         }else {
             result.success = false;
-            result.message = '게시글이 생성되지 않았습니다.';
-            winston.log('info', `[BOARD|RECORD][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            result.message = '음성 게시글이 생성되지 않았습니다.';
+            winston.log('info', `[BOARD|RECORD][${req.clientIp}|${user_email}] ${result.message}`);
             return res.status(200).json(result);
         }
     } catch(e){
@@ -50,13 +50,13 @@ router.post('/create', clientIp, isLoggedIn, upload_s3_test(type, fileSize).sing
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[BOARD|RECORD][${req.clientIp}|${req.user.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[BOARD|RECORD][${req.clientIp}|${req.user.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
 });
 
-router.put('/update/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileSize).single('recordfile'), async (req, res, next) => {
+router.put('/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileSize).single('recordfile'), async (req, res, next) => {
     try{
         const user_email = req.user.email;
         const board_id = req.params.board_id;
@@ -98,9 +98,9 @@ router.put('/update/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileS
         let result = {
             success: true,
             data,
-            message: 'board record update 성공'
+            message: '게시글(음성) 전체 수정 성공'
         }
-        winston.log('info', `[BOARD|RECORD][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('info', `[BOARD|RECORD][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
     } catch(e){
         winston.log('error', `[BOARD|RECORD][${req.clientIp}|${req.user.email}] 게시글(음성) 전체 수정 Exception`);
@@ -109,7 +109,7 @@ router.put('/update/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileS
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[BOARD|RECORD][${req.clientIp}|${req.user.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[BOARD|RECORD][${req.clientIp}|${req.user.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -147,9 +147,9 @@ router.patch('/file/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileS
         let result = {
             success: true,
             data,
-            message: 'board record update 성공'
+            message: '게시글(음성) 일부 수정 성공'
         }
-        winston.log('info', `[BOARD|RECORD][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('info', `[BOARD|RECORD][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
     } catch(e){
         winston.log('error', `[BOARD|RECORD][${req.clientIp}|${req.user.email}] 게시글(음성) 일부 수정 Exception`);
@@ -158,7 +158,7 @@ router.patch('/file/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileS
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[BOARD|RECORD][${req.clientIp}|${req.user.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[BOARD|RECORD][${req.clientIp}|${req.user.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }

@@ -22,21 +22,19 @@ Create a comment to a single post.
 
 * **URL**
   
-  /:board_id
-  >*주소 변경됨: `/comment/create` -> `/comments/:board_id`*
+  /
+  >*주소 변경됨: `/comment/create` -> `/comments`*
 
 * **Method:**
 
   `POST`
   
 *  **URL Params**
-
-   **Required:**
-   * `board_id=[integer]` 게시물 번호(ID)
+    
+    None
 
 * **Data Params**
-
-    **Required:**
+    * `board_id=[integer]` 게시물 번호(ID)
     * `comment_content=[string]` 댓글 내용
 
 * **Response:**
@@ -130,16 +128,11 @@ Show all comments of a single post. Return full data of the comments and user's 
   
 *  **URL Params**
 
-   **Required:**
    * `board_id=[integer]` 게시물 번호(ID)
- 
-   None
 
 * **Data Params**
 
-    **Required:**
     None
-
 
 * **Response:**
 
@@ -150,7 +143,7 @@ Show all comments of a single post. Return full data of the comments and user's 
     * **Code:** 200
         **Content:** 해당 게시물의 모든 댓글 불러오기<br/>
 
-        * **Sample request JSON data:**
+        * **Sample response JSON data:**
 
         ```json
         {
@@ -256,14 +249,10 @@ Return full data of a single comment and user(commenter)'s nickname, portrait.
   
 *  **URL Params**
 
-   **Required:**
    * `comment_id=[integer]` 댓글 번호(ID)
- 
-   None
 
 * **Data Params**
 
-    **Required:**
     None
 
     <!--필요한 form field 명시 + 설명-->
@@ -336,16 +325,12 @@ Update a single comment of the loggedin user and return the modified comment in 
   
 *  **URL Params**
 
-   **Required:**
    * `comment_id=[integer]` 댓글 번호(ID)
  
-
 * **Data Params**
+    
+    * `comment_content=[String]` 댓글 내용
 
-    **Required:**
-     * `comment_content=[String]` 댓글 내용
-
-    <!--필요한 form field 명시 + 설명-->
 
 * **Response:**
     <details>
@@ -428,17 +413,11 @@ Delete a single comment of the loggedin user and return the deleted comment_id a
   
 *  **URL Params**
 
-   **Required:**
    * `comment_id=[integer]` 댓글 번호(ID)
- 
-   None
 
 * **Data Params**
 
-    **Required:**
     None
-
-    <!--필요한 form field 명시 + 설명-->
 
 * **Response:**
     <details>
