@@ -5,8 +5,8 @@ const express = require('express');
 const { Board } = require('../../models');
 const router = express.Router();
 
-
-router.post('/create', clientIp, isLoggedIn, async (req, res, next) => {
+//게시물 생성
+router.post('/', clientIp, isLoggedIn, async (req, res, next) => {
     try{
         const user_email = req.user.email;
         const { feedback_id, board_title, board_content } = req.body;
@@ -49,7 +49,7 @@ router.post('/create', clientIp, isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.put('/update/:board_id', clientIp, isLoggedIn, async (req, res, next) => {
+router.put('/:board_id', clientIp, isLoggedIn, async (req, res, next) => {
     try{
         const user_email = req.user.email;
         const board_id = req.params.board_id;

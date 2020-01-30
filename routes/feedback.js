@@ -2,9 +2,7 @@ const winston = require('../config/winston');
 const { clientIp, isLoggedIn, isNotLoggedIn } = require('./middlewares');
 
 const express = require('express');
-const bcrypt = require('bcrypt');
 const { User, Feedback, Board, Sequelize: { Op } } = require('../models');
-const passport = require('passport');
 const router = express.Router();
 const { deleteS3Obj, upload_s3_test } = require('./S3');
 
@@ -34,8 +32,8 @@ const findCategory = async (category_id, categoryList) => {
     })
 }
 
-
-router.post('/create', clientIp, isLoggedIn, async (req, res, next) => {
+//피드백 생성
+router.post('/', clientIp, isLoggedIn, async (req, res, next) => {
     try {
         const user_email = req.user.email;
         const { adviser, category, title, write_date } = req.body;
@@ -75,16 +73,17 @@ router.post('/create', clientIp, isLoggedIn, async (req, res, next) => {
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] ${JSON.stringify(result)}`);
         res.status(500).send(result);
         return next(e);
     }
 });
 
-router.post('/complete/request', clientIp, isLoggedIn, async (req, res, next) => {
+//피드백 완료 요청
+router.patch('/request/:feedback_id', clientIp, isLoggedIn, async (req, res, next) => {
     try {
         const user_email = req.user.email;
-        const feedback_id = req.body.feedback_id;
+        const feedback_id = req.params.feedback_id;
 
         winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] 피드백 완료 Request`);
         winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] feedback_id : ${feedback_id}`);
@@ -134,10 +133,11 @@ router.post('/complete/request', clientIp, isLoggedIn, async (req, res, next) =>
     }
 });
 
-router.post('/complete/reject', clientIp, isLoggedIn, async (req, res, next) => {
+//피드백 완료 거절
+router.patch('/rejection/:feedback_id', clientIp, isLoggedIn, async (req, res, next) => {
     try {
         const user_email = req.user.email;
-        const feedback_id = req.body.feedback_id;
+        const feedback_id = req.params.feedback_id;
 
         winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] 피드백 완료 거절 Request`);
         winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] feedback_id : ${feedback_id}`);
@@ -187,10 +187,11 @@ router.post('/complete/reject', clientIp, isLoggedIn, async (req, res, next) => 
     }
 });
 
-router.post('/complete/accept', clientIp, isLoggedIn, async (req, res, next) => {
+//피드백 완료 수락
+router.patch('/approval/:feedback_id', clientIp, isLoggedIn, async (req, res, next) => {
     try {
         const user_email = req.user.email;
-        const feedback_id = req.body.feedback_id;
+        const feedback_id = req.params.feedback_id;
 
         winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] 피드백 완료 수락 Request`);
         winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] feedback_id : ${feedback_id}`);
@@ -240,9 +241,8 @@ router.post('/complete/accept', clientIp, isLoggedIn, async (req, res, next) => 
     }
 });
 
-/* getfeedback API
- */
-router.get('/all/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
+//피드백 목록 가져오기(전체)
+router.get('/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
     try {
         const user_uid = req.user.user_uid;
         const user_email = req.user.email;
@@ -275,8 +275,8 @@ router.get('/all/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
             limit: 10,
             include: [{
                 model: User,
-                attributes: ['nickname', 'portrait'],
-                as: 'myfeedback'
+                attributes: ['email', 'nickname', 'portrait'],
+                as: 'adviser'
             }]
         })
         //유저가 조언자인 피드백 목록
@@ -286,8 +286,8 @@ router.get('/all/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
             limit: 10,
             include: [{
                 model: User,
-                attributes: ['nickname', 'portrait'],
-                as: 'yourfeedback'
+                attributes: ['email', 'nickname', 'portrait'],
+                as: 'owner'
             }]
         })
         let result = {
@@ -310,7 +310,8 @@ router.get('/all/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.get('/all/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next) => {
+//피드백 목록 가져오기(전체)
+router.get('/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next) => {
     try {
         const user_uid = req.user.user_uid;
         const user_email = req.user.email;
@@ -343,8 +344,8 @@ router.get('/all/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next) =
             limit,
             include: [{
                 model: User,
-                attributes: ['nickname', 'portrait'],
-                as: 'myfeedback'
+                attributes: ['email', 'nickname', 'portrait'],
+                as: 'adviser'
             }]
         })
         //유저가 조언자인 피드백 목록
@@ -354,8 +355,8 @@ router.get('/all/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next) =
             limit,
             include: [{
                 model: User,
-                attributes: ['nickname', 'portrait'],
-                as: 'yourfeedback'
+                attributes: ['email', 'nickname', 'portrait'],
+                as: 'owner'
             }]
         })
         let result = {
@@ -378,7 +379,8 @@ router.get('/all/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next) =
     }
 });
 
-router.get('/my/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
+//피드백 목록 가져오기(내피드백)
+router.get('/mine/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
     try {
         const user_email = req.user.email;
         let lastid = parseInt(req.params.lastid);
@@ -405,8 +407,8 @@ router.get('/my/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
             limit: 10,
             include: [{
                 model: User,
-                attributes: ['nickname', 'portrait'],
-                as: 'myfeedback'
+                attributes: ['email', 'nickname', 'portrait'],
+                as: 'adviser'
             }]
         });
         await result.data.map((contact) => {
@@ -430,7 +432,8 @@ router.get('/my/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.get('/my/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next) => {
+//피드백 목록 가져오기(내피드백)
+router.get('/mine/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next) => {
     try {
         const user_email = req.user.email;
         let lastid = parseInt(req.params.lastid);
@@ -458,8 +461,8 @@ router.get('/my/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next) =>
             limit,
             include: [{
                 model: User,
-                attributes: ['nickname', 'portrait'],
-                as: 'myfeedback'
+                attributes: ['email', 'nickname', 'portrait'],
+                as: 'adviser'
             }]
         });
         await result.data.map((contact) => {
@@ -483,22 +486,28 @@ router.get('/my/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next) =>
     }
 });
 
-router.get('/your/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
+//피드백 목록 가져오기(내가 조언자)
+router.get('/yoursa/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
     try {
+        const user_uid = req.user.user_uid;
         const user_email = req.user.email;
         let lastid = parseInt(req.params.lastid);
+
+        if (lastid === 0) {
+            lastid = 9999;
+        }
 
         winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] 내가 조언자인 피드백 목록 조회 Request`);
         winston.log('info', `[CATEGORY][${req.clientIp}|${user_email}] lastid : ${lastid}`);
 
         const yourFeedback = await Feedback.findAll({
-            where: { adviser_uid: req.user.user_uid, id: { [Op.lt]: lastid } },
-            order: [['write_date', 'DESC']],
+            where: { adviser_uid: user_uid, id: { [Op.lt]: lastid } },
+            order: [['createdAt', 'DESC']],
             limit: 10,
             include: [{
                 model: User,
-                attributes: ['nickname', 'portrait'],
-                as: 'yourfeedback'
+                attributes: ['email', 'nickname', 'portrait'],
+                as: 'owner'
             }]
         });
         let result = {
@@ -521,23 +530,29 @@ router.get('/your/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.get('/your/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next) => {
+//피드백 목록 가져오기(내가 조언자)
+router.get('/yours/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next) => {
     try {
+        const user_uid = req.user.user_uid;
         const user_email = req.user.email;
         let lastid = parseInt(req.params.lastid);
         let limit = parseInt(req.params.limit);
+
+        if (lastid === 0) {
+            lastid = 9999;
+        }
 
         winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] 내가 조언자인 피드백 목록(제한) 조회 Request`);
         winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] lastid : ${lastid}, limit : ${limit}`);
 
         const yourFeedback = await Feedback.findAll({
-            where: { adviser_uid: req.user.user_uid, id: { [Op.lt]: lastid } },
-            order: [['write_date', 'DESC']],
+            where: { adviser_uid: user_uid, id: { [Op.lt]: lastid } },
+            order: [['createdAt', 'DESC']],
             limit,
             include: [{
                 model: User,
-                attributes: ['nickname', 'portrait'],
-                as: 'yourfeedback'
+                attributes: ['email', 'nickname', 'portrait'],
+                as: 'owner'
             }]
         });
         let result = {
@@ -554,13 +569,14 @@ router.get('/your/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next) 
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] ${JSON.stringify(result)}`);
         res.status(500).send(result);
         return next(e);
     }
 });
 
-router.put('/update/:feedback_id', clientIp, isLoggedIn, async (req, res, next) => {
+//피드백 수정 (전체)
+router.put('/:feedback_id', clientIp, isLoggedIn, async (req, res, next) => {
     try {
         const user_email = req.user.email;
         const feedback_id = req.params.feedback_id;
@@ -615,6 +631,7 @@ router.put('/update/:feedback_id', clientIp, isLoggedIn, async (req, res, next) 
     }
 });
 
+//피드백 수정 (조언자)
 router.patch('/adviser/:feedback_id', clientIp, isLoggedIn, async (req, res, next) => {
     try {
         const user_email = req.user.email;
@@ -714,7 +731,7 @@ router.patch('/title/:feedback_id', clientIp, isLoggedIn, async (req, res, next)
     }
 });
 
-router.patch('/write_date/:feedback_id', clientIp, isLoggedIn, async (req, res, next) => {
+router.patch('/dday/:feedback_id', clientIp, isLoggedIn, async (req, res, next) => {
     try {
         const user_email = req.user.email;
         const feedback_id = req.params.feedback_id;
