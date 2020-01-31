@@ -10,6 +10,7 @@ const { deleteS3Obj, upload_s3 } = require('./S3');
 
 const Sequelize = require('sequelize');
 const env = process.env.NODE_ENV || 'development';
+require('dotenv').config(); //.env 설정
 const config = require(__dirname + '/../config/config.json')[env];
 
 const crypto = require('crypto');
@@ -318,7 +319,7 @@ router.get('/logout', clientIp, isLoggedIn, (req, res) => {
 
 
 // 비밀번호 분실 신고
-router.post('/forgetpassword', clientIp, async (req, res, next) => {
+router.post('/password', clientIp, async (req, res, next) => {
     try {
         const user_email = req.body.email;
 
@@ -329,7 +330,7 @@ router.post('/forgetpassword', clientIp, async (req, res, next) => {
             where: {email: user_email}
         }).then(exuser => {
             //존재시 토큰 생성 후
-            const token = crypto.randomBytes(20).toString('hex'); // token 생성
+            const token = crypto.randomBytes(2).toString('hex'); // token 생성
             const data = { // 데이터 정리
                 token,
                 email: exuser.email,
@@ -343,8 +344,8 @@ router.post('/forgetpassword', clientIp, async (req, res, next) => {
                 port: 456,
                 secure: true,
                 auth: {
-                    user: 'avon.commu@gmail.com',
-                    pass: 'dpdlqhs0609!'
+                    user: process.env.gmail_user,
+                    pass: process.env.gmail_pass
                 }
             });
             const emailOptions = { // 옵션값 설정
@@ -386,41 +387,32 @@ router.post('/forgetpassword', clientIp, async (req, res, next) => {
 });
 
 // 비밀번호 초기화 요청
-router.post('/resetpassword', async (req, res, next) => {
+router.patch('/password', clientIp, async (req, res, next) => {
     try {
         const {token, password} = req.body;
 
-        // winston.log('info', `[AUTH][${req.clientIp}|${token}] 비밀번호 초기화 요청`);
+        winston.log('info', `[AUTH][${req.clientIp}|${token}] 비밀번호 초기화 요청`);
         console.log('시간', new Date()-300)
 
         //이메일 존재여부 파악
-        let flag = false;
-        const exauth = await Auth.findOne({
+        await Auth.findOne({
             where: {
                 token,
+                createdAt: {
+                    [Op.gt]: new Date() - 300000
+                },
             }
-        })
-
-        //console.log('시간계산', auth.createdAt, new Date(), auth.ttl, auth.createdAt - new Date() - (auth.createdAt - ttl))
-        let created = exauth.createdAt.getTime();
-        let now = new Date().getTime();
-        let ttl = exauth.ttl * 1000;
-        let authemail = exauth.email.toString();
-        console.log('이프문 여기까지 타는것 확인', created, now, ttl, authemail)
-        console.log(created > now - ttl)
-        if(created > now - ttl){
-            flag = true;
-            // console.log(exauth)
-        }
-
-        if(flag){
+        }).then(async exauth => {
+            let authemail = exauth.email;
             await console.log('여기다여기',authemail)
             const newpw = await bcrypt.hash(password, 12);
             const 유조 = await User.findOne({where: {email: authemail}})
             console.log('유조',유조.user_uid);
             await User.update({
                 password: newpw
-            }, {where: {user_uid: 유조.user_uid}}).then().catch(err => {console.error(err)});
+            }, {where: {user_uid: 유조.user_uid}}).then(
+                await Auth.destroy({where: {token: exauth.token}}).then().catch()
+            ).catch(err => {console.error(err)});
 
             // 비밀번호 변경 성공 메세지 리턴
             const result = new Object();
@@ -429,19 +421,15 @@ router.post('/resetpassword', async (req, res, next) => {
             result.message = '비밀번호를 변경하였습니다 다시 로그인해주세요.';
             winston.log('info', `[AUTH][${req.clientIp}|] ${JSON.stringify(result)}`);
             return await res.status(200).send(result);
-        }else{
+        }).catch(async e => {
+            console.error(e);
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
             result.message = '유효한 토큰이 아닙니다.';
             winston.log('info', `[AUTH][${req.clientIp}|] ${JSON.stringify(result)}`);
             return res.status(200).send(result);
-        }
-        // then(async exauth => {
-            
-        // }).catch(error => {
-            
-        // })
+        })
         
     } catch (e) {
         winston.log('error', `[AUTH][${req.clientIp}] 비밀번호 초기화 요청 Exception`);
