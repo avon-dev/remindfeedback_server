@@ -392,7 +392,6 @@ router.patch('/password', clientIp, async (req, res, next) => {
         const {token, password} = req.body;
 
         winston.log('info', `[AUTH][${req.clientIp}|${token}] 비밀번호 초기화 요청`);
-        console.log('시간', new Date()-300)
 
         //이메일 존재여부 파악
         await Auth.findOne({
