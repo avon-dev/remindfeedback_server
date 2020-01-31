@@ -10,14 +10,17 @@ const router = express.Router();
 let type = 'video';
 let fileSize = 500 * 1024 * 1024;
 
-router.post('/create', clientIp, isLoggedIn, upload_s3_test(type, fileSize).single('videofile'), async (req, res, next) => {
+<<<<<<< HEAD
+=======
+//게시물 생성
+>>>>>>> editcode_CHOI
+router.post('/', clientIp, isLoggedIn, upload_s3_test(type, fileSize).single('videofile'), async (req, res, next) => {
     try{
         const user_email = req.user.email;
         const { feedback_id, board_title, board_content } = req.body;
 
         winston.log('info', `[BOARD|VIDEO][${req.clientIp}|${user_email}] 게시글(영상) 생성 Request`);
         winston.log('info', `[BOARD|VIDEO][${req.clientIp}|${user_email}] feedback_id : ${feedback_id}, board_title : ${board_title},  board_content : ${board_content}`);
-        winston.log('info', `[BOARD|VIDEO][${req.clientIp}|${user_email}] files : ${req.file}`);
 
         let file;
         if(req.file)file = await req.file.key;
@@ -32,16 +35,16 @@ router.post('/create', clientIp, isLoggedIn, upload_s3_test(type, fileSize).sing
         let result = {
             success: true,
             data: '',
-            message: '게시글 생성 완료',
+            message: '게시글(영상) 생성 완료',
         }
         if(exBoard) {
             result.data = exBoard;
-            winston.log('info', `[BOARD|VIDEO][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            winston.log('info', `[BOARD|VIDEO][${req.clientIp}|${user_email}] ${result.message}`);
             res.status(201).json(result);
         }else {
             result.success = false;
-            result.message = '게시글이 생성되지 않았습니다.';
-            winston.log('info', `[BOARD|VIDEO][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            result.message = '영상 게시글이 생성되지 않았습니다.';
+            winston.log('info', `[BOARD|VIDEO][${req.clientIp}|${user_email}] ${result.message}`);
             return res.status(200).json(result);
         }
     } catch(e){
@@ -51,13 +54,17 @@ router.post('/create', clientIp, isLoggedIn, upload_s3_test(type, fileSize).sing
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[BOARD|VIDEO][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[BOARD|VIDEO][${req.clientIp}|${req.user.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
 });
 
-router.put('/update/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileSize).single('videofile'), async (req, res, next) => {
+<<<<<<< HEAD
+=======
+//게시물 수정 (전체)
+>>>>>>> editcode_CHOI
+router.put('/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileSize).single('videofile'), async (req, res, next) => {
     try{
         const user_email = req.user.email;
         const board_id = req.params.board_id;
@@ -100,9 +107,9 @@ router.put('/update/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileS
         let result = {
             success: true,
             data,
-            message: 'board video update 성공'
+            message: '게시글(영상) 전체 수정 성공'
         }
-        winston.log('info', `[BOARD|VIDEO][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('info', `[BOARD|VIDEO][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
     } catch(e){
         winston.log('error', `[BOARD|VIDEO][${req.clientIp}|${req.user.email}] 게시글(영상) 전체 수정 Exception`);
@@ -111,12 +118,13 @@ router.put('/update/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileS
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[BOARD|VIDEO][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[BOARD|VIDEO][${req.clientIp}|${req.user.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
 });
 
+//게시물 수정 (영상파일)
 router.patch('/file/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileSize).single('videofile'), async (req, res, next) => {
     try{
         const user_email = req.user.email;
@@ -149,9 +157,9 @@ router.patch('/file/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileS
         let result = {
             success: true,
             data,
-            message: 'board video update 성공'
+            message: '게시글(영상) 일부 수정 성공'
         }
-        winston.log('info', `[BOARD|VIDEO][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('info', `[BOARD|VIDEO][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
     } catch(e){
         winston.log('error', `[BOARD|VIDEO][${req.clientIp}|${req.user.email}] 게시글(영상) 일부 수정 Exception`);
@@ -160,7 +168,7 @@ router.patch('/file/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileS
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[BOARD|VIDEO][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[BOARD|VIDEO][${req.clientIp}|${req.user.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }

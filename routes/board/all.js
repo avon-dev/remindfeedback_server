@@ -22,7 +22,7 @@ if (config.use_env_variable) {
     );
 }
 
-router.get('/selectone/:board_id', clientIp, async (req, res, next) => {
+router.get('/:board_id', clientIp, async (req, res, next) => {
     const user_email = req.user.email;
     let board_id = parseInt(req.params.board_id);
 
@@ -98,7 +98,7 @@ router.get('/:feedbackid/:lastid', clientIp, isLoggedIn, async (req, res, next) 
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[BOARD|ALL][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[BOARD|ALL][${req.clientIp}|${req.user.email}] ${JSON.stringify(result)}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -131,7 +131,7 @@ router.get('/:feedbackid/:lastid/:limit', clientIp, isLoggedIn, async (req, res,
             data: boardList,
             message: ""
         }
-        winston.log('info', `[BOARD|ALL][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);ㄴ
+        winston.log('info', `[BOARD|ALL][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
         res.status(200).json(result);
     } catch (e) {
         winston.log('error', `[BOARD|ALL][${req.clientIp}|${req.user.email}] 게시글 목록(제한) 조회 Exception`);
@@ -140,7 +140,7 @@ router.get('/:feedbackid/:lastid/:limit', clientIp, isLoggedIn, async (req, res,
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[BOARD|ALL][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[BOARD|ALL][${req.clientIp}|${req.user.email}] ${JSON.stringify(result)}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -252,7 +252,7 @@ router.delete('/:board_id', clientIp, isLoggedIn, async (req, res, next) => {
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[BOARD|ALL][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[BOARD|ALL][${req.clientIp}|${req.user.email}] ${JSON.stringify(result)}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -285,7 +285,7 @@ router.patch('/board_title/:board_id', clientIp, isLoggedIn, async (req, res, ne
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[BOARD|ALL][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[BOARD|ALL][${req.clientIp}|${req.user.email}] ${JSON.stringify(result)}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -318,7 +318,7 @@ router.patch('/board_content/:board_id', clientIp, isLoggedIn, async (req, res, 
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[BOARD|ALL][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[BOARD|ALL][${req.clientIp}|${req.user.email}] ${JSON.stringify(result)}`);
         res.status(500).send(result);
         return next(e);
     }

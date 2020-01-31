@@ -9,14 +9,17 @@ const router = express.Router();
 let type = 'picture';
 let fileSize = 50 * 1024 * 1024;
 
-router.post('/create', clientIp, isLoggedIn, upload_s3_test(type, fileSize).fields([{ name: 'file1' }, { name: 'file2' }, { name: 'file3' }]), async (req, res, next) => {
+<<<<<<< HEAD
+=======
+//게시물 생성
+>>>>>>> editcode_CHOI
+router.post('/', clientIp, isLoggedIn, upload_s3_test(type, fileSize).fields([{ name: 'file1' }, { name: 'file2' }, { name: 'file3' }]), async (req, res, next) => {
     try{
         const user_email = req.user.email;
         const { feedback_id, board_title, board_content } = req.body;
 
         winston.log('info', `[BOARD|PICTURE][${req.clientIp}|${user_email}] 게시글(사진) 생성 Request`);
         winston.log('info', `[BOARD|PICTURE][${req.clientIp}|${user_email}] feedback_id : ${feedback_id}, board_title : ${board_title},  board_content : ${board_content}`);
-        winston.log('info', `[BOARD|PICTURE][${req.clientIp}|${user_email}] files : ${req.files}`);
 
         // req.files.map((v, i) => files[i] = v.key);
         let file1, file2, file3;
@@ -36,16 +39,16 @@ router.post('/create', clientIp, isLoggedIn, upload_s3_test(type, fileSize).fiel
         let result = {
             success: true,
             data: '',
-            message: '게시글 생성 완료',
+            message: '게시글(사진) 생성 성공',
         }
         if(exBoard) {
             result.data= exBoard
-            winston.log('info', `[BOARD|PICTURE][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            winston.log('info', `[BOARD|PICTURE][${req.clientIp}|${user_email}] ${result.message}`);
             res.status(201).json(result);
         }else {
             result.success = false;
-            result.message = '게시글이 생성되지 않았습니다.';
-            winston.log('info', `[BOARD|PICTURE][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            result.message = '사진 게시글이 생성되지 않았습니다.';
+            winston.log('info', `[BOARD|PICTURE][${req.clientIp}|${user_email}] ${result.message}`);
             return res.status(200).json(result);
         }
     } catch(e){
@@ -55,13 +58,17 @@ router.post('/create', clientIp, isLoggedIn, upload_s3_test(type, fileSize).fiel
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[BOARD|PICTURE][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[BOARD|PICTURE][${req.clientIp}|${req.user.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
 });
 
-router.put('/update/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileSize).fields([{ name: 'file1' }, { name: 'file2' }, { name: 'file3' }]), async (req, res, next) => {
+<<<<<<< HEAD
+=======
+//게시물 수정 (전체)
+>>>>>>> editcode_CHOI
+router.put('/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileSize).fields([{ name: 'file1' }, { name: 'file2' }, { name: 'file3' }]), async (req, res, next) => {
     try{
         const user_email = req.user.email;
         const board_id = req.params.board_id;
@@ -115,9 +122,9 @@ router.put('/update/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileS
         let result = {
             success: true,
             data,
-            message: 'board picture update 성공'
+            message: '게시글(사진) 전체 수정 성공'
         }
-        winston.log('info', `[BOARD|PICTURE][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('info', `[BOARD|PICTURE][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
     } catch(e){
         winston.log('error', `[BOARD|PICTURE][${req.clientIp}|${req.user.email}] 게시글(사진) 전체 수정 Exception`);
@@ -126,12 +133,13 @@ router.put('/update/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileS
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[BOARD|PICTURE][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[BOARD|PICTURE][${req.clientIp}|${req.user.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
 });
 
+//게시물 수정 (사진파일들)
 router.patch('/files/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileSize).fields([{ name: 'file1' }, { name: 'file2' }, { name: 'file3' }]), async (req, res, next) => {
     try{
         const user_email = req.user.email;
@@ -178,9 +186,9 @@ router.patch('/files/:board_id', clientIp, isLoggedIn, upload_s3_test(type, file
         let result = {
             success: true,
             data,
-            message: 'board picture update 성공'
+            message: '게시글(사진) 일부 수정 성공'
         }
-        winston.log('info', `[BOARD|PICTURE][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('info', `[BOARD|PICTURE][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
     } catch(e){
         winston.log('error', `[BOARD|PICTURE][${req.clientIp}|${req.user.email}] 게시글(사진) 일부 수정 Exception`);
@@ -189,7 +197,7 @@ router.patch('/files/:board_id', clientIp, isLoggedIn, upload_s3_test(type, file
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[BOARD|PICTURE][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[BOARD|PICTURE][${req.clientIp}|${req.user.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }

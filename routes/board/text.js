@@ -5,8 +5,12 @@ const express = require('express');
 const { Board } = require('../../models');
 const router = express.Router();
 
+<<<<<<< HEAD
 
-router.post('/create', clientIp, isLoggedIn, async (req, res, next) => {
+=======
+//게시물 생성
+>>>>>>> editcode_CHOI
+router.post('/', clientIp, isLoggedIn, async (req, res, next) => {
     try{
         const user_email = req.user.email;
         const { feedback_id, board_title, board_content } = req.body;
@@ -23,16 +27,16 @@ router.post('/create', clientIp, isLoggedIn, async (req, res, next) => {
         let result = {
             success: true,
             data: '',
-            message: '게시글 생성 완료',
+            message: '게시글(글) 생성 완료',
         }
         if(exBoard) {
             result.data= exBoard;
-            winston.log('info', `[BOARD|TEXT][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            winston.log('info', `[BOARD|TEXT][${req.clientIp}|${user_email}] ${result.message}`);
             res.status(201).json(result);
         }else {
             result.success = false;
             result.message = '게시글이 생성되지 않았습니다.';
-            winston.log('info', `[BOARD|TEXT][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            winston.log('info', `[BOARD|TEXT][${req.clientIp}|${user_email}] ${result.message}`);
             return res.status(200).json(result);
         }
 
@@ -43,13 +47,13 @@ router.post('/create', clientIp, isLoggedIn, async (req, res, next) => {
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[BOARD|TEXT][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[BOARD|TEXT][${req.clientIp}|${req.user.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
 });
 
-router.put('/update/:board_id', clientIp, isLoggedIn, async (req, res, next) => {
+router.put('/:board_id', clientIp, isLoggedIn, async (req, res, next) => {
     try{
         const user_email = req.user.email;
         const board_id = req.params.board_id;
@@ -80,9 +84,9 @@ router.put('/update/:board_id', clientIp, isLoggedIn, async (req, res, next) => 
         let result = {
             success: true,
             data,
-            message: 'board text update 성공'
+            message: '게시글(글) 전체 수정 성공'
         }
-        winston.log('info', `[BOARD|TEXT][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('info', `[BOARD|TEXT][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
     } catch(e){
         winston.log('error', `[BOARD|TEXT][${req.clientIp}|${req.user.email}] 게시글(텍스트) 수정 Exception`);
@@ -91,7 +95,7 @@ router.put('/update/:board_id', clientIp, isLoggedIn, async (req, res, next) => 
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[BOARD|TEXT][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[BOARD|TEXT][${req.clientIp}|${req.user.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }

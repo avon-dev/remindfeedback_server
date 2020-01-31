@@ -27,3 +27,21 @@
     * @param : 이 함수의 파라미터
     * @returns : 이 함수의 리턴값
     * @name : 이 함수, 클래스, 변수의 이름을 외부에서 지정할 때
+
+* **Response**
+    <details>
+    <summary>Success Response</summary>
+    <div markdown="1">
+
+    <!-- 위에 공백 1줄 두고 이 안에 기존 내용 붙이기 (Code ~ )-->
+    
+    </div>
+    </details>
+    <details>
+    <summary>Error Response</summary>
+    <div markdown="1">
+
+    <!-- 위에 공백 1줄 두고 이 안에 기존 내용 붙이기 (Code ~ )-->
+
+    </div>
+    </details>

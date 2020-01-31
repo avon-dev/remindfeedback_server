@@ -1,5 +1,4 @@
 ## About Category
-----
   <_카테고리(Category) 정보에 접근하는 방법 (카테고리 생성, 확인, 수정, 삭제)_>
 
 * **전제**
@@ -9,8 +8,8 @@
 
 * **API call:**
     ```
-    http://localhost:8000/category
-    http://54.180.118.35/category
+    http://localhost:8000/categories
+    http://54.180.118.35/categories
     ```
 
 **Create Category**
@@ -19,7 +18,7 @@
 
 * **URL**
 
-    `/create`
+    `/`
 
 * **Method:**
 
@@ -34,14 +33,16 @@
     `category_title=[string]` 추가할 카테고리 제목, NULL[X] <br>
     `category_color=[string]` 추가할 카테고리 색상, NULL[X]
 
-* **Success Response:**
+* **Response**
+    <details>
+    <summary>Success Response</summary>
+    <div markdown="1">
 
-  * **Code:** 
-    `200` : 카테고리 생성 성공 시 모든 카테고리 반환 <br>
+    * **Code** `200` : 카테고리 생성 성공 시 모든 카테고리 반환 <br>
     **Content:** 
     ```json
     {
-        "success": true,
+       "success": true,
         "data": [
             {
                 "category_id": 0,
@@ -57,15 +58,19 @@
                 "category_id": 2,
                 "category_title": "category2",
                 "category_color": "#222222"
-            }
+           }
         ],
         "message": "새로운 카테고리를 생성했습니다."
     }
     ```
+    
+    </div>
+    </details>
+    <details>
+    <summary>Error Response</summary>
+    <div markdown="1">
 
-* **Error Response:**
-
-  * **Code:** `200` FORBIDDEN : 카테고리 제한 개수를 초과한 경우 <br>
+    * **Code:** `200` FORBIDDEN : 카테고리 제한 개수를 초과한 경우 <br>
     **Content:**
     ```json
     {
@@ -75,7 +80,7 @@
     }
     ```
 
-  * **Code:** `200` FORBIDDEN : 기본 카테고리 이름으로 생성을 시도한 경우 <br>
+    * **Code:** `200` FORBIDDEN : 기본 카테고리 이름으로 생성을 시도한 경우 <br>
     **Content:**
     ```json
     {
@@ -85,7 +90,7 @@
     }
     ```
 
-  * **Code:** `200` FORBIDDEN : 카테고리 이름이 기존에 생성한 이름과 중복되는 경우 <br>
+    * **Code:** `200` FORBIDDEN : 카테고리 이름이 기존에 생성한 이름과 중복되는 경우 <br>
     **Content:**
     ```json
     {
@@ -95,7 +100,7 @@
     }
     ```
 
- * **Code:** `200` NOT FOUND <br>
+    * **Code:** `200` NOT FOUND <br>
     **Content:** 
     ```json
     {
@@ -105,7 +110,7 @@
     }
     ```
 
-  * **Code:** `500` INTERNAL SERVER ERROR <br>
+    * **Code:** `500` INTERNAL SERVER ERROR <br>
     **Content:** 
     ```json
     {
@@ -115,7 +120,7 @@
     }
     ```
     
-  * **Code:** `500` INTERNAL SERVER ERROR <br>
+    * **Code:** `500` INTERNAL SERVER ERROR <br>
     **Content:** 
     ```json
     {
@@ -125,6 +130,9 @@
     }
     ```
 
+    </div>
+    </details>
+
 
 
 **Read All Category**
@@ -133,7 +141,7 @@
 
 * **URL**
 
-    `/selectall`
+    `/`
 
 * **Method:**
 
@@ -147,10 +155,12 @@
 
   `NONE`
 
-* **Success Response:**
+* **Response**
+    <details>
+    <summary>Success Response</summary>
+    <div markdown="1">
 
-  * **Code:** 
-    `200` : 카테고리 생성 성공 시 모든 카테고리 반환 <br>
+    * **Code:** `200` : 카테고리 생성 성공 시 모든 카테고리 반환 <br>
     **Content:** 
     ```json
     {
@@ -175,9 +185,13 @@
     }
     ```
 
-* **Error Response:**
+    </div>
+    </details>
+    <details>
+    <summary>Error Response</summary>
+    <div markdown="1">
 
- * **Code:** `200` NOT FOUND <br>
+    * **Code:** `200` NOT FOUND <br>
     **Content:** 
     ```json
     {
@@ -196,6 +210,9 @@
         "message": "사용자 조회 과정에서 에러가 발생하였습니다."
     }
     ```
+    
+    </div>
+    </details>
 
 
 
@@ -205,7 +222,7 @@
 
 * **URL**
 
-  `/selectone/:category_id`
+  `/:category_id`
 
 * **Method:**
 
@@ -219,10 +236,12 @@
 
   `NONE`
 
-* **Success Response:**
+* **Response**
+    <details>
+    <summary>Success Response</summary>
+    <div markdown="1">
 
-  * **Code:** 
-    `200` : 선택한 카테고리 반환 <br>
+    * **Code:** `200` : 선택한 카테고리 반환 <br>
     **Content:** 
     ```json
     {
@@ -236,9 +255,13 @@
     }
     ```
 
-* **Error Response:**
+    </div>
+    </details>
+    <details>
+    <summary>Error Response</summary>
+    <div markdown="1">
 
- * **Code:** `200` NOT FOUND <br>
+    * **Code:** `200` NOT FOUND <br>
     **Content:** 
     ```json
     {
@@ -248,7 +271,7 @@
     }
     ```
 
- * **Code:** `200` NOT FOUND <br>
+    * **Code:** `200` NOT FOUND <br>
     **Content:** 
     ```json
     {
@@ -258,7 +281,7 @@
     }
     ```
 
-  * **Code:** `500` INTERNAL SERVER ERROR <br>
+    * **Code:** `500` INTERNAL SERVER ERROR <br>
     **Content:** 
     ```json
     {
@@ -268,6 +291,9 @@
     }
     ```
 
+    </div>
+    </details>
+
 
 
 **Update One Category**
@@ -276,7 +302,7 @@
 
 * **URL**
 
-  `/update/:category_id`
+  `/:category_id`
 
 * **Method:**
 
@@ -290,10 +316,12 @@
 
   `NONE`
 
-* **Success Response:**
+* **Response**
+    <details>
+    <summary>Success Response</summary>
+    <div markdown="1">
 
-  * **Code:** 
-    `200` : 수정한 카테고리 반환 <br>
+    * **Code:** `200` : 수정한 카테고리 반환 <br>
     **Content:** 
     ```json
     {
@@ -307,9 +335,13 @@
     }
     ```
 
-* **Error Response:**
+    </div>
+    </details>
+    <details>
+    <summary>Error Response</summary>
+    <div markdown="1">
 
- * **Code:** `200` FORBIDDEN : 기본 카테고리의 수정을 시도한 경우 <br>
+    * **Code:** `200` FORBIDDEN : 기본 카테고리의 수정을 시도한 경우 <br>
     **Content:** 
     ```json
     {
@@ -319,7 +351,7 @@
     }
     ```
 
- * **Code:** `200` NOT FOUND <br>
+    * **Code:** `200` NOT FOUND <br>
     **Content:** 
     ```json
     {
@@ -329,7 +361,7 @@
     }
     ```
 
- * **Code:** `200` NOT FOUND <br>
+    * **Code:** `200` NOT FOUND <br>
     **Content:** 
     ```json
     {
@@ -339,7 +371,7 @@
     }
     ```
 
-  * **Code:** `500` INTERNAL SERVER ERROR <br>
+    * **Code:** `500` INTERNAL SERVER ERROR <br>
     **Content:** 
     ```json
     {
@@ -349,7 +381,7 @@
     }
     ```
 
-  * **Code:** `500` INTERNAL SERVER ERROR <br>
+    * **Code:** `500` INTERNAL SERVER ERROR <br>
     **Content:** 
     ```json
     {
@@ -359,6 +391,9 @@
     }
     ```
 
+    </div>
+    </details>
+
 
 
 **Delete One Category**
@@ -367,7 +402,7 @@
 
 * **URL**
 
-  `/delete/:category_id`
+  `/:category_id`
 
 * **Method:**
 
@@ -381,10 +416,12 @@
 
   `NONE`
 
-* **Success Response:**
+* **Response**
+    <details>
+    <summary>Success Response</summary>
+    <div markdown="1">
 
-  * **Code:** 
-    `200` : 삭제한 카테고리의 id 반환 <br>
+    * **Code:** `200` : 삭제한 카테고리의 id 반환 <br>
     **Content:** 
     ```json
     {
@@ -394,9 +431,13 @@
     }
     ```
 
-* **Error Response:**
+    </div>
+    </details>
+    <details>
+    <summary>Error Response</summary>
+    <div markdown="1">
 
- * **Code:** `200` FORBIDDEN : 기본 카테고리의 삭제를 시도한 경우 <br>
+    * **Code:** `200` FORBIDDEN : 기본 카테고리의 삭제를 시도한 경우 <br>
     **Content:** 
     ```json
     {
@@ -406,7 +447,7 @@
     }
     ```
 
- * **Code:** `200` NOT FOUND <br>
+    * **Code:** `200` NOT FOUND <br>
     **Content:** 
     ```json
     {
@@ -416,7 +457,7 @@
     }
     ```
 
- * **Code:** `200` NOT FOUND <br>
+    * **Code:** `200` NOT FOUND <br>
     **Content:** 
     ```json
     {
@@ -426,7 +467,7 @@
     }
     ```
 
-  * **Code:** `500` INTERNAL SERVER ERROR <br>
+    * **Code:** `500` INTERNAL SERVER ERROR <br>
     **Content:** 
     ```json
     {
@@ -436,7 +477,7 @@
     }
     ```
 
-  * **Code:** `500` INTERNAL SERVER ERROR <br>
+    * **Code:** `500` INTERNAL SERVER ERROR <br>
     **Content:** 
     ```json
     {
@@ -446,7 +487,7 @@
     }
     ```
 
-  * **Code:** `500` INTERNAL SERVER ERROR <br>
+    * **Code:** `500` INTERNAL SERVER ERROR <br>
     **Content:** 
     ```json
     {
@@ -455,3 +496,6 @@
         "message": "카테고리 삭제 과정에서 에러가 발생하였습니다."
     }
     ```
+
+    </div>
+    </details>

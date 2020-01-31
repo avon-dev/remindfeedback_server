@@ -176,16 +176,16 @@ if (cluster.isMaster) {
   
   app.use('/auth', authRouter);
   app.use('/users', userRouter);
-  app.use('/feedback', feedbackRouter);
-  app.use('/category', categoryRouter);
-  app.use('/board', boardRouter);
-  app.use('/board/text', boardTextRouter);
-  app.use('/board/picture', boardPictureRouter);
-  app.use('/board/video', boardVideoRouter);
-  app.use('/board/record', boardRecordRouter);
+  app.use('/feedbacks', feedbackRouter);
+  app.use('/categories', categoryRouter);
+  app.use('/board/cards', boardRouter);
+  app.use('/board/cards/text', boardTextRouter);
+  app.use('/board/cards/picture', boardPictureRouter);
+  app.use('/board/cards/video', boardVideoRouter);
+  app.use('/board/cards/record', boardRecordRouter);
   app.use('/mypage', mypageRouter);
-  app.use('/friend', friendRouter);
-  app.use('/comment', commentRouter);
+  app.use('/friends', friendRouter);
+  app.use('/comments', commentRouter);
 
   // catch 404 and forward to error handler
   app.use(function (req, res, next) {
