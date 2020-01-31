@@ -10,6 +10,10 @@ const router = express.Router();
 let type = 'video';
 let fileSize = 500 * 1024 * 1024;
 
+<<<<<<< HEAD
+=======
+//게시물 생성
+>>>>>>> editcode_CHOI
 router.post('/', clientIp, isLoggedIn, upload_s3_test(type, fileSize).single('videofile'), async (req, res, next) => {
     try{
         const user_email = req.user.email;
@@ -56,6 +60,10 @@ router.post('/', clientIp, isLoggedIn, upload_s3_test(type, fileSize).single('vi
     }
 });
 
+<<<<<<< HEAD
+=======
+//게시물 수정 (전체)
+>>>>>>> editcode_CHOI
 router.put('/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileSize).single('videofile'), async (req, res, next) => {
     try{
         const user_email = req.user.email;
@@ -116,6 +124,7 @@ router.put('/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileSize).si
     }
 });
 
+//게시물 수정 (영상파일)
 router.patch('/file/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileSize).single('videofile'), async (req, res, next) => {
     try{
         const user_email = req.user.email;

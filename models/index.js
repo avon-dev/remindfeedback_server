@@ -59,12 +59,13 @@ db.User.hasMany(db.Friend, {
   foreignKey:'fk_friendId', targetKey: 'id',
   onDelete: 'CASCADE'
 });
-//feedback 호출시 조언자 정보 반환 위한 관계
+
+//feedback 호출시 조언자 및 작성자 정보 반환 위한 관계
 db.Feedback.belongsTo(db.User, {
-  foreignKey: 'adviser_uid', sourceKey: 'user_uid', as: 'myfeedback'
+  foreignKey: 'adviser_uid', sourceKey: 'user_uid', as: 'adviser'
 });
 db.Feedback.belongsTo(db.User, {
-  foreignKey: 'user_uid', sourceKey: 'user_uid', as: 'yourfeedback'
+  foreignKey: 'user_uid', sourceKey: 'user_uid', as: 'owner'
 });
 
 Object.keys(db).forEach(modelName => {

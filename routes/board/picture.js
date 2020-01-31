@@ -9,6 +9,10 @@ const router = express.Router();
 let type = 'picture';
 let fileSize = 50 * 1024 * 1024;
 
+<<<<<<< HEAD
+=======
+//게시물 생성
+>>>>>>> editcode_CHOI
 router.post('/', clientIp, isLoggedIn, upload_s3_test(type, fileSize).fields([{ name: 'file1' }, { name: 'file2' }, { name: 'file3' }]), async (req, res, next) => {
     try{
         const user_email = req.user.email;
@@ -60,6 +64,10 @@ router.post('/', clientIp, isLoggedIn, upload_s3_test(type, fileSize).fields([{ 
     }
 });
 
+<<<<<<< HEAD
+=======
+//게시물 수정 (전체)
+>>>>>>> editcode_CHOI
 router.put('/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileSize).fields([{ name: 'file1' }, { name: 'file2' }, { name: 'file3' }]), async (req, res, next) => {
     try{
         const user_email = req.user.email;
@@ -131,6 +139,7 @@ router.put('/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileSize).fi
     }
 });
 
+//게시물 수정 (사진파일들)
 router.patch('/files/:board_id', clientIp, isLoggedIn, upload_s3_test(type, fileSize).fields([{ name: 'file1' }, { name: 'file2' }, { name: 'file3' }]), async (req, res, next) => {
     try{
         const user_email = req.user.email;
