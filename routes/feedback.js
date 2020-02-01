@@ -610,7 +610,14 @@ router.put('/:feedback_id', clientIp, isLoggedIn, async (req, res, next) => {
             adviser_uid: tempFeedback.adviser_uid, category: tempFeedback.category, title: tempFeedback.title, write_date: tempFeedback.write_date
         }, { where: { id: feedback_id } })
         //response
-        let data = await Feedback.findOne({ where: { id: feedback_id } })
+        let data = await Feedback.findOne({ 
+            where: { id: feedback_id },
+            include: [{
+                model: User,
+                attributes: ['email', 'nickname', 'portrait'],
+                as: 'adviser'
+            }]
+         })
         let result = {
             success: true,
             data,
@@ -644,7 +651,14 @@ router.patch('/adviser/:feedback_id', clientIp, isLoggedIn, async (req, res, nex
         await Feedback.update({
             adviser_uid: adviser
         }, { where: { id: feedback_id } })
-        const data = await Feedback.findOne({ where: { id: feedback_id } })
+        const data = await Feedback.findOne({ 
+            where: { id: feedback_id },
+            include: [{
+                model: User,
+                attributes: ['email', 'nickname', 'portrait'],
+                as: 'adviser'
+            }]
+        })
         let result = {
             success: true,
             data,
@@ -677,7 +691,14 @@ router.patch('/category/:feedback_id', clientIp, isLoggedIn, async (req, res, ne
         await Feedback.update({
             category: category
         }, { where: { id: feedback_id } })
-        const data = await Feedback.findOne({ where: { id: feedback_id } })
+        const data = await Feedback.findOne({ 
+            where: { id: feedback_id },
+            include: [{
+                model: User,
+                attributes: ['email', 'nickname', 'portrait'],
+                as: 'adviser'
+            }]
+         })
         let result = {
             success: true,
             data: data,
@@ -710,7 +731,14 @@ router.patch('/title/:feedback_id', clientIp, isLoggedIn, async (req, res, next)
         await Feedback.update({
             title
         }, { where: { id: feedback_id } })
-        const data = await Feedback.findOne({ where: { id: feedback_id } })
+        const data = await Feedback.findOne({ 
+            where: { id: feedback_id },
+            include: [{
+                model: User,
+                attributes: ['email', 'nickname', 'portrait'],
+                as: 'adviser'
+            }]
+         })
         let result = {
             success: true,
             data,
@@ -743,7 +771,14 @@ router.patch('/dday/:feedback_id', clientIp, isLoggedIn, async (req, res, next) 
         await Feedback.update({
             write_date
         }, { where: { id: feedback_id } })
-        const data = await Feedback.findOne({ where: { id: feedback_id } })
+        const data = await Feedback.findOne({ 
+            where: { id: feedback_id },
+            include: [{
+                model: User,
+                attributes: ['email', 'nickname', 'portrait'],
+                as: 'adviser'
+            }]
+         })
         let result = {
             success: true,
             data,

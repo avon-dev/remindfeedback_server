@@ -515,7 +515,12 @@ Feedback completion request, feedback completion rejection, feedback completion 
         "confirm": false,
         "createdAt": "2020-01-30T08:03:41.000Z",
         "updatedAt": "2020-01-30T08:03:41.000Z",
-        "deletedAt": null
+        "deletedAt": null,
+        "adviser": {
+            "email": "test@test.com",
+            "nickname": "testnick",
+            "portrait": ""
+        }
     },
     "message": "feedback update 성공"
   }
@@ -582,7 +587,12 @@ Edit feedback adviser
         "confirm": false,
         "createdAt": "2020-01-30T08:03:41.000Z",
         "updatedAt": "2020-01-30T08:03:41.000Z",
-        "deletedAt": null
+        "deletedAt": null,
+        "adviser": {
+            "email": "test@test.com",
+            "nickname": "testnick",
+            "portrait": ""
+        }
     },
     "message": "feedback update 성공"
   }
@@ -651,7 +661,12 @@ Edit feedback category
         "confirm": false,
         "createdAt": "2020-01-30T08:03:41.000Z",
         "updatedAt": "2020-01-30T08:03:41.000Z",
-        "deletedAt": null
+        "deletedAt": null,
+        "adviser": {
+            "email": "test@test.com",
+            "nickname": "testnick",
+            "portrait": ""
+        }
     },
     "message": "feedback update 성공"
   }
@@ -718,7 +733,12 @@ Edit feedback title
         "confirm": false,
         "createdAt": "2020-01-30T08:03:41.000Z",
         "updatedAt": "2020-01-30T08:03:41.000Z",
-        "deletedAt": null
+        "deletedAt": null,
+        "adviser": {
+            "email": "test@test.com",
+            "nickname": "testnick",
+            "portrait": ""
+        }
     },
     "message": "feedback update 성공"
   }
@@ -742,7 +762,7 @@ Edit feedback write_date
 
 * **URL**
 
-  /write_date/(feedback_id)
+  /dday/(feedback_id)
 
 * **Method:**
 
@@ -785,7 +805,12 @@ Edit feedback write_date
         "confirm": false,
         "createdAt": "2020-01-30T08:03:41.000Z",
         "updatedAt": "2020-01-30T08:03:41.000Z",
-        "deletedAt": null
+        "deletedAt": null,
+        "adviser": {
+            "email": "test@test.com",
+            "nickname": "testnick",
+            "portrait": ""
+        }
     },
     "message": "feedback update 성공"
   }
