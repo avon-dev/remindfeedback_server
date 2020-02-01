@@ -5,11 +5,7 @@ const express = require('express');
 const { Board } = require('../../models');
 const router = express.Router();
 
-<<<<<<< HEAD
-
-=======
 //게시물 생성
->>>>>>> editcode_CHOI
 router.post('/', clientIp, isLoggedIn, async (req, res, next) => {
     try{
         const user_email = req.user.email;
