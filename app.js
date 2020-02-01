@@ -128,7 +128,7 @@ if (cluster.isMaster) {
     app.use(helmet());
     app.use(morgan('combined'));
     app.use(cors({
-      origin: true,
+      origin: 'http://remindfeedback.com',
       credentials: true,
     }));
   } else {
@@ -152,6 +152,7 @@ if (cluster.isMaster) {
     cookie: {
       httpOnly: true,
       secure: false,
+      domain: prod && '.remindfeedback.com',
     },
   }));
   // app.use(express.static(path.join(__dirname, 'public')));

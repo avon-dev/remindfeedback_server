@@ -6,14 +6,13 @@
 
 
 ---
-
 **SignUp**
 ----
   클라이언트로부터 JSON 형식의 유저 정보를 받아 새로운 유저 생성 후 생성된 유저의 정보를 JSON 형태로 반환.
 
 * **URL**
 
-  /signup
+  /register
 
 * **Method:**
 
@@ -54,6 +53,7 @@
   }
   ```
 
+---
 **LogIn**
 ----
   
@@ -109,6 +109,7 @@
   }
   ```
 
+---
 **GET User (Me)**
 ----
   로그인 후 본인 정보 get (passport방식).
@@ -163,6 +164,7 @@
 
 
 
+---
 **LogOut**
 ----
   로그인 후 본인 정보 get (passport방식).
@@ -267,3 +269,98 @@
         "message": "회원 탈퇴 실행 과정에서 에러가 발생하였습니다."
     }
     ```
+
+
+----
+**Request find password**
+----
+Send to token with email
+요청시 이메일로 토큰 보내기
+
+* **URL**
+
+  /password
+
+* **Method:**
+
+  `POST`
+  
+*  **URL Params**
+
+   NONE
+
+* **Data Params**
+
+    **Required:**
+ 
+    * `email=[string]` 토큰을 보낼 이메일 주소
+
+    <!--필요한 form field 명시 + 설명-->
+
+
+* **Response:**
+    <details>
+    <summary>Success Response</summary>
+    <div markdown="1">
+  
+  * **Code:** 200 <br />
+
+    이메일로 토큰 보냄
+
+    </div>
+    </details>
+    <details>
+    <summary>Error Response</summary>
+    <div markdown="1">
+
+    <!-- 위에 공백 1줄 두고 이 안에 기존 내용 붙이기 (Code ~ )-->
+    </div>
+    </details>
+
+
+
+----
+**Changing password**
+----
+Changing your password
+
+* **URL**
+
+  /password
+
+* **Method:**
+
+  `PATCH`
+  
+*  **URL Params**
+
+   NONE
+
+* **Data Params**
+
+    **Required:**
+ 
+    * `token=[string]` 이메일로 받은 토큰정보
+    * `password=[string]` 새로운 비밀번호
+
+    <!--필요한 form field 명시 + 설명-->
+
+
+* **Response:**
+    <details>
+    <summary>Success Response</summary>
+    <div markdown="1">
+  
+  * **Code:** 200 <br />
+
+    성공(실패) 메세지
+
+    </div>
+    </details>
+    <details>
+    <summary>Error Response</summary>
+    <div markdown="1">
+
+    <!-- 위에 공백 1줄 두고 이 안에 기존 내용 붙이기 (Code ~ )-->
+    </div>
+    </details>
