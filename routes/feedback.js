@@ -41,12 +41,21 @@ router.post('/', clientIp, isLoggedIn, async (req, res, next) => {
         winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] 피드백 생성 Request`);
         winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] adviser : ${adviser}, category : ${category}, title : ${title}, write_date : ${write_date}`);
 
-        const exFeedback = await Feedback.create({
+        let newFeedback = await Feedback.create({
             user_uid: req.user.user_uid,
             adviser_uid: adviser,
             category,
             title,
             write_date,
+        });
+
+        const exFeedback = await Feedback.findOne({
+            where: { id: newFeedback.id },
+            include: [{
+                model: User,
+                attributes: ['email', 'nickname', 'portrait'],
+                as: 'adviser'
+            }]
         });
 
         let result = {

@@ -384,7 +384,13 @@ Create a Feedback.
           "title": "feedback title",
           "write_date": "2019-12-25T18:25:43.000Z",
           "createdAt": "2020-01-30T08:03:41.741Z",
-          "updatedAt": "2020-01-30T08:03:41.741Z"
+          "updatedAt": "2020-01-30T08:03:41.741Z",
+          "deletedAt": null,
+          "adviser": {
+              "email": "test@test.com",
+              "nickname": "testnick",
+              "portrait": "portrait-1576497442442.jpg"
+          }
       },
       "message": "피드백 생성 완료"
   }
