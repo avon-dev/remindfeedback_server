@@ -34,7 +34,7 @@ let fileSize = 50 * 1024 * 1024;
 // Auth CRUD API
 
 // 회원가입
-router.post('/signup', clientIp, async (req, res, next) => {
+router.post('/register', clientIp, async (req, res, next) => {
     try {
         const { email, nickname, password } = req.body;
 
