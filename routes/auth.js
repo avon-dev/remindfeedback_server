@@ -233,6 +233,8 @@ router.post('/login', clientIp, async (req, res, next) => {
                 let json_user = {
                     email: user.email,
                     nickname: user.nickname,
+                    portrait: user.portrait,
+                    introduction: user.introduction,
                     tutorial: user.tutorial,
                 }
 

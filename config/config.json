@@ -10,7 +10,7 @@
       "charset": "utf8mb4",
       "multipleStatements": true
     },
-    "operatorsAliases": false
+    "operatorsAliases": 0
   },
   "test": {
     "username": "root",
@@ -22,7 +22,7 @@
       "charset": "utf8mb4",
       "multipleStatements": true
     },
-    "operatorsAliases": false
+    "operatorsAliases": 0
   },
   "production": {
     "username": "root",
