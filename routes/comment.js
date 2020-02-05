@@ -2,7 +2,7 @@ const winston = require('../config/winston');
 const { clientIp, isLoggedIn, isNotLoggedIn } = require('./middlewares');
 
 const express = require('express');
-const { User, Feedback, Board, Comment } = require('../models');
+const { User, Feedback, Board, Comment, Sequelize: { Op } } = require('../models');
 const router = express.Router();
 
 let result = { // response form
@@ -15,9 +15,15 @@ let result = { // response form
  * - parameter user_id : 로그인 한 회원 uuid
  * - parameter friend_id : 친구 추가할 회원 uuid
  */
-router.get('/all/:board_id', clientIp, isLoggedIn, async(req, res, next)=>{
+router.get('/all/scroll/:board_id/:lastid', clientIp, isLoggedIn, async(req, res, next)=>{
     const user_email = req.user.email;
     const board_id = parseInt(req.params.board_id);
+    let lastid = parseInt(req.params.lastid);
+
+    // if (lastid === 0) {
+    //     lastid = 9999;
+    // }
+    // 댓글은 최초 작성된 댓글이 가장 위에 오는 오름차순 정렬 -> lastid 보다 큰 것들을 불러옴
 
     winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] 게시물의 전체 댓글 목록 Request`);
     winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] board_id : ${board_id}`);
@@ -32,20 +38,104 @@ router.get('/all/:board_id', clientIp, isLoggedIn, async(req, res, next)=>{
             return res.status(200).json(result);
         }
         await Comment.findAll({
-            where:{fk_board_id: board_id},
+            where: { id: { [Op.gt]: lastid } , fk_board_id: board_id},
+            order: [['id']], 
+            limit: 10,
             include: [{ // 댓글 작성자의 nickname, portrait 정보 가져오기
                 model: User,
                 attributes: ['email', 'nickname', 'portrait'],
             }],
-            paranoid: false // 삭제된 데이터도 반환
         }).then(comments=>{
             if(comments){
                 if(comments[0]){
                     result.message = "해당 게시물의 전체 댓글 조회 성공";
                     result.data = comments;
                 }else{
-                    result.message = "해당 게시물에 댓글이 없습니다.";
+                    result.message = "더 이상 불러올 댓글이 없습니다."
+                    if(lastid===0){
+                        result.message = "해당 게시물에 댓글이 없습니다.";
+                    }
                     result.data = '';
+                }
+                result.success = true;
+                winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
+                return res.status(200).json(result);
+            }else{
+                result.success = false;
+                result.message = "해당 게시물의 전체 댓글 조회 실패";
+                winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
+                return res.status(200).json(result);
+            }
+        });
+    }catch(e){
+        winston.log('error', `[COMMENT][${req.clientIp}|${req.user.email}] 게시물의 전체 댓글 목록 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[COMMENT][${req.clientIp}|${req.body.email}] ${result.message}`);
+        res.status(500).send(result);
+        return next(e);
+    }
+});
+
+/* get all comment = 전체 댓글보기가 곧 해당 게시물 보기와 같음.
+ * - parameter user_id : 로그인 한 회원 uuid
+ * - parameter friend_id : 친구 추가할 회원 uuid
+ */
+router.get('/all/page/:board_id/:page/:countPerPage', clientIp, isLoggedIn, async(req, res, next)=>{
+    const user_email = req.user.email;
+    const board_id = req.params.board_id;
+    let page = parseInt(req.params.page)
+    let countPerPage = 10;
+    if(parseInt(req.params.countPerPage)!=0) countPerPage = parseInt(req.params.countPerPage)
+    
+
+    winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] 게시물의 전체 댓글 목록 Request`);
+    winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] board_id : ${board_id}, page : ${page}, countPerPage : ${countPerPage}`);
+
+    result.data = '';
+    try{
+        const exBoard = await Board.findOne({where:{id: board_id}})
+        if(!exBoard){
+            result.success = false;
+            result.message = "존재하지 않는 게시물의 댓글은 조회할 수 없습니다.";
+            winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
+            return res.status(200).json(result);
+        }
+        await Comment.count({
+            where:{fk_board_id: board_id},
+        }).then(count=>{
+            if(count == 0){
+                result.success = true;
+                result.message = "해당 게시물에 댓글이 없습니다.";
+                result.data = '';
+                winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
+                return res.status(200).json(result);
+            }
+            // 총 페이지 수 반환
+            result.count = Math.ceil(count/countPerPage);
+        })
+        // 페이지 0 이하면 1페이지로 간주
+        if(page<1) page = 1;
+        // 페이지 범위 초과 시 가장 마지막 페이지로 간주
+        if(page>result.count) page = result.count;
+        let startNum = 1 + countPerPage*(page-1);
+
+        await Comment.findAll({
+            where:{fk_board_id: board_id},
+            include: [{ // 댓글 작성자의 nickname, portrait 정보 가져오기
+                model: User,
+                attributes: ['email', 'nickname', 'portrait'],
+            }],
+            offset: startNum,
+            limit: countPerPage,
+        }).then(comments=>{
+            if(comments){
+                if(comments[0]){
+                    result.message = "해당 게시물의 전체 댓글 조회 성공";
+                    result.data = comments;
                 }
                 result.success = true;
                 winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
