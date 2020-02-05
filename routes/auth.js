@@ -370,14 +370,14 @@ router.post('/password', clientIp, async (req, res, next) => {
             result.success = true;
             result.data = exuser;
             result.message = '토큰을 생성하여 이메일로 발신했습니다.';
-            winston.log('info', `[AUTH][${req.clientIp}|${user_email}] ${JSON.stringify(result)} ${token}`);
+            winston.log('info', `[AUTH][${req.clientIp}|${user_email}] ${result.message} ${token}`);
             return res.status(200).send(result);
         }).catch(error => {
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
             result.message = '잘못된 이메일 입니다.';
-            winston.log('info', `[AUTH][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            winston.log('info', `[AUTH][${req.clientIp}|${user_email}] ${result.message}`);
             return res.status(200).send(result);
         })
         
@@ -388,7 +388,7 @@ router.post('/password', clientIp, async (req, res, next) => {
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[AUTH][${req.clientIp}|${req.user.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[AUTH][${req.clientIp}|${req.user.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -426,7 +426,7 @@ router.patch('/password', clientIp, async (req, res, next) => {
             result.success = true;
             result.data = 'NONE';
             result.message = '비밀번호를 변경하였습니다 다시 로그인해주세요.';
-            winston.log('info', `[AUTH][${req.clientIp}|] ${JSON.stringify(result)}`);
+            winston.log('info', `[AUTH][${req.clientIp}|] ${result.message}`);
             return await res.status(200).send(result);
         }).catch(async e => {
             console.error(e);
@@ -434,7 +434,7 @@ router.patch('/password', clientIp, async (req, res, next) => {
             result.success = false;
             result.data = 'NONE';
             result.message = '유효한 토큰이 아닙니다.';
-            winston.log('info', `[AUTH][${req.clientIp}|] ${JSON.stringify(result)}`);
+            winston.log('info', `[AUTH][${req.clientIp}|] ${result.message}`);
             return res.status(200).send(result);
         })
         
@@ -445,7 +445,7 @@ router.patch('/password', clientIp, async (req, res, next) => {
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[AUTH][${req.clientIp}] ${JSON.stringify(result)}`);
+        winston.log('error', `[AUTH][${req.clientIp}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }

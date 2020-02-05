@@ -17,9 +17,9 @@ exports.isLoggedIn = (req, res, next) => {
         let result ={ 
           success: false,
           data: '',
-          massage: '로그인 요망'
+          message: '로그인 요망'
         }
-        winston.log('info', `[isLoggedIn][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        winston.log('info', `[isLoggedIn][${req.clientIp}|${req.body.email}] ${result.message}`);
         res.status(200).send(result);
       }
     };
@@ -33,9 +33,9 @@ exports.isNotLoggedIn = (req, res, next) => {
       let result ={
         success: false,
         data: '',
-        massage: '로그아웃 요망'
+        message: '로그아웃 요망'
       }
-      winston.log('info', `[isNotLoggedIn][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+      winston.log('info', `[isNotLoggedIn][${req.clientIp}|${req.body.email}] ${result.message}`);
       res.status(200).send(result);
     }
 };

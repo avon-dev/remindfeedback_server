@@ -66,12 +66,12 @@ router.post('/', clientIp, isLoggedIn, async (req, res, next) => {
 
         if (exFeedback) {
             result.data = exFeedback
-            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
             res.status(201).json(result);
         } else {
             result.success = false;
             result.message = '피드백이 생성되지 않았습니다.';
-            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
             return res.status(200).json(result);
         }
 
@@ -82,7 +82,7 @@ router.post('/', clientIp, isLoggedIn, async (req, res, next) => {
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -108,7 +108,7 @@ router.patch('/request/:feedback_id', clientIp, isLoggedIn, async (req, res, nex
         if (!beforeFeedback) {
             result.success = false;
             result.message = '피드백이 존재하지 않습니다';
-            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
             return res.status(200).json(result);
         }
 
@@ -120,12 +120,12 @@ router.patch('/request/:feedback_id', clientIp, isLoggedIn, async (req, res, nex
 
         if (exFeedback) {
             result.data = exFeedback
-            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
             res.status(200).json(result);
         } else {
             result.success = false;
             result.message = '존재하지 않는 피드백 입니다.';
-            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
             return res.status(200).json(result);
         }
 
@@ -136,7 +136,7 @@ router.patch('/request/:feedback_id', clientIp, isLoggedIn, async (req, res, nex
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -162,7 +162,7 @@ router.patch('/rejection/:feedback_id', clientIp, isLoggedIn, async (req, res, n
         if (!beforeFeedback) {
             result.success = false;
             result.message = '피드백이 존재하지 않습니다';
-            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
             return res.status(200).json(result);
         }
 
@@ -174,12 +174,12 @@ router.patch('/rejection/:feedback_id', clientIp, isLoggedIn, async (req, res, n
 
         if (exFeedback) {
             result.data = exFeedback
-            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
             res.status(200).json(result);
         } else {
             result.success = false;
             result.message = '존재하지 않는 피드백 입니다.';
-            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
             return res.status(200).json(result);
         }
 
@@ -190,7 +190,7 @@ router.patch('/rejection/:feedback_id', clientIp, isLoggedIn, async (req, res, n
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -216,7 +216,7 @@ router.patch('/approval/:feedback_id', clientIp, isLoggedIn, async (req, res, ne
         if (!beforeFeedback) {
             result.success = false;
             result.message = '피드백이 존재하지 않습니다';
-            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
             return res.status(200).json(result);
         }
 
@@ -228,12 +228,12 @@ router.patch('/approval/:feedback_id', clientIp, isLoggedIn, async (req, res, ne
 
         if (exFeedback) {
             result.data = exFeedback;
-            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
             res.status(200).json(result);
         } else {
             result.success = false;
             result.message = '존재하지 않는 피드백 입니다.';
-            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
             return res.status(200).json(result);
         }
 
@@ -244,7 +244,7 @@ router.patch('/approval/:feedback_id', clientIp, isLoggedIn, async (req, res, ne
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -304,7 +304,7 @@ router.get('/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
             data: feedbackList,
             message: ""
         }
-        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
     } catch (e) {
         winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 피드백 목록 조회 Exception`);
@@ -313,7 +313,7 @@ router.get('/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -373,7 +373,7 @@ router.get('/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next) => {
             data: feedbackList,
             message: ""
         }
-        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
     } catch (e) {
         winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 피드백 목록(제한) 조회 Exception`);
@@ -382,7 +382,7 @@ router.get('/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next) => {
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -426,7 +426,7 @@ router.get('/mine/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
                 contact.category = data
             });
         })
-        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
     } catch (e) {
         winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 내가 만든 피드백 목록 조회 Exception`);
@@ -435,7 +435,7 @@ router.get('/mine/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -480,7 +480,7 @@ router.get('/mine/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next) 
                 contact.category = data
             });
         });
-        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
     } catch (e) {
         winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 내가 만든 피드백 목록(제한) 조회 Exception`);
@@ -489,7 +489,7 @@ router.get('/mine/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next) 
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -524,7 +524,7 @@ router.get('/yoursa/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
             data: yourFeedback,
             message: "내가 조언자인 피드백 목록"
         }
-        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
     } catch (e) {
         winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 내가 조언자인 피드백 목록 조회 Exception`);
@@ -533,7 +533,7 @@ router.get('/yoursa/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -569,7 +569,7 @@ router.get('/yours/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next)
             data: yourFeedback,
             message: "내가 조언자인 피드백 목록"
         }
-        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
     } catch (e) {
         winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 내가 조언자인 피드백 목록(제한) 조회  Exception`);
@@ -578,7 +578,7 @@ router.get('/yours/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next)
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -632,7 +632,7 @@ router.put('/:feedback_id', clientIp, isLoggedIn, async (req, res, next) => {
             data,
             message: 'feedback update 성공'
         }
-        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
     } catch (e) {
         winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 피드백 수정 Exception`);
@@ -641,7 +641,7 @@ router.put('/:feedback_id', clientIp, isLoggedIn, async (req, res, next) => {
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -673,7 +673,7 @@ router.patch('/adviser/:feedback_id', clientIp, isLoggedIn, async (req, res, nex
             data,
             message: 'feedback update 성공'
         }
-        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
     } catch (e) {
         winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 피드백 조언자 수정 Exception`);
@@ -682,7 +682,7 @@ router.patch('/adviser/:feedback_id', clientIp, isLoggedIn, async (req, res, nex
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -713,7 +713,7 @@ router.patch('/category/:feedback_id', clientIp, isLoggedIn, async (req, res, ne
             data: data,
             message: 'feedback update 성공'
         }
-        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
     } catch (e) {
         winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 피드백 카테고리 수정 Exception`);
@@ -722,7 +722,7 @@ router.patch('/category/:feedback_id', clientIp, isLoggedIn, async (req, res, ne
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -753,7 +753,7 @@ router.patch('/title/:feedback_id', clientIp, isLoggedIn, async (req, res, next)
             data,
             message: 'feedback update 성공'
         }
-        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
     } catch (e) {
         winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 피드백 제목 수정 Exception`);
@@ -762,7 +762,7 @@ router.patch('/title/:feedback_id', clientIp, isLoggedIn, async (req, res, next)
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -793,7 +793,7 @@ router.patch('/dday/:feedback_id', clientIp, isLoggedIn, async (req, res, next) 
             data,
             message: 'feedback update 성공'
         }
-        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
     } catch (e) {
         winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 피드백 날짜 수정 Exception`);
@@ -802,7 +802,7 @@ router.patch('/dday/:feedback_id', clientIp, isLoggedIn, async (req, res, next) 
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
@@ -833,7 +833,7 @@ router.delete('/:feedback_id', clientIp, isLoggedIn, async (req, res, next) => {
                 result.success = false;
                 result.data = 'NONE';
                 result.message = '피드백을 찾을 수 없습니다.';
-                winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+                winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
                 return res.status(200).send(result);
             } else {
                 // 피드백 테이블에서 피드백 검색에 성공한 경우
@@ -843,7 +843,7 @@ router.delete('/:feedback_id', clientIp, isLoggedIn, async (req, res, next) => {
                     result.success = false;
                     result.data = 'NONE';
                     result.message = '내가 작성한 피드백이 아닙니다.';
-                    winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+                    winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
                     return res.status(200).send(result);
                 } else {
                     // 본인이 작성한 피드백인 경우
@@ -891,7 +891,7 @@ router.delete('/:feedback_id', clientIp, isLoggedIn, async (req, res, next) => {
                         result.success = true;
                         result.data = feedback_id;
                         result.message = '성공적으로 피드백을 삭제했습니다.';
-                        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+                        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
                         return res.status(200).send(result);
                     }).catch(error => {
                         // 삭제 쿼리 실행을 실패한 경우
@@ -901,7 +901,7 @@ router.delete('/:feedback_id', clientIp, isLoggedIn, async (req, res, next) => {
                         result.success = false;
                         result.data = 'NONE';
                         result.message = '피드백 삭제 실행 과정에서 에러가 발생하였습니다.';
-                        winston.log('error', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+                        winston.log('error', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
                         return res.status(500).send(result);
                     });
                 }
@@ -914,7 +914,7 @@ router.delete('/:feedback_id', clientIp, isLoggedIn, async (req, res, next) => {
             result.success = false;
             result.data = 'NONE';
             result.message = '피드백 조회 과정에서 에러가 발생하였습니다.';
-            winston.log('error', `[FEEDBACK][${req.clientIp}|${user_email}] ${JSON.stringify(result)}`);
+            winston.log('error', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
             return res.status(500).send(result);
         });
     } catch (e) {
@@ -924,7 +924,7 @@ router.delete('/:feedback_id', clientIp, isLoggedIn, async (req, res, next) => {
         result.success = false;
         result.data = 'NONE';
         result.message = 'INTERNAL SERVER ERROR';
-        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${JSON.stringify(result)}`);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.body.email}] ${result.message}`);
         res.status(500).send(result);
         return next(e);
     }
