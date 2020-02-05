@@ -15,12 +15,16 @@ let result = { // response form
  * - parameter user_id : 로그인 한 회원 uuid
  * - parameter friend_id : 친구 추가할 회원 uuid
  */
-router.get('/all/:board_id', clientIp, isLoggedIn, async(req, res, next)=>{
+router.get('/all/:board_id/:page/:countPerPage', clientIp, isLoggedIn, async(req, res, next)=>{
     const user_email = req.user.email;
-    const board_id = parseInt(req.params.board_id);
+    const board_id = req.params.board_id;
+    const page = parseInt(req.params.page)
+    let countPerPage = 10;
+    if(parseInt(req.params.countPerPage)!=0) countPerPage = parseInt(req.params.countPerPage)
+    let startNum = 1 + countPerPage*(page-1);
 
     winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] 게시물의 전체 댓글 목록 Request`);
-    winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] board_id : ${board_id}`);
+    winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] board_id : ${board_id}, page : ${page}, countPerPage : ${countPerPage}`);
 
     result.data = '';
     try{
@@ -37,15 +41,13 @@ router.get('/all/:board_id', clientIp, isLoggedIn, async(req, res, next)=>{
                 model: User,
                 attributes: ['email', 'nickname', 'portrait'],
             }],
-            paranoid: false // 삭제된 데이터도 반환
+            offset: startNum,
+            limit: countPerPage,
         }).then(comments=>{
             if(comments){
                 if(comments[0]){
                     result.message = "해당 게시물의 전체 댓글 조회 성공";
                     result.data = comments;
-                }else{
-                    result.message = "해당 게시물에 댓글이 없습니다.";
-                    result.data = '';
                 }
                 result.success = true;
                 winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
