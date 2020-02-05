@@ -32,7 +32,7 @@ router.get('/:board_id', clientIp, async (req, res, next) => {
     let result = {
         success: true,
         data: '',
-        message: ""
+        message: "게시글 조회 성공"
     }
 
     try {
@@ -87,7 +87,7 @@ router.get('/:feedbackid/:lastid', clientIp, isLoggedIn, async (req, res, next) 
         let result = {
             success: true,
             data: boardList,
-            message: ""
+            message: "게시글 목록 조회 성공"
         }
         winston.log('info', `[BOARD|ALL][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
@@ -129,7 +129,7 @@ router.get('/:feedbackid/:lastid/:limit', clientIp, isLoggedIn, async (req, res,
         let result = {
             success: true,
             data: boardList,
-            message: ""
+            message: "게시글 목록(제한) 조회 성공"
         }
         winston.log('info', `[BOARD|ALL][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
@@ -274,7 +274,7 @@ router.patch('/board_title/:board_id', clientIp, isLoggedIn, async (req, res, ne
         let result = {
             success: true,
             data,
-            message: 'board update 성공'
+            message: '게시글 제목 수정 성공'
         }
         winston.log('info', `[BOARD|ALL][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
@@ -307,7 +307,7 @@ router.patch('/board_content/:board_id', clientIp, isLoggedIn, async (req, res, 
         let result = {
             success: true,
             data,
-            message: 'board update 성공'
+            message: '게시글 내용 수정 성공'
         }
         winston.log('info', `[BOARD|ALL][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);

@@ -302,7 +302,7 @@ router.get('/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
         let result = {
             success: true,
             data: feedbackList,
-            message: ""
+            message: "피드백 목록 조회 성공"
         }
         winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
@@ -371,7 +371,7 @@ router.get('/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next) => {
         let result = {
             success: true,
             data: feedbackList,
-            message: ""
+            message: "피드백 목록(제한) 조회 성공"
         }
         winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
@@ -400,7 +400,7 @@ router.get('/mine/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
         let result = {
             success: true,
             data: '',
-            message: "내가 만든 피드백 목록"
+            message: "내가 만든 피드백 목록 조회 성공"
         }
 
         if (lastid === 0) {
@@ -454,7 +454,7 @@ router.get('/mine/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next) 
         let result = {
             success: true,
             data: '',
-            message: "내가 만든 피드백 목록"
+            message: "내가 만든 피드백 목록(제한) 조회 성공"
         }
 
         if (lastid === 0) {
@@ -522,7 +522,7 @@ router.get('/yoursa/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
         let result = {
             success: true,
             data: yourFeedback,
-            message: "내가 조언자인 피드백 목록"
+            message: "내가 조언자인 피드백 목록 조회 성공"
         }
         winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
@@ -567,7 +567,7 @@ router.get('/yours/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next)
         let result = {
             success: true,
             data: yourFeedback,
-            message: "내가 조언자인 피드백 목록"
+            message: "내가 조언자인 피드백 목록(제한) 조회 성공"
         }
         winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
@@ -591,7 +591,7 @@ router.put('/:feedback_id', clientIp, isLoggedIn, async (req, res, next) => {
         const feedback_id = req.params.feedback_id;
         const { adviser, category, title, write_date } = req.body;
 
-        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] 피드백 생성 Request`);
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] 피드백 전체수정 Request`);
         winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] feedback_id : ${feedback_id}, adviser : ${adviser}, category : ${category}, title : ${title}, write_date : ${write_date}`);
 
         const beforeFeedback = await Feedback.findOne({
@@ -630,12 +630,12 @@ router.put('/:feedback_id', clientIp, isLoggedIn, async (req, res, next) => {
         let result = {
             success: true,
             data,
-            message: 'feedback update 성공'
+            message: '피드백 전체수정 성공'
         }
         winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
     } catch (e) {
-        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 피드백 수정 Exception`);
+        winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 피드백 전체수정 Exception`);
 
         const result = new Object();
         result.success = false;
@@ -671,7 +671,7 @@ router.patch('/adviser/:feedback_id', clientIp, isLoggedIn, async (req, res, nex
         let result = {
             success: true,
             data,
-            message: 'feedback update 성공'
+            message: '피드백 조언자 수정 성공'
         }
         winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
@@ -711,7 +711,7 @@ router.patch('/category/:feedback_id', clientIp, isLoggedIn, async (req, res, ne
         let result = {
             success: true,
             data: data,
-            message: 'feedback update 성공'
+            message: '피드백 카테고리 수정 성공'
         }
         winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
@@ -734,7 +734,7 @@ router.patch('/title/:feedback_id', clientIp, isLoggedIn, async (req, res, next)
         const feedback_id = req.params.feedback_id;
         const title = req.body.title;
 
-        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] 피드백 카테고리 수정 Request`);
+        winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] 피드백 제목 수정 Request`);
         winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] feedback_id : ${feedback_id}, title : ${title}`);
 
         await Feedback.update({
@@ -751,7 +751,7 @@ router.patch('/title/:feedback_id', clientIp, isLoggedIn, async (req, res, next)
         let result = {
             success: true,
             data,
-            message: 'feedback update 성공'
+            message: '피드백 제목 수정 성공'
         }
         winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
@@ -791,7 +791,7 @@ router.patch('/dday/:feedback_id', clientIp, isLoggedIn, async (req, res, next) 
         let result = {
             success: true,
             data,
-            message: 'feedback update 성공'
+            message: '피드백 날짜 수정 성공'
         }
         winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
