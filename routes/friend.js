@@ -481,11 +481,11 @@ router.get('/', clientIp, isLoggedIn, async function (req, res, next) {
             '(' +
             'SELECT id, friend_uid, type ' +
             'FROM friends ' +
-            'WHERE user_uid=:user_uid AND (type=2 OR type=4) ' +
+            'WHERE user_uid=:user_uid AND (type=2 OR type=4) AND deletedAt IS NULL ' +
             'UNION ' +
             'SELECT id, user_uid, type ' +
             'FROM friends ' +
-            'WHERE friend_uid=:user_uid AND (type=2 OR type=3)' +
+            'WHERE friend_uid=:user_uid AND (type=2 OR type=3)AND deletedAt IS NULL' +
             ') AS f ' +
             'WHERE u.user_uid=f.friend_uid ' +
             'ORDER BY u.nickname ASC';
@@ -551,11 +551,11 @@ router.get('/adviser', clientIp, isLoggedIn, async function (req, res, next) {
             '(' +
             'SELECT id, friend_uid, type ' +
             'FROM friends ' +
-            'WHERE user_uid=:user_uid AND type=2 ' +
+            'WHERE user_uid=:user_uid AND type=2 AND deletedAt IS NULL ' +
             'UNION ' +
             'SELECT id, user_uid, type ' +
             'FROM friends ' +
-            'WHERE friend_uid=:user_uid AND type=2' +
+            'WHERE friend_uid=:user_uid AND type=2 AND deletedAt IS NULL' +
             ') AS f ' +
             'WHERE u.user_uid=f.friend_uid ' +
             'ORDER BY u.nickname ASC';
@@ -622,7 +622,7 @@ router.get('/transmission', clientIp, isLoggedIn, async function (req, res, next
             'FROM users AS u, (' +
             'SELECT id, friend_uid, type ' +
             'FROM friends ' +
-            'WHERE user_uid=:user_uid AND (type=0 OR type=1) ' +
+            'WHERE user_uid=:user_uid AND (type=0 OR type=1) AND deletedAt IS NULL ' +
             ') AS f ' +
             'WHERE u.user_uid=f.friend_uid ' +
             'ORDER BY u.nickname ASC';
@@ -687,7 +687,7 @@ router.get('/reception', clientIp, isLoggedIn, async function (req, res, next) {
             'FROM users AS u, (' +
             'SELECT id, user_uid, type ' +
             'FROM friends ' +
-            'WHERE friend_uid=:user_uid AND type=1' +
+            'WHERE friend_uid=:user_uid AND type=1 AND deletedAt IS NULL' +
             ') AS f ' +
             'WHERE u.user_uid=f.user_uid ' +
             'ORDER BY u.nickname ASC';
@@ -752,11 +752,11 @@ router.get('/block', clientIp, isLoggedIn, async function (req, res, next) {
             'FROM users AS u, (' +
             'SELECT id, friend_uid, type ' +
             'FROM friends ' +
-            'WHERE user_uid=:user_uid AND (type=3 OR type=5) ' +
+            'WHERE user_uid=:user_uid AND (type=3 OR type=5) AND deletedAt IS NULL ' +
             'UNION ' +
             'SELECT id, user_uid, type ' +
             'FROM friends ' +
-            'WHERE friend_uid=:user_uid AND (type=4 OR type=5)' +
+            'WHERE friend_uid=:user_uid AND (type=4 OR type=5) AND deletedAt IS NULL' +
             ') AS f ' +
             'WHERE u.user_uid=f.friend_uid ' +
             'ORDER BY u.nickname ASC';
