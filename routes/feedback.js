@@ -425,9 +425,9 @@ router.get('/mine/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
                 // console.log(data, contact.category);
                 contact.category = data
             });
-        })
+        });
         winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
-        res.status(200).json(result);
+        await res.status(200).json(result);
     } catch (e) {
         winston.log('error', `[FEEDBACK][${req.clientIp}|${req.user.email}] 내가 만든 피드백 목록 조회 Exception`);
 
@@ -474,12 +474,12 @@ router.get('/mine/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next) 
                 as: 'adviser'
             }]
         });
-        await result.data.map((contact) => {
+        await Promise.all(result.data.map((contact) => {
             findCategory(contact.category, category).then((data) => {
-                // console.log(data, contact.category);
+                console.log(data, contact.category);
                 contact.category = data
             });
-        });
+        }))
         winston.log('info', `[FEEDBACK][${req.clientIp}|${user_email}] ${result.message}`);
         res.status(200).json(result);
     } catch (e) {
