@@ -16,7 +16,7 @@
 ---
 **GET All Feedback**
 ----
-  Returns json data about myfeedback and yourfeedback
+  Returns json data about myfeedback and yourfeedback</br>
   나의 피드백목록, 내가 조언자인 피드백 목록을 반환.
 
 * **URL**
@@ -152,7 +152,7 @@
 ----
 **GET My Feedback**
 ----
-  Returns json data about myfeedbacks.
+  Returns json data about myfeedbacks.</br>
   내가 작성한 피드백 목록 반환.
 
 * **URL**
@@ -246,7 +246,7 @@
 ----
 **GET Your Feedback**
 ----
-  Returns json data about yourfeedbacks.
+  Returns json data about yourfeedbacks.</br>
   내가 조언자인 피드백 목록을 반환.
 
 * **URL**
@@ -408,7 +408,7 @@ Create a Feedback.
 ----
 **Complete Feedback**
 ----
-Feedback completion request, feedback completion rejection, feedback completion acceptance 
+Feedback completion request, feedback completion rejection, feedback completion acceptance </br>
 피드백 완료 요청, 피드백 완료 거절, 피드백 완료 수락
 
 * **URL**
@@ -470,7 +470,7 @@ Feedback completion request, feedback completion rejection, feedback completion 
 ----
 **Update Feedback All**
 ----
-  Edit entire item of feedback
+  Edit entire item of feedback</br>
   피드백 수정
 
 * **URL**
@@ -545,7 +545,7 @@ Feedback completion request, feedback completion rejection, feedback completion 
 ----
 **Update Feedback adviser**
 ----
-Edit feedback adviser
+Edit feedback adviser</br>
 피드백 조언자 수정
 
 * **URL**
@@ -619,7 +619,7 @@ Edit feedback adviser
 ----
 **Update Feedback category**
 ----
-Edit feedback category
+Edit feedback category</br>
 피드백 카테고리 수정
 
 * **URL**
@@ -692,7 +692,7 @@ Edit feedback category
 ----
 **Update Feedback title**
 ----
-Edit feedback title
+Edit feedback title</br>
 피드백 제목 수정
 
 * **URL**
@@ -763,7 +763,7 @@ Edit feedback title
 ----
 **Update Feedback write Date**
 ----
-Edit feedback write_date
+Edit feedback write_date</br>
 피드백 받은 날짜 수정
 
 * **URL**

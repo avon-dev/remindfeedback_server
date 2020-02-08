@@ -111,15 +111,15 @@ Create a comment to a single post.
 
 
 ---
-**Show all comments of a single post**
+**Show all comments of a single post with infinity scroll**
 ----
 게시물 하나의 모든 댓글 보기. 댓글 객체 정보 + user의 nickname, portrait 정보 반환함. data 안 user 속성으로 접근할 수 있음.
-Show all comments of a single post. Return full data of the comments and user's nickname, portrait.
+Show all comments of a single post with infinity scroll. Return full data of the comments and user's email, nickname, portrait.
 
 * **URL**
 
-  /all/:board_id
-  >*변경됨: `/comment/selectall/:board_id` -> `/comments/all/:board_id`*
+  /all/scroll/:board_id/:lastid
+  >*변경됨: `/comment/selectall/:board_id` -> `/comments/all/scroll/:board_id/:lastid`*
   
 
 * **Method:**
@@ -129,6 +129,8 @@ Show all comments of a single post. Return full data of the comments and user's 
 *  **URL Params**
 
    * `board_id=[integer]` 게시물 번호(ID)
+   * `lastid=[integer]` 마지막 (가장 아래의) 댓글 번호(ID)
+        > 댓글은 최초 작성된 댓글이 가장 위에 오는 오름차순 정렬 -> lastid 보다 큰 것들을 불러옴
 
 * **Data Params**
 
@@ -196,6 +198,126 @@ Show all comments of a single post. Return full data of the comments and user's 
                 }
             ],
             "message": "해당 게시물의 전체 댓글 조회 성공"
+        }
+        ```
+
+      * **Code:** 200
+        **Content:** 조회 요청했으나 댓글이 하나도 없을 때<br/>
+
+        * **Sample request JSON data:**
+        ```json
+            {
+                "success": true,
+                "data": "",
+                "message": "해당 게시물에 댓글이 없습니다."
+            }
+        ```
+
+        **Content:** 조회 요청했으나 더 이상 불러올 댓글이 하나도 없을 때<br/>
+
+        * **Sample request JSON data:**
+        ```json
+            {
+                "success": true,
+                "data": "",
+                "message": "더 이상 불러올 댓글이 없습니다."
+            }
+        ```
+    </div>
+    </details>
+
+    <details>
+    <summary>Error Response</summary>
+    <div markdown="1">
+
+    * **Code:** 존재하지 않는 게시물의 댓글들을 조회하려고 할 때<br/>
+        **Content:** 
+        ```json
+            {
+                "success": false,
+                "data": "",
+                "message": "존재하지 않는 게시물의 댓글은 조회할 수 없습니다."
+            }
+        ```
+
+    </div>
+    </details>
+
+---
+**Show all comments of a single post with pages**
+----
+페이지로 게시물 하나의 모든 댓글 보기. 총 페이지 수(result.count) + 댓글 객체 정보(result.data) + user의 email, nickname, portrait 정보 반환함. data 안 user 속성으로 접근할 수 있음.
+Show all comments of a single post with pages. Return the number of total pages, full data of the comments and user's email, nickname, portrait.
+
+* **URL**
+
+  /all/page/:board_id/:page/:countPerPage
+  >*변경됨: `/comment/selectall/:board_id` -> `/comments/all/page/:board_id/:page/:countPerPage`*
+  
+
+* **Method:**
+
+  `GET`
+  
+*  **URL Params**
+
+   * `board_id=[integer]` 게시물 번호(ID)
+   * `page=[integer]` 페이지 번호
+        > 페이지 0 이하면 1페이지로 간주하고 페이지 범위 초과 시 가장 마지막 페이지로 간주함
+   * `countPerPage=[integer]` 한 페이지 당 보여 줄 객체 수
+
+* **Data Params**
+
+    None
+
+* **Response:**
+
+    <details>
+    <summary>Success Response</summary>
+    <div markdown="1">
+
+    * **Code:** 200
+        **Content:** 해당 게시물의 모든 댓글 및 총 페이지 수(count) 불러오기<br/>
+
+        * **Sample response JSON data:**
+
+        ```json
+        {
+            "success": true,
+            "data": [
+                {
+                    "id": 10,
+                    "comment_content": "test_by2",
+                    "confirm": false,
+                    "createdAt": "2020-02-05T09:18:41.000Z",
+                    "updatedAt": "2020-02-05T09:18:41.000Z",
+                    "deletedAt": null,
+                    "fk_user_uid": "$2b$12$IeUzBAMlvYWhLeKUM0LgLeyeCQa2c/1mbyCWiI89e8DHxwpaU78Qa",
+                    "fk_board_id": 15,
+                    "user": {
+                        "email": "1",
+                        "nickname": "aa",
+                        "portrait": ""
+                    }
+                },
+                {
+                    "id": 11,
+                    "comment_content": "test_by2",
+                    "confirm": false,
+                    "createdAt": "2020-02-05T09:18:42.000Z",
+                    "updatedAt": "2020-02-05T09:18:42.000Z",
+                    "deletedAt": null,
+                    "fk_user_uid": "$2b$12$IeUzBAMlvYWhLeKUM0LgLeyeCQa2c/1mbyCWiI89e8DHxwpaU78Qa",
+                    "fk_board_id": 15,
+                    "user": {
+                        "email": "1",
+                        "nickname": "aa",
+                        "portrait": ""
+                    }
+                }
+            ],
+            "message": "해당 게시물의 전체 댓글 조회 성공",
+            "count": 5
         }
         ```
 
