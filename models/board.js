@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: true,
         }, 
         board_content: {
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT,
             allowNull: true,
         }, 
         board_file1: {
