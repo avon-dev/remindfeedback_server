@@ -893,13 +893,13 @@
     `PATCH`
   
 * **URL Params**
-
-    `NONE`
+ 
+    `friend_id=[integer]` 거절할 친구 테이블 id, NULL[X]
 
 * **Data Params**
-
-    `user_uid=[string]` 거절할 사용자 uid, NULL[X] <br>
-    `friend_id=[integer]` 거절할 친구 테이블 id, NULL[X]
+ 
+    `user_uid=[string]` 차단 해제할 사용자 uid, NULL[X] <br>
+    `friend_uid=[string]` 거절할 친구의 uid, NULL[X]
 
 * **Response**
     <details>
@@ -1028,12 +1028,12 @@
   
 * **URL Params**
  
-    `NONE`
+    `friend_id=[integer]` 거절할 친구 테이블 id, NULL[X]
 
 * **Data Params**
  
-    `user_uid=[string]` 차단할 사용자 uid, NULL[X] <br>
-    `friend_id=[integer]` 거절할 친구 테이블 id, NULL[X]
+    `user_uid=[string]` 차단 해제할 사용자 uid, NULL[X] <br>
+    `friend_uid=[string]` 거절할 친구의 uid, NULL[X]
 
  **Response**
     <details>
@@ -1196,12 +1196,12 @@
   
 * **URL Params**
  
-    `NONE`
+    `friend_id=[integer]` 거절할 친구 테이블 id, NULL[X]
 
 * **Data Params**
  
     `user_uid=[string]` 차단 해제할 사용자 uid, NULL[X] <br>
-    `friend_id=[integer]` 거절할 친구 테이블 id, NULL[X]
+    `friend_uid=[string]` 거절할 친구의 uid, NULL[X]
 
 * **Response**
     <details>
