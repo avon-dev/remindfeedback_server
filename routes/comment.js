@@ -96,6 +96,7 @@ router.get('/all/page/:board_id/:page/:countPerPage', clientIp, isLoggedIn, asyn
     winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] board_id : ${board_id}, page : ${page}, countPerPage : ${countPerPage}`);
 
     result.data = '';
+    let totalPage;
     try{
         const exBoard = await Board.findOne({where:{id: board_id}})
         if(!exBoard){
@@ -115,12 +116,14 @@ router.get('/all/page/:board_id/:page/:countPerPage', clientIp, isLoggedIn, asyn
                 return res.status(200).json(result);
             }
             // 총 페이지 수 반환
-            result.count = Math.ceil(count/countPerPage);
+            result.count = count;
+            totalPage = Math.ceil(count/countPerPage);
         })
         // 페이지 0 이하면 1페이지로 간주
+        
         if(page<1) page = 1;
         // 페이지 범위 초과 시 가장 마지막 페이지로 간주
-        if(page>result.count) page = result.count;
+        if(page>totalPage) page = totalPage;
         let startNum = 1 + countPerPage*(page-1);
 
         await Comment.findAll({
