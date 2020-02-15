@@ -364,3 +364,75 @@ Changing your password
     <!-- 위에 공백 1줄 두고 이 안에 기존 내용 붙이기 (Code ~ )-->
     </div>
     </details>
+
+
+----
+**Checking password**
+----
+Checking your password
+
+* **URL**
+
+  /checkpassword
+
+* **Method:**
+
+  `POST`
+  
+*  **URL Params**
+
+   NONE
+
+* **Data Params**
+
+    **Required:**
+ 
+    * `password=[string]` 비밀번호
+
+    <!--필요한 form field 명시 + 설명-->
+
+
+* **Response:**
+    <details>
+    <summary>Success Response</summary>
+    <div markdown="1">
+  
+  * **Code:** 200 <br />
+
+    * **Code:** `200` SUCCESS : 비밀번호 일치 메세지 반환
+    **Content:** 
+    ```json
+    {
+        "success": true,
+        "data": "NONE",
+        "message": "비밀번호가 일치합니다."
+    }
+    ```
+    * **Code:** `200` SUCCESS : 비밀번호 불일치 메세지 반환
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "비밀번호가 일치하지 않습니다."
+    }
+    ```
+
+    </div>
+    </details>
+    <details>
+    <summary>Error Response</summary>
+    <div markdown="1">
+
+    * **Code:** `500` INTERNAL SERVER ERROR
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "유효한 비밀번호가 아닙니다. (string 값 보내주세요)"
+    }
+    ```
+    <!-- 위에 공백 1줄 두고 이 안에 기존 내용 붙이기 (Code ~ )-->
+    </div>
+    </details>

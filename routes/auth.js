@@ -451,5 +451,56 @@ router.patch('/password', clientIp, async (req, res, next) => {
     }
 });
 
+// 비밀번호 확인
+router.post('/checkpassword', clientIp, isLoggedIn, async (req, res, next) => {
+    try {
+        const {password} = req.body;
+        const user_uid = req.user.user_uid;
+
+        winston.log('info', `[AUTH][${req.clientIp}|${password}] 비밀번호 확인 요청`);
+
+        //이메일 존재여부 파악
+        await User.findOne({
+            where: {
+                user_uid: user_uid
+            }
+        }).then(async exuser => {
+            const result = new Object();
+            const samepw = await bcrypt.compare(password, exuser.password); 
+            if (samepw) {//비밀번호 일치
+                result.success = true;
+                result.data = 'NONE';
+                result.message = '비밀번호가 일치합니다.';
+                winston.log('info', `[AUTH][${req.clientIp}|] ${result.message}`);
+                return await res.status(200).send(result);
+            } else {//비밀번호 불일치
+                result.success = false;
+                result.data = 'NONE';
+                result.message = '비밀번호가 일치하지 않습니다.';
+                winston.log('info', `[AUTH][${req.clientIp}|] ${result.message}`);
+                return await res.status(200).send(result);
+            }
+        }).catch(async e => {
+            console.error(e);
+            const result = new Object();
+            result.success = false;
+            result.data = 'NONE';
+            result.message = '유효한 비밀번호가 아닙니다. (string 값 보내주세요)';
+            winston.log('info', `[AUTH][${req.clientIp}|] ${result.message}`);
+            return res.status(500).send(result);
+        })
+        
+    } catch (e) {
+        winston.log('error', `[AUTH][${req.clientIp}] 비밀번호 초기화 요청 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[AUTH][${req.clientIp}] ${result.message}`);
+        res.status(500).send(result);
+        return next(e);
+    }
+});
 
 module.exports = router;
