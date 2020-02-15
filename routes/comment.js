@@ -124,7 +124,7 @@ router.get('/all/page/:board_id/:page/:countPerPage', clientIp, isLoggedIn, asyn
         if(page<1) page = 1;
         // 페이지 범위 초과 시 가장 마지막 페이지로 간주
         if(page>totalPage) page = totalPage;
-        let startNum = 1 + countPerPage*(page-1);
+        let startNum = countPerPage*(page-1);
 
         await Comment.findAll({
             where:{fk_board_id: board_id},
@@ -136,10 +136,8 @@ router.get('/all/page/:board_id/:page/:countPerPage', clientIp, isLoggedIn, asyn
             limit: countPerPage,
         }).then(comments=>{
             if(comments){
-                if(comments[0]){
-                    result.message = "해당 게시물의 전체 댓글 조회 성공";
-                    result.data = comments;
-                }
+                result.message = "해당 게시물의 전체 댓글 조회 성공";
+                result.data = comments;
                 result.success = true;
                 winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
                 return res.status(200).json(result);

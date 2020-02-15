@@ -246,7 +246,7 @@ Show all comments of a single post with infinity scroll. Return full data of the
 ---
 **Show all comments of a single post with pages**
 ----
-페이지로 게시물 하나의 모든 댓글 보기. 총 페이지 수(result.count) + 댓글 객체 정보(result.data) + user의 email, nickname, portrait 정보 반환함. data 안 user 속성으로 접근할 수 있음.
+페이지로 게시물 하나의 모든 댓글 보기. 총 댓글 객체 수(result.count) + 댓글 객체 정보(result.data) + user의 email, nickname, portrait 정보 반환함. data 안 user 속성으로 접근할 수 있음.
 Show all comments of a single post with pages. Return the number of total pages, full data of the comments and user's email, nickname, portrait.
 
 * **URL**
