@@ -113,13 +113,13 @@ Create a comment to a single post.
 ---
 **Show all comments of a single post with infinity scroll**
 ----
-게시물 하나의 모든 댓글 보기. 댓글 객체 정보 + user의 nickname, portrait 정보 반환함. data 안 user 속성으로 접근할 수 있음.
+게시물 하나의 모든 댓글 보기(10개씩 가져옴). 댓글 객체 정보 + user의 nickname, portrait 정보 반환함. data 안 user 속성으로 접근할 수 있음.
 Show all comments of a single post with infinity scroll. Return full data of the comments and user's email, nickname, portrait.
 
 * **URL**
 
-  /all/scroll/:board_id/:lastid
-  >*변경됨: `/comment/selectall/:board_id` -> `/comments/all/scroll/:board_id/:lastid`*
+  /all/scroll/:board_id/:lastid/:sort
+  > 변경됨: /comment/selectall/:board_id -> /comments/all/scroll/:board_id/:lastid/:sort
   
 
 * **Method:**
@@ -131,6 +131,7 @@ Show all comments of a single post with infinity scroll. Return full data of the
    * `board_id=[integer]` 게시물 번호(ID)
    * `lastid=[integer]` 마지막 (가장 아래의) 댓글 번호(ID)
         > 댓글은 최초 작성된 댓글이 가장 위에 오는 오름차순 정렬 -> lastid 보다 큰 것들을 불러옴
+   * `sort=[integer]` 정렬방식. 0 = 오름차순(오래된 순), 1 = 내림차순(최신순)
 
 * **Data Params**
 
@@ -143,7 +144,7 @@ Show all comments of a single post with infinity scroll. Return full data of the
     <div markdown="1">
 
     * **Code:** 200
-        **Content:** 해당 게시물의 모든 댓글 불러오기<br/>
+        **Content:** 해당 게시물의 모든 댓글(10개씩) 불러오기<br/>
 
         * **Sample response JSON data:**
 
@@ -197,7 +198,8 @@ Show all comments of a single post with infinity scroll. Return full data of the
                     }
                 }
             ],
-            "message": "해당 게시물의 전체 댓글 조회 성공"
+            "message": "해당 게시물의 전체 댓글 조회 성공",
+            "sort": "ASCENDING"
         }
         ```
 
@@ -265,6 +267,7 @@ Show all comments of a single post with pages. Return the number of total pages,
    * `page=[integer]` 페이지 번호
         > 페이지 0 이하면 1페이지로 간주하고 페이지 범위 초과 시 가장 마지막 페이지로 간주함
    * `countPerPage=[integer]` 한 페이지 당 보여 줄 객체 수
+   * `sort=[integer]` 정렬방식. 0 = 오름차순(오래된 순), 1 = 내림차순(최신순)
 
 * **Data Params**
 
@@ -317,7 +320,8 @@ Show all comments of a single post with pages. Return the number of total pages,
                 }
             ],
             "message": "해당 게시물의 전체 댓글 조회 성공",
-            "count": 5
+            "count": 5,
+            "sort": "ASCENDING"
         }
         ```
 
