@@ -35,18 +35,7 @@ router.get('/all/scroll/:board_id/:lastid/:sort', clientIp, isLoggedIn, async(re
             return res.status(200).json(result);
         }
         let comments;
-        if(sort===0){
-            comments = await Comment.findAll({
-                where: { id: { [Op.gt]: lastid } , fk_board_id: board_id},
-                order: [['id']], 
-                limit: 10,
-                include: [{ // 댓글 작성자의 nickname, portrait 정보 가져오기
-                    model: User,
-                    attributes: ['email', 'nickname', 'portrait'],
-                }],
-            })
-            result.sort = 'ASCENDING'
-        } else {
+        if(sort===1){
             if(lastid===0) lastid = 9999;
             comments = await Comment.findAll({
                 where: { id: { [Op.lt]: lastid } , fk_board_id: board_id},
@@ -58,6 +47,17 @@ router.get('/all/scroll/:board_id/:lastid/:sort', clientIp, isLoggedIn, async(re
                 }],
             })
             result.sort = 'DESCENDING'
+        } else {
+            comments = await Comment.findAll({
+                where: { id: { [Op.gt]: lastid } , fk_board_id: board_id},
+                order: [['id']], 
+                limit: 10,
+                include: [{ // 댓글 작성자의 nickname, portrait 정보 가져오기
+                    model: User,
+                    attributes: ['email', 'nickname', 'portrait'],
+                }],
+            })
+            result.sort = 'ASCENDING'
         }
         if(comments){
             if(comments[0]){
@@ -139,18 +139,7 @@ router.get('/all/page/:board_id/:page/:countPerPage/:sort', clientIp, isLoggedIn
         if(page>totalPage) page = totalPage;
         let startNum = countPerPage*(page-1);
         let comments;
-        if(sort===0){
-            comments = await Comment.findAll({
-                where:{fk_board_id: board_id},
-                include: [{ // 댓글 작성자의 nickname, portrait 정보 가져오기
-                    model: User,
-                    attributes: ['email', 'nickname', 'portrait'],
-                }],
-                offset: startNum,
-                limit: countPerPage,
-            })
-            result.sort = 'ASCENDING'
-        }else {
+        if(sort===1){
             comments = await Comment.findAll({
                 where:{fk_board_id: board_id},
                 include: [{ // 댓글 작성자의 nickname, portrait 정보 가져오기
@@ -161,7 +150,19 @@ router.get('/all/page/:board_id/:page/:countPerPage/:sort', clientIp, isLoggedIn
                 limit: countPerPage,
                 order: [['createdAt', 'desc']]
             })
-            result.sort = 'DESCENDING'            
+            result.sort = 'DESCENDING'  
+
+        }else {
+            comments = await Comment.findAll({
+                where:{fk_board_id: board_id},
+                include: [{ // 댓글 작성자의 nickname, portrait 정보 가져오기
+                    model: User,
+                    attributes: ['email', 'nickname', 'portrait'],
+                }],
+                offset: startNum,
+                limit: countPerPage,
+            })
+            result.sort = 'ASCENDING'
         }
         if(comments){
             result.message = "해당 게시물의 전체 댓글 조회 성공";
