@@ -224,9 +224,6 @@ router.post('/login', clientIp, async (req, res, next) => {
                     winston.log('error', `[AUTH][${req.clientIp}|${email}] ${loginError}`);
                     return next(loginError);
                 }
-                if (user.tutorial === false) {
-                    User.update({ tutorial: true }, { where: { user_uid: user.user_uid } });
-                }
                 // 정상적으로 로그인에 성공한 경우
                 winston.log('debug', `[AUTH][${req.clientIp}|${email}] 로그인 성공`);
                 winston.log('debug', `[AUTH][${req.clientIp}|${email}] 로그인 인증 여부 : ${req.isAuthenticated()}`);
@@ -295,6 +292,32 @@ router.get('/me', clientIp, isLoggedIn, async (req, res, next) => {
         return next(e);
     }
 });
+
+router.patch('/tutorial', clientIp, isLoggedIn, async (req, res, next)=>{
+    let result = {
+        success: true,
+        data: '',
+        message: ""
+    }
+    try{
+        const user_uid = req.user.user_uid;
+        const user_email = req.user.email;
+        winston.log('info', `[AUTH][${req.clientIp}|${user_email}] 튜토리얼 상태 true로 변경 Request`);
+        if (req.user.tutorial === false) {
+            User.update({ tutorial: true }, { where: { user_uid: user_uid } });
+        }
+        result.success = true;
+        result.message = `튜토리얼 완료처리 성공`;
+        winston.log('info', `[AUTH]][${req.clientIp}|${user_email}] ${result.message}`);
+        return res.status(200).json(result);
+    }catch{
+        result.success = false;
+        result.message = `튜토리얼 완료처리 실패`;
+        winston.log('error', `[AUTH]][${req.clientIp}|${user_email}] ${result.message}`);
+        res.status(500).send(result);
+        return next(e);
+    }
+})
 
 // 로그아웃
 router.get('/logout', clientIp, isLoggedIn, (req, res) => {

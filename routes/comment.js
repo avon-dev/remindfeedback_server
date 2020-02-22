@@ -15,18 +15,15 @@ let result = { // response form
  * - parameter user_id : 로그인 한 회원 uuid
  * - parameter friend_id : 친구 추가할 회원 uuid
  */
-router.get('/all/scroll/:board_id/:lastid', clientIp, isLoggedIn, async(req, res, next)=>{
+router.get('/all/scroll/:board_id/:lastid/:sort', clientIp, isLoggedIn, async(req, res, next)=>{
     const user_email = req.user.email;
     const board_id = parseInt(req.params.board_id);
     let lastid = parseInt(req.params.lastid);
-
-    // if (lastid === 0) {
-    //     lastid = 9999;
-    // }
-    // 댓글은 최초 작성된 댓글이 가장 위에 오는 오름차순 정렬 -> lastid 보다 큰 것들을 불러옴
+    let sort = parseInt(req.params.sort);
+    // sort = 0 (asc), =1 (desc)
 
     winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] 게시물의 전체 댓글 목록 Request`);
-    winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] board_id : ${board_id}`);
+    winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] board_id : ${board_id}, lastid : ${lastid}, sort : ${sort}`);
 
     result.data = '';
     try{
@@ -37,36 +34,52 @@ router.get('/all/scroll/:board_id/:lastid', clientIp, isLoggedIn, async(req, res
             winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
             return res.status(200).json(result);
         }
-        await Comment.findAll({
-            where: { id: { [Op.gt]: lastid } , fk_board_id: board_id},
-            order: [['id']], 
-            limit: 10,
-            include: [{ // 댓글 작성자의 nickname, portrait 정보 가져오기
-                model: User,
-                attributes: ['email', 'nickname', 'portrait'],
-            }],
-        }).then(comments=>{
-            if(comments){
-                if(comments[0]){
-                    result.message = "해당 게시물의 전체 댓글 조회 성공";
-                    result.data = comments;
-                }else{
-                    result.message = "더 이상 불러올 댓글이 없습니다."
-                    if(lastid===0){
-                        result.message = "해당 게시물에 댓글이 없습니다.";
-                    }
-                    result.data = '';
-                }
-                result.success = true;
-                winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
-                return res.status(200).json(result);
+        let comments;
+        if(sort===1){
+            if(lastid===0) lastid = 9999;
+            comments = await Comment.findAll({
+                where: { id: { [Op.lt]: lastid } , fk_board_id: board_id},
+                order: [['id', 'desc']], 
+                limit: 10,
+                include: [{ // 댓글 작성자의 nickname, portrait 정보 가져오기
+                    model: User,
+                    attributes: ['email', 'nickname', 'portrait'],
+                }],
+            })
+            result.sort = 'DESCENDING'
+        } else {
+            comments = await Comment.findAll({
+                where: { id: { [Op.gt]: lastid } , fk_board_id: board_id},
+                order: [['id']], 
+                limit: 10,
+                include: [{ // 댓글 작성자의 nickname, portrait 정보 가져오기
+                    model: User,
+                    attributes: ['email', 'nickname', 'portrait'],
+                }],
+            })
+            result.sort = 'ASCENDING'
+        }
+        if(comments){
+            if(comments[0]){
+                result.message = "해당 게시물의 전체 댓글 조회 성공";
+                result.data = comments;
             }else{
-                result.success = false;
-                result.message = "해당 게시물의 전체 댓글 조회 실패";
-                winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
-                return res.status(200).json(result);
+                result.message = "더 이상 불러올 댓글이 없습니다."
+                if(lastid===0){
+                    result.message = "해당 게시물에 댓글이 없습니다.";
+                }
+                result.data = '';
             }
-        });
+            result.success = true;
+            winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
+            winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] sort : ${result.sort}`);
+            return res.status(200).json(result);
+        }else{
+            result.success = false;
+            result.message = "해당 게시물의 전체 댓글 조회 실패";
+            winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
+            return res.status(200).json(result);
+        }
     }catch(e){
         winston.log('error', `[COMMENT][${req.clientIp}|${req.user.email}] 게시물의 전체 댓글 목록 Exception`);
         
@@ -84,18 +97,19 @@ router.get('/all/scroll/:board_id/:lastid', clientIp, isLoggedIn, async(req, res
  * - parameter user_id : 로그인 한 회원 uuid
  * - parameter friend_id : 친구 추가할 회원 uuid
  */
-router.get('/all/page/:board_id/:page/:countPerPage', clientIp, isLoggedIn, async(req, res, next)=>{
+router.get('/all/page/:board_id/:page/:countPerPage/:sort', clientIp, isLoggedIn, async(req, res, next)=>{
     const user_email = req.user.email;
     const board_id = req.params.board_id;
     let page = parseInt(req.params.page)
     let countPerPage = 10;
     if(parseInt(req.params.countPerPage)!=0) countPerPage = parseInt(req.params.countPerPage)
+    let sort = parseInt(req.params.sort)
     
-
     winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] 게시물의 전체 댓글 목록 Request`);
-    winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] board_id : ${board_id}, page : ${page}, countPerPage : ${countPerPage}`);
+    winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] board_id : ${board_id}, page : ${page}, countPerPage : ${countPerPage}, sort : ${sort}`);
 
     result.data = '';
+    let totalPage;
     try{
         const exBoard = await Board.findOne({where:{id: board_id}})
         if(!exBoard){
@@ -115,38 +129,54 @@ router.get('/all/page/:board_id/:page/:countPerPage', clientIp, isLoggedIn, asyn
                 return res.status(200).json(result);
             }
             // 총 페이지 수 반환
-            result.count = Math.ceil(count/countPerPage);
+            result.count = count;
+            totalPage = Math.ceil(count/countPerPage);
         })
         // 페이지 0 이하면 1페이지로 간주
+        
         if(page<1) page = 1;
         // 페이지 범위 초과 시 가장 마지막 페이지로 간주
-        if(page>result.count) page = result.count;
-        let startNum = 1 + countPerPage*(page-1);
+        if(page>totalPage) page = totalPage;
+        let startNum = countPerPage*(page-1);
+        let comments;
+        if(sort===1){
+            comments = await Comment.findAll({
+                where:{fk_board_id: board_id},
+                include: [{ // 댓글 작성자의 nickname, portrait 정보 가져오기
+                    model: User,
+                    attributes: ['email', 'nickname', 'portrait'],
+                }],
+                offset: startNum,
+                limit: countPerPage,
+                order: [['createdAt', 'desc']]
+            })
+            result.sort = 'DESCENDING'  
 
-        await Comment.findAll({
-            where:{fk_board_id: board_id},
-            include: [{ // 댓글 작성자의 nickname, portrait 정보 가져오기
-                model: User,
-                attributes: ['email', 'nickname', 'portrait'],
-            }],
-            offset: startNum,
-            limit: countPerPage,
-        }).then(comments=>{
-            if(comments){
-                if(comments[0]){
-                    result.message = "해당 게시물의 전체 댓글 조회 성공";
-                    result.data = comments;
-                }
-                result.success = true;
-                winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
-                return res.status(200).json(result);
-            }else{
-                result.success = false;
-                result.message = "해당 게시물의 전체 댓글 조회 실패";
-                winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
-                return res.status(200).json(result);
-            }
-        });
+        }else {
+            comments = await Comment.findAll({
+                where:{fk_board_id: board_id},
+                include: [{ // 댓글 작성자의 nickname, portrait 정보 가져오기
+                    model: User,
+                    attributes: ['email', 'nickname', 'portrait'],
+                }],
+                offset: startNum,
+                limit: countPerPage,
+            })
+            result.sort = 'ASCENDING'
+        }
+        if(comments){
+            result.message = "해당 게시물의 전체 댓글 조회 성공";
+            result.data = comments;
+            result.success = true;
+            winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
+            winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] count : ${result.count}, sort : ${result.sort}`);
+            return res.status(200).json(result);
+        }else{
+            result.success = false;
+            result.message = "해당 게시물의 전체 댓글 조회 실패";
+            winston.log('info', `[COMMENT][${req.clientIp}|${user_email}] ${result.message}`);
+            return res.status(200).json(result);
+        }
     }catch(e){
         winston.log('error', `[COMMENT][${req.clientIp}|${req.user.email}] 게시물의 전체 댓글 목록 Exception`);
         

@@ -3,7 +3,7 @@ const winston = require('./config/winston');
 var cluster = require('cluster');
 var os = require('os');
 var uuid = require('uuid');
-// const port = 3000;
+
 //키생성 - 서버 확인용
 var instance_id = uuid.v4();
 
@@ -121,7 +121,7 @@ if (cluster.isMaster) {
   sequelize.sync();
   passportConfig(passport);
 
-  app.set('port', process.env.PORT || 8000); //포트 설정
+  app.set('port', process.env.PORT || 3000); //포트 설정
 
   if (prod) {
     app.use(hpp());
@@ -166,14 +166,15 @@ if (cluster.isMaster) {
     res.send('remindfeedback 백엔드 정상 동작!');
   });
   
-  // Worker 테스트 주소
-  app.get('/worker', function (req, res) {
-    res.send('안녕하세요 저는<br>['+master_id+']서버의<br>워커 ['+ cluster.worker.id+'] 입니다.');
-  });
-  app.get("/workerKiller", function (req, res) {
-    cluster.worker.kill();
-    res.send('워커킬러 호출됨');
-  });
+  // // Worker 테스트 주소
+  // app.get('/worker', function (req, res) {
+  //   res.send('안녕하세요 저는<br>['+master_id+']서버의<br>워커 ['+ cluster.worker.id+'] 입니다.');
+  // });
+  // Worker Killer 호출
+  // app.get("/workerKiller", function (req, res) {
+  //   cluster.worker.kill();
+  //   res.send('워커킬러 호출됨');
+  // });
   
   app.use('/auth', authRouter);
   app.use('/users', userRouter);
@@ -207,7 +208,7 @@ if (cluster.isMaster) {
     res.render('error');
   });
 
-  app.listen(prod ? app.get('port') : 8000, () => {
+  app.listen(prod ? app.get('port') : 3000, () => {
     winston.log('info', `${app.get('port')}번 포트에서 서버 실행중입니다.`);
   });
 
