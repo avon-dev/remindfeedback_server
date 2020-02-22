@@ -496,6 +496,54 @@ router.patch('/password', clientIp, async (req, res, next) => {
     }
 });
 
+// 이메일 확인
+router.post('/checkemail', clientIp, async (req, res, next) => {
+    try {
+        const {email} = req.body;
+
+        winston.log('info', `[AUTH][${req.clientIp}|${email}] 이메일 확인 요청`);
+
+        //이메일 존재여부 파악
+        await User.findOne({
+            where: { email }
+        }).then(async exuser => {
+            const result = new Object();
+            if(exuser !== null){
+                result.success = true;
+                result.data = 'NONE';
+                result.message = '존재하는 회원입니다.';
+                winston.log('info', `[AUTH][${req.clientIp}|] ${result.message} | ${exuser}`);
+                return await res.status(201).send(result);
+            }else{
+                result.success = false;
+                result.data = 'NONE';
+                result.message = '존재하지 않는 회원입니다.';
+                winston.log('info', `[AUTH][${req.clientIp}|] ${result.message} | ${exuser}`);
+                return await res.status(201).send(result);
+            }
+        }).catch(async e => {
+            console.error(e);
+            const result = new Object();
+            result.success = false;
+            result.data = 'NONE';
+            result.message = '잘못된 email 입니다.';
+            winston.log('info', `[AUTH][${req.clientIp}|] ${result.message}`);
+            return res.status(201).send(result);
+        })
+        
+    } catch (e) {
+        winston.log('error', `[AUTH][${req.clientIp}] 이메일 확인 요청 Exception`);
+        
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[AUTH][${req.clientIp}] ${result.message}`);
+        res.status(500).send(result);
+        return next(e);
+    }
+});
+
 // 비밀번호 확인
 router.post('/checkpassword', clientIp, isLoggedIn, async (req, res, next) => {
     try {
@@ -517,13 +565,13 @@ router.post('/checkpassword', clientIp, isLoggedIn, async (req, res, next) => {
                 result.data = 'NONE';
                 result.message = '비밀번호가 일치합니다.';
                 winston.log('info', `[AUTH][${req.clientIp}|] ${result.message}`);
-                return await res.status(200).send(result);
+                return await res.status(201).send(result);
             } else {//비밀번호 불일치
                 result.success = false;
                 result.data = 'NONE';
                 result.message = '비밀번호가 일치하지 않습니다.';
                 winston.log('info', `[AUTH][${req.clientIp}|] ${result.message}`);
-                return await res.status(200).send(result);
+                return await res.status(201).send(result);
             }
         }).catch(async e => {
             console.error(e);
@@ -536,7 +584,7 @@ router.post('/checkpassword', clientIp, isLoggedIn, async (req, res, next) => {
         })
         
     } catch (e) {
-        winston.log('error', `[AUTH][${req.clientIp}] 비밀번호 초기화 요청 Exception`);
+        winston.log('error', `[AUTH][${req.clientIp}] 비밀번호 확인 요청 Exception`);
         
         const result = new Object();
         result.success = false;

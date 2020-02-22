@@ -366,6 +366,79 @@ Changing your password
     </details>
 
 
+
+----
+**Checking email**
+----
+Checking your email
+
+* **URL**
+
+  /checkemail
+
+* **Method:**
+
+  `POST`
+  
+*  **URL Params**
+
+   NONE
+
+* **Data Params**
+
+    **Required:**
+ 
+    * `email=[string]` 이메일
+
+
+* **Response:**
+    <details>
+    <summary>Success Response</summary>
+    <div markdown="1">
+  
+  * **Code:** 201 <br />
+
+    * **Code:** `201` SUCCESS : 이메일 존재 여부 메세지 반환
+    **Content:** 
+    ```json
+    {
+        "success": true,
+        "data": "NONE",
+        "message": "존재하는 회원입니다."
+    }
+    ```
+    * **Code:** `201` SUCCESS : 이메일 부재 메세지 반환
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "존재하지 않는 회원입니다."
+    }
+    ```
+
+    </div>
+    </details>
+    <details>
+    <summary>Error Response</summary>
+    <div markdown="1">
+
+    * **Code:** `500` INTERNAL SERVER ERROR
+    **Content:** 
+    ```json
+    {
+        "success": false,
+        "data": "NONE",
+        "message": "INTERNAL SERVER ERROR"
+    }
+    ```
+    <!-- 위에 공백 1줄 두고 이 안에 기존 내용 붙이기 (Code ~ )-->
+    </div>
+    </details>
+
+
+
+
 ----
 **Checking password**
 ----
@@ -397,9 +470,9 @@ Checking your password
     <summary>Success Response</summary>
     <div markdown="1">
   
-  * **Code:** 200 <br />
+  * **Code:** 201 <br />
 
-    * **Code:** `200` SUCCESS : 비밀번호 일치 메세지 반환
+    * **Code:** `201` SUCCESS : 비밀번호 일치 메세지 반환
     **Content:** 
     ```json
     {
@@ -408,7 +481,7 @@ Checking your password
         "message": "비밀번호가 일치합니다."
     }
     ```
-    * **Code:** `200` SUCCESS : 비밀번호 불일치 메세지 반환
+    * **Code:** `201` SUCCESS : 비밀번호 불일치 메세지 반환
     **Content:** 
     ```json
     {
