@@ -139,7 +139,8 @@ router.delete('/unregister', clientIp, isLoggedIn, async (req, res, next) => {
                     'UPDATE boards SET deletedAt=NOW() WHERE fk_feedbackId=ANY(SELECT id FROM feedbacks WHERE user_uid=:user_uid); ' +
                     'UPDATE feedbacks SET deletedAt=NOW() WHERE user_uid=:user_uid; ' +
                     'UPDATE friends SET deletedAt=NOW() WHERE user_uid=:user_uid OR friend_uid=:user_uid; ' +
-                    'UPDATE users SET deletedAt=NOW() WHERE user_uid=:user_uid;';
+                    'UPDATE users SET deletedAt=NOW() WHERE user_uid=:user_uid;'+
+                    'UPDATE feedbacks SET updatedAt=NOW(), adviser_uid=null, complete=IF(complete=2, 2, -1) WHERE adviser_uid=:user_uid;';
 
                 sequelize.query(query_update, {
                     replacements: {
@@ -333,10 +334,32 @@ router.post('/password', clientIp, async (req, res, next) => {
 
         winston.log('info', `[AUTH][${req.clientIp}|${user_email}] 비밀번호 초기화 요청`);
 
+        const result = new Object();
+
         //이메일 존재여부 파악
         User.findOne({
             where: {email: user_email}
-        }).then(exuser => {
+        }).then(async exuser => {
+
+            const exauth = await Auth.findAll({
+                where: {email: user_email}
+            })
+
+            if(exauth.length > 4){
+                let lastauth = await exauth[exauth.length - 1]
+                if(lastauth.createdAt > new Date() - 3600000) {//한시간 뒤 재발급 가능
+                    console.log('lastauth', lastauth);
+                    //1시간이 지나지 않아 토큰 발행 거부
+                    result.success = false;
+                    result.data = '';
+                    result.message = '연속 토큰 발행 거부.';
+                    return res.status(201).json(result);
+                }else{
+                    //제한시간이 지났으니 기존 토큰 모두 제거
+                    await Auth.destroy({ where: {email: user_email}});
+                }
+            }
+
             //존재시 토큰 생성 후
             const token = crypto.randomBytes(2).toString('hex'); // token 생성
             const data = { // 데이터 정리
@@ -366,7 +389,6 @@ router.post('/password', clientIp, async (req, res, next) => {
             transporter.sendMail(emailOptions, res); //전송
 
             // 토큰 생성 성공 메세지 리턴
-            const result = new Object();
             result.success = true;
             result.data = exuser;
             result.message = '토큰을 생성하여 이메일로 발신했습니다.';
@@ -377,7 +399,7 @@ router.post('/password', clientIp, async (req, res, next) => {
             result.success = false;
             result.data = 'NONE';
             result.message = '잘못된 이메일 입니다.';
-            winston.log('info', `[AUTH][${req.clientIp}|${user_email}] ${result.message}`);
+            winston.log('info', `[AUTH][${req.clientIp}|${user_email}] ${result.message} ${error}`);
             return res.status(200).send(result);
         })
         
@@ -406,7 +428,7 @@ router.patch('/password', clientIp, async (req, res, next) => {
             where: {
                 token,
                 createdAt: {
-                    [Op.gt]: new Date() - 300000
+                    [Op.gt]: new Date() - 600000
                 },
             }
         }).then(async exauth => {
