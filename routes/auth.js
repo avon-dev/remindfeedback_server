@@ -33,46 +33,142 @@ let fileSize = 50 * 1024 * 1024;
 
 // Auth CRUD API
 
-// 회원가입
-router.post('/register', clientIp, async (req, res, next) => {
-    try {
-        const { email, nickname, password } = req.body;
 
-        winston.log('info', `[AUTH][${req.clientIp}|${email}] 회원가입 Request`);
-        winston.log('info', `[AUTH][${req.clientIp}|${email}] email : ${email}, nickname : ${nickname}, password : ${password}`);
+//회원가입 전 이메일 중복확인 및 토큰 발행
+router.post('/email', clientIp, async (req, res, next) => {
+    try{
+        const { email } = req.body;
+        const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+        
+        winston.log('info', `[AUTH][${req.clientIp}|${email}] 회원가입전 메일확인 Request`);
+        winston.log('info', `[AUTH][${req.clientIp}|${email}] email : ${email}`);
 
-        const exUser = await User.findOne({ where: { email } });
-        if (exUser) {
+        const result = new Object();
+        if(!emailRegexp.test(email)){
+            result.success = false;
+            result.data = 'NONE';
+            result.message = '이메일형식오류';
+            return res.status(201).json(result)
+        }
+
+        //이메일 존재여부 파악
+        const exuser = await User.findOne({
+            where: {email: email}
+        })
+        if(exuser===null) {
+            //존재시 토큰 생성 후
+            const token = crypto.randomBytes(2).toString('hex'); // token 생성
+            const data = { // 데이터 정리
+                token,
+                email: email,
+                type: 1 // 비밀번호 관련 타입 1
+            };
+            Auth.create(data); // 데이터베이스 Auth 테이블에 데이터 입력
+
+            //메일로 토큰 보내기
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                port: 456,
+                secure: true,
+                auth: {
+                    user: process.env.gmail_user,
+                    pass: process.env.gmail_pass
+                }
+            });
+            const emailOptions = { // 옵션값 설정
+                from: 'test@gmail.com',
+                to: email,
+                subject: `[RemindFeedback] 회원가입을 위한 안내메일 입니다. `,
+                html: '회원가입을 위해 토큰을 입력하여 주세요.'
+                + `<br>token 정보 : ${token}`+ `<br>유효시간 10분`,
+            };
+            transporter.sendMail(emailOptions, res); //전송
+
+            // 토큰 생성 성공 메세지 리턴
+            console.log('info', `${token}`);
+            return res.status(201).json(token);
+        } else {
             const result = new Object();
             result.success = false;
             result.data = 'NONE';
-            result.message = '이미 가입한 이메일입니다.';
-            winston.log('info', `[AUTH][${req.clientIp}|${email}] ${result.message}`);
-            return res.status(200).send(result);
+            result.message = '존재하는 이메일 입니다.';
+            console.log('info');
+            return res.status(201).send(result);
         }
-        const uid = await bcrypt.hash(email, 12);
-        const pw = await bcrypt.hash(password, 12);
-        const newUser = await User.create({
-            user_uid: uid,
-            email,
-            nickname,
-            password: pw,
-            portrait: '',
-            introduction: '',
-            tutorial: false,
-        });
-        const returnData = new Object();
-        returnData.user_uid = uid;
-        returnData.email = email;
-        returnData.nickname = nickname;
-        returnData.tutorial = false;
-        
-        const result = new Object();
-        result.success = true;
-        result.data = returnData;
-        result.message = '회원 가입에 성공했습니다.';
-        winston.log('info', `[AUTH][${req.clientIp}|${email}] ${result.message}`);
-        return res.status(201).send(result);
+
+    }catch(e){
+        console.error(e);
+        return next(e);
+    }
+})
+
+
+// 회원가입
+router.post('/register', clientIp, async (req, res, next) => {
+    try {
+        const { email, nickname, password, token } = req.body;
+
+        winston.log('info', `[AUTH][${req.clientIp}|${email}] 회원가입 Request`);
+        winston.log('info', `[AUTH][${req.clientIp}|${email}] email : ${email}, nickname : ${nickname}, password : ${password}, token : ${token}`);
+
+        await Auth.findOne({
+            where: {
+                token,
+                createdAt: {
+                    [Op.gt]: new Date() - 600000
+                },
+                type: 1
+            }
+        }).then(async exauth => {
+            let authemail = exauth.email;
+            await console.log('authemail',authemail)
+
+            await Auth.destroy({where: {token: exauth.token}}).then().catch()
+
+            //회원 등록
+            const exUser = await User.findOne({ where: { email } });
+            if (exUser) {
+                const result = new Object();
+                result.success = false;
+                result.data = 'NONE';
+                result.message = '이미 가입한 이메일입니다.';
+                winston.log('info', `[AUTH][${req.clientIp}|${email}] ${result.message}`);
+                return res.status(200).send(result);
+            }
+            const uid = await bcrypt.hash(email, 12);
+            const pw = await bcrypt.hash(password, 12);
+            await User.create({
+                user_uid: uid,
+                email,
+                nickname,
+                password: pw,
+                portrait: '',
+                introduction: '',
+                tutorial: false,
+            });
+            const returnData = new Object();
+            returnData.user_uid = uid;
+            returnData.email = email;
+            returnData.nickname = nickname;
+            returnData.tutorial = false;
+            
+            const result = new Object();
+            result.success = true;
+            result.data = returnData;
+            result.message = '회원 가입에 성공했습니다.';
+            winston.log('info', `[AUTH][${req.clientIp}|${email}] ${result.message}`);
+            return res.status(201).send(result);
+
+        }).catch(async e => {
+            console.error(e);
+            const result = new Object();
+            result.success = false;
+            result.data = 'NONE';
+            result.message = '유효한 토큰이 아닙니다.';
+            console.log('info', `[AUTH] ${result.message}`);
+            return res.status(200).send(result);
+        })
+
     } catch (e) {
         winston.log('error', `[AUTH][${req.clientIp}|${req.body.email}] 회원가입 Exception`);
         
@@ -365,7 +461,10 @@ router.post('/password', clientIp, async (req, res, next) => {
         }).then(async exuser => {
 
             const exauth = await Auth.findAll({
-                where: {email: user_email}
+                where: {
+                    email: user_email,
+                    type: 2
+                }
             })
 
             if(exauth.length > 4){
@@ -388,7 +487,7 @@ router.post('/password', clientIp, async (req, res, next) => {
             const data = { // 데이터 정리
                 token,
                 email: exuser.email,
-                ttl: 300 // ttl 값 설정 (5분)
+                type: 2 // 비밀번호 관련 타입 2
             };
             Auth.create(data); // 데이터베이스 Auth 테이블에 데이터 입력
 
@@ -407,7 +506,7 @@ router.post('/password', clientIp, async (req, res, next) => {
                 to: user_email,
                 subject: `[RemindFeedback] 비밀번호 재설정을 위한 안내메일 입니다. `,
                 html: '비밀번호 초기화를 위해 토큰을 입력하여 주세요.'
-                + `<br>token 정보 : ${token}`+ `<br>유효시간 5분`,
+                + `<br>token 정보 : ${token}`+ `<br>유효시간 10분`,
             };
             transporter.sendMail(emailOptions, res); //전송
 

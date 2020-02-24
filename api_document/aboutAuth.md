@@ -1,8 +1,48 @@
 ## About Auth
 ----
-  <_회원 인증 관련: 회원 가입, 회원 탈퇴, 로그인, 로그아웃, 유저 정보 확인_>
+  <_회원 인증 관련: 메일중복검사 및 토큰발행, 회원 가입, 회원 탈퇴, 로그인, 로그아웃, 유저 정보 확인, 메일확인, 비밀번호변경_>
 * **API call:**
   localhost:8000/auth
+
+
+---
+**Send token by email**
+----
+  이메일 중복검사 및 토큰발행.
+
+* **URL**
+
+  /email
+
+* **Method:**
+
+  `POST`
+  
+*  **URL Params**
+
+   **Required:**
+ 
+   None
+
+* **Data Params**
+
+    **Required:**
+    
+    * `email=[string]` 회원 이메일. 토큰 전송용 메일, null[x]
+
+
+* **Success Response:**
+
+  * **Code:** 201
+    **Content:** 토큰 데이터
+        <!--회원정보 JSON 그대로 들어감-->
+
+* **Sample JSON data:**
+  ```json
+  {
+      "email": "example@test.com"
+  }
+  ```
 
 
 ---
@@ -31,6 +71,7 @@
     * `email=[string]` 회원 이메일. 로그인 할 때 사용됨, null[x]
     * `nickname=[string]` 회원이 직접 설정한 회원 이름, null[x]
     * `password=[string]` 암호화된 회원 비밀번호, null[x]
+    * `token=[string]` 메일로 전달받은 토큰 정보, null[x]
 
 
 * **Success Response:**
@@ -47,7 +88,8 @@
           "user_uid": "$2b$12$vAPL5iEkkpAheaAd2ssbXeEofDvGvgrbIHKr8qQ8YKcE7okyTBDlm",
           "email": "d",
           "nickname": "d",
-          "tutorial": false
+          "tutorial": false,
+          "token": "ab12"
       },
       "message": "회원 가입에 성공했습니다."
   }
