@@ -36,15 +36,15 @@ let fileSize = 50 * 1024 * 1024;
 
 //회원가입 전 이메일 중복확인 및 토큰 발행
 router.post('/email', clientIp, async (req, res, next) => {
-    try{
+    try {
         const { email } = req.body;
         const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-        
+
         winston.log('info', `[AUTH][${req.clientIp}|${email}] 회원가입전 메일확인 Request`);
         winston.log('info', `[AUTH][${req.clientIp}|${email}] email : ${email}`);
 
         const result = new Object();
-        if(!emailRegexp.test(email)){
+        if (!emailRegexp.test(email)) {
             result.success = false;
             result.data = 'NONE';
             result.message = '이메일형식오류';
@@ -53,9 +53,9 @@ router.post('/email', clientIp, async (req, res, next) => {
 
         //이메일 존재여부 파악
         const exuser = await User.findOne({
-            where: {email: email}
+            where: { email: email }
         })
-        if(exuser===null) {
+        if (exuser === null) {
             //존재시 토큰 생성 후
             const token = crypto.randomBytes(2).toString('hex'); // token 생성
             const data = { // 데이터 정리
@@ -80,7 +80,7 @@ router.post('/email', clientIp, async (req, res, next) => {
                 to: email,
                 subject: `[RemindFeedback] 회원가입을 위한 안내메일 입니다. `,
                 html: '회원가입을 위해 토큰을 입력하여 주세요.'
-                + `<br>token 정보 : ${token}`+ `<br>유효시간 10분`,
+                    + `<br>token 정보 : ${token}` + `<br>유효시간 10분`,
             };
             transporter.sendMail(emailOptions, res); //전송
 
@@ -96,7 +96,7 @@ router.post('/email', clientIp, async (req, res, next) => {
             return res.status(201).send(result);
         }
 
-    }catch(e){
+    } catch (e) {
         console.error(e);
         return next(e);
     }
@@ -121,9 +121,9 @@ router.post('/register', clientIp, async (req, res, next) => {
             }
         }).then(async exauth => {
             let authemail = exauth.email;
-            await console.log('authemail',authemail)
+            await console.log('authemail', authemail)
 
-            await Auth.destroy({where: {token: exauth.token}}).then().catch()
+            await Auth.destroy({ where: { token: exauth.token } }).then().catch()
 
             //회원 등록
             const exUser = await User.findOne({ where: { email } });
@@ -151,7 +151,7 @@ router.post('/register', clientIp, async (req, res, next) => {
             returnData.email = email;
             returnData.nickname = nickname;
             returnData.tutorial = false;
-            
+
             const result = new Object();
             result.success = true;
             result.data = returnData;
@@ -171,7 +171,7 @@ router.post('/register', clientIp, async (req, res, next) => {
 
     } catch (e) {
         winston.log('error', `[AUTH][${req.clientIp}|${req.body.email}] 회원가입 Exception`);
-        
+
         const result = new Object();
         result.success = false;
         result.data = 'NONE';
@@ -235,7 +235,7 @@ router.delete('/unregister', clientIp, isLoggedIn, async (req, res, next) => {
                     'UPDATE boards SET deletedAt=NOW() WHERE fk_feedbackId=ANY(SELECT id FROM feedbacks WHERE user_uid=:user_uid); ' +
                     'UPDATE feedbacks SET deletedAt=NOW() WHERE user_uid=:user_uid; ' +
                     'UPDATE friends SET deletedAt=NOW() WHERE user_uid=:user_uid OR friend_uid=:user_uid; ' +
-                    'UPDATE users SET deletedAt=NOW() WHERE user_uid=:user_uid;'+
+                    'UPDATE users SET deletedAt=NOW() WHERE user_uid=:user_uid;' +
                     'UPDATE feedbacks SET updatedAt=NOW(), adviser_uid=null, complete=IF(complete=2, 2, -1) WHERE adviser_uid=:user_uid;';
 
                 sequelize.query(query_update, {
@@ -287,7 +287,7 @@ router.delete('/unregister', clientIp, isLoggedIn, async (req, res, next) => {
         });
     } catch (e) {
         winston.log('error', `[AUTH][${req.clientIp}|${req.user.email}] 회원 탈퇴 Exception`);
-        
+
         const result = new Object();
         result.success = false;
         result.data = 'NONE';
@@ -343,7 +343,7 @@ router.post('/login', clientIp, async (req, res, next) => {
         })(req, res, next); // 미들웨어 내의 미들웨어에는 (req, res, next)를 붙입니다.
     } catch (e) {
         winston.log('error', `[AUTH][${req.clientIp}|${req.body.email}] 로그인 Exception`);
-        
+
         const result = new Object();
         result.success = false;
         result.data = 'NONE';
@@ -378,7 +378,7 @@ router.get('/me', clientIp, isLoggedIn, async (req, res, next) => {
         return res.status(200).send(result);
     } catch (e) {
         winston.log('error', `[AUTH][${req.clientIp}|${req.user.email}] 내 정보 Exception`);
-        
+
         const result = new Object();
         result.success = false;
         result.data = 'NONE';
@@ -389,13 +389,13 @@ router.get('/me', clientIp, isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.patch('/tutorial', clientIp, isLoggedIn, async (req, res, next)=>{
+router.patch('/tutorial', clientIp, isLoggedIn, async (req, res, next) => {
     let result = {
         success: true,
         data: '',
         message: ""
     }
-    try{
+    try {
         const user_uid = req.user.user_uid;
         const user_email = req.user.email;
         winston.log('info', `[AUTH][${req.clientIp}|${user_email}] 튜토리얼 상태 true로 변경 Request`);
@@ -407,7 +407,7 @@ router.patch('/tutorial', clientIp, isLoggedIn, async (req, res, next)=>{
         result.message = `튜토리얼 완료처리 성공`;
         winston.log('info', `[AUTH]][${req.clientIp}|${user_email}] ${result.message}`);
         return res.status(200).json(result);
-    }catch{
+    } catch (e) {
         result.success = false;
         result.message = `튜토리얼 완료처리 실패`;
         winston.log('error', `[AUTH]][${req.clientIp}|${user_email}] ${result.message}`);
@@ -435,7 +435,7 @@ router.get('/logout', clientIp, isLoggedIn, (req, res) => {
         return res.status(200).send(result);
     } catch (e) {
         winston.log('error', `[AUTH][${req.clientIp}|${req.user.email}] 로그아웃 Exception`);
-        
+
         const result = new Object();
         result.success = false;
         result.data = 'NONE';
@@ -458,7 +458,7 @@ router.post('/password', clientIp, async (req, res, next) => {
 
         //이메일 존재여부 파악
         User.findOne({
-            where: {email: user_email}
+            where: { email: user_email }
         }).then(async exuser => {
 
             const exauth = await Auth.findAll({
@@ -468,18 +468,18 @@ router.post('/password', clientIp, async (req, res, next) => {
                 }
             })
 
-            if(exauth.length > 4){
+            if (exauth.length > 4) {
                 let lastauth = await exauth[exauth.length - 1]
-                if(lastauth.createdAt > new Date() - 3600000) {//한시간 뒤 재발급 가능
+                if (lastauth.createdAt > new Date() - 3600000) {//한시간 뒤 재발급 가능
                     console.log('lastauth', lastauth);
                     //1시간이 지나지 않아 토큰 발행 거부
                     result.success = false;
                     result.data = '';
                     result.message = '연속 토큰 발행 거부.';
                     return res.status(201).json(result);
-                }else{
+                } else {
                     //제한시간이 지났으니 기존 토큰 모두 제거
-                    await Auth.destroy({ where: {email: user_email}});
+                    await Auth.destroy({ where: { email: user_email } });
                 }
             }
 
@@ -507,7 +507,7 @@ router.post('/password', clientIp, async (req, res, next) => {
                 to: user_email,
                 subject: `[RemindFeedback] 비밀번호 재설정을 위한 안내메일 입니다. `,
                 html: '비밀번호 초기화를 위해 토큰을 입력하여 주세요.'
-                + `<br>token 정보 : ${token}`+ `<br>유효시간 10분`,
+                    + `<br>token 정보 : ${token}` + `<br>유효시간 10분`,
             };
             transporter.sendMail(emailOptions, res); //전송
 
@@ -525,10 +525,10 @@ router.post('/password', clientIp, async (req, res, next) => {
             winston.log('info', `[AUTH][${req.clientIp}|${user_email}] ${result.message} ${error}`);
             return res.status(200).send(result);
         })
-        
+
     } catch (e) {
         winston.log('error', `[AUTH][${req.clientIp}|${req.user.email}] 비밀번호 초기화 요청 Exception`);
-        
+
         const result = new Object();
         result.success = false;
         result.data = 'NONE';
@@ -542,7 +542,7 @@ router.post('/password', clientIp, async (req, res, next) => {
 // 비밀번호 초기화 요청
 router.patch('/password', clientIp, async (req, res, next) => {
     try {
-        const {token, password} = req.body;
+        const { token, password } = req.body;
 
         winston.log('info', `[AUTH][${req.clientIp}|${token}] 비밀번호 초기화 요청`);
 
@@ -556,15 +556,15 @@ router.patch('/password', clientIp, async (req, res, next) => {
             }
         }).then(async exauth => {
             let authemail = exauth.email;
-            await console.log('여기다여기',authemail)
+            await console.log('여기다여기', authemail)
             const newpw = await bcrypt.hash(password, 12);
-            const 유조 = await User.findOne({where: {email: authemail}})
-            console.log('유조',유조.user_uid);
+            const 유조 = await User.findOne({ where: { email: authemail } })
+            console.log('유조', 유조.user_uid);
             await User.update({
                 password: newpw
-            }, {where: {user_uid: 유조.user_uid}}).then(
-                await Auth.destroy({where: {token: exauth.token}}).then().catch()
-            ).catch(err => {console.error(err)});
+            }, { where: { user_uid: 유조.user_uid } }).then(
+                await Auth.destroy({ where: { token: exauth.token } }).then().catch()
+            ).catch(err => { console.error(err) });
 
             // 비밀번호 변경 성공 메세지 리턴
             const result = new Object();
@@ -582,10 +582,10 @@ router.patch('/password', clientIp, async (req, res, next) => {
             winston.log('info', `[AUTH][${req.clientIp}|] ${result.message}`);
             return res.status(200).send(result);
         })
-        
+
     } catch (e) {
         winston.log('error', `[AUTH][${req.clientIp}] 비밀번호 초기화 요청 Exception`);
-        
+
         const result = new Object();
         result.success = false;
         result.data = 'NONE';
@@ -599,7 +599,7 @@ router.patch('/password', clientIp, async (req, res, next) => {
 // 이메일 확인
 router.post('/checkemail', clientIp, async (req, res, next) => {
     try {
-        const {email} = req.body;
+        const { email } = req.body;
 
         winston.log('info', `[AUTH][${req.clientIp}|${email}] 이메일 확인 요청`);
 
@@ -608,13 +608,13 @@ router.post('/checkemail', clientIp, async (req, res, next) => {
             where: { email }
         }).then(async exuser => {
             const result = new Object();
-            if(exuser !== null){
+            if (exuser !== null) {
                 result.success = true;
                 result.data = 'NONE';
                 result.message = '존재하는 회원입니다.';
                 winston.log('info', `[AUTH][${req.clientIp}|] ${result.message} | ${exuser}`);
                 return await res.status(201).send(result);
-            }else{
+            } else {
                 result.success = false;
                 result.data = 'NONE';
                 result.message = '존재하지 않는 회원입니다.';
@@ -630,10 +630,10 @@ router.post('/checkemail', clientIp, async (req, res, next) => {
             winston.log('info', `[AUTH][${req.clientIp}|] ${result.message}`);
             return res.status(201).send(result);
         })
-        
+
     } catch (e) {
         winston.log('error', `[AUTH][${req.clientIp}] 이메일 확인 요청 Exception`);
-        
+
         const result = new Object();
         result.success = false;
         result.data = 'NONE';
@@ -647,7 +647,7 @@ router.post('/checkemail', clientIp, async (req, res, next) => {
 // 비밀번호 확인
 router.post('/checkpassword', clientIp, isLoggedIn, async (req, res, next) => {
     try {
-        const {password} = req.body;
+        const { password } = req.body;
         const user_uid = req.user.user_uid;
 
         winston.log('info', `[AUTH][${req.clientIp}|${password}] 비밀번호 확인 요청`);
@@ -659,7 +659,7 @@ router.post('/checkpassword', clientIp, isLoggedIn, async (req, res, next) => {
             }
         }).then(async exuser => {
             const result = new Object();
-            const samepw = await bcrypt.compare(password, exuser.password); 
+            const samepw = await bcrypt.compare(password, exuser.password);
             if (samepw) {//비밀번호 일치
                 result.success = true;
                 result.data = 'NONE';
@@ -682,10 +682,10 @@ router.post('/checkpassword', clientIp, isLoggedIn, async (req, res, next) => {
             winston.log('info', `[AUTH][${req.clientIp}|] ${result.message}`);
             return res.status(500).send(result);
         })
-        
+
     } catch (e) {
         winston.log('error', `[AUTH][${req.clientIp}] 비밀번호 확인 요청 Exception`);
-        
+
         const result = new Object();
         result.success = false;
         result.data = 'NONE';
