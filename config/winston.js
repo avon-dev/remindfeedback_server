@@ -28,7 +28,7 @@ if (!fs.existsSync(logDir)) {
 // 파일 출력 옵션 설정
 const transport_file = new transports.File({
     name: 'info-file',
-    filename: `${logDir}/${DATE}_server-test.log`,
+    filename: `${logDir}/${DATE}_remindfeedback.log`,
     datePattern: 'YYYY-MM-DD',
     zippedArchive: false,
     colorize: false,
@@ -41,7 +41,7 @@ const transport_file = new transports.File({
         appendTimestamp({ tz: 'Asia/Seoul' }),
         myFormat
     ),
-    maxsize: 10485760, // 단위는 바이트(10MB)
+    maxsize: 5242880, // 단위는 바이트(5MB)
     maxFiles: 10 // 자동으로 분리되어 생성되는 파일 개수
 });
 
