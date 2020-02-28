@@ -30,7 +30,7 @@ const transport_file = new transports.File({
     name: 'info-file',
     filename: `${logDir}/${DATE}_remindfeedback.log`,
     datePattern: 'YYYY-MM-DD',
-    zippedArchive: false,
+    zippedArchive: false, // 압축하지 않음
     colorize: false,
     // level: env === "development" ? "debug" : "info",
     level: 'info',
@@ -41,8 +41,8 @@ const transport_file = new transports.File({
         appendTimestamp({ tz: 'Asia/Seoul' }),
         myFormat
     ),
-    maxsize: 5242880, // 단위는 바이트(5MB)
-    maxFiles: 10 // 자동으로 분리되어 생성되는 파일 개수
+    maxsize: 10485760, // 단위는 바이트(10MB)
+    maxFiles: "1d" // 자동으로 분리되어 생성되는 파일 개수 or 삭제일(하루 지나면 삭제)
 });
 
 // 콘솔 출력 옵션 설정
