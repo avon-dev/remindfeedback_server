@@ -1,6 +1,7 @@
 const { createLogger, format, transports } = require('winston');
 const moment = require('moment');
 require('moment-timezone');
+require('dotenv').config(); //.env 설정
 const fs = require('fs');
 
 const env = process.env.NODE_ENV || "development";
@@ -41,8 +42,8 @@ const transport_file = new transports.File({
         appendTimestamp({ tz: 'Asia/Seoul' }),
         myFormat
     ),
-    maxsize: 10485760, // 단위는 바이트(10MB)
-    maxFiles: "1d" // 자동으로 분리되어 생성되는 파일 개수 or 삭제일(하루 지나면 삭제)
+    maxsize: process.env.WINSTON_MAXSIZE, // 단위는 바이트
+    maxFiles: process.env.WINSTON_MAXFILES // 자동으로 분리되어 생성되는 파일 개수 or 삭제일
 });
 
 // 콘솔 출력 옵션 설정
