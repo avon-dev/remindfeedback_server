@@ -101,7 +101,6 @@ if (cluster.isMaster) {
 
   //router 객체 선언
   const authRouter = require('./routes/auth');
-  const userRouter = require('./routes/users');
   const feedbackRouter = require('./routes/feedback');
   const categoryRouter = require('./routes/category');
   const boardRouter = require('./routes/board/all');
@@ -177,7 +176,6 @@ if (cluster.isMaster) {
   // });
   
   app.use('/auth', authRouter);
-  app.use('/users', userRouter);
   app.use('/feedbacks', feedbackRouter);
   app.use('/categories', categoryRouter);
   app.use('/board/cards', boardRouter);
