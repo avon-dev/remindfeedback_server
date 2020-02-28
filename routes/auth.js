@@ -399,6 +399,7 @@ router.patch('/tutorial', clientIp, isLoggedIn, async (req, res, next)=>{
         const user_uid = req.user.user_uid;
         const user_email = req.user.email;
         winston.log('info', `[AUTH][${req.clientIp}|${user_email}] 튜토리얼 상태 true로 변경 Request`);
+
         if (req.user.tutorial === false) {
             User.update({ tutorial: true }, { where: { user_uid: user_uid } });
         }
@@ -413,7 +414,7 @@ router.patch('/tutorial', clientIp, isLoggedIn, async (req, res, next)=>{
         res.status(500).send(result);
         return next(e);
     }
-})
+});
 
 // 로그아웃
 router.get('/logout', clientIp, isLoggedIn, (req, res) => {
