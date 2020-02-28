@@ -65,3 +65,6 @@ public/uploads/*
 
 # firebase
 config/remindfeedback-40186-firebase-adminsdk-k7u8s-a4cc12d6ba.json
+
+# setting file
+config/config.json
