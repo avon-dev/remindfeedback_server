@@ -106,8 +106,7 @@ router.post('/email', clientIp, async (req, res, next) => {
         console.error(e);
         return next(e);
     }
-})
-
+});
 
 // 회원가입
 router.post('/register', clientIp, async (req, res, next) => {
@@ -177,6 +176,60 @@ router.post('/register', clientIp, async (req, res, next) => {
 
     } catch (e) {
         winston.log('error', `[AUTH][${req.clientIp}|${req.body.email}] 회원가입 Exception`);
+
+        const result = new Object();
+        result.success = false;
+        result.data = 'NONE';
+        result.message = 'INTERNAL SERVER ERROR';
+        winston.log('error', `[AUTH][${req.clientIp}|${req.body.email}] ${result.message}`);
+        res.status(500).send(result);
+        return next(e);
+    }
+});
+
+// 회원가입
+router.post('/tempRegister', clientIp, async (req, res, next) => {
+    try {
+        const { email, nickname, password, token } = req.body;
+
+        winston.log('info', `[AUTH][${req.clientIp}|${email}] (임시) 회원가입 Request`);
+        winston.log('info', `[AUTH][${req.clientIp}|${email}] email : ${email}, nickname : ${nickname}, password : ${password}, token : ${token}`);
+
+            //회원 등록
+            const exUser = await User.findOne({ where: { email } });
+            if (exUser) {
+                const result = new Object();
+                result.success = false;
+                result.data = 'NONE';
+                result.message = '이미 가입한 이메일입니다.';
+                winston.log('info', `[AUTH][${req.clientIp}|${email}] ${result.message}`);
+                return res.status(200).send(result);
+            }
+            const uid = await bcrypt.hash(email, 12);
+            const pw = await bcrypt.hash(password, 12);
+            await User.create({
+                user_uid: uid,
+                email,
+                nickname,
+                password: pw,
+                portrait: '',
+                introduction: '',
+                tutorial: false,
+            });
+            const returnData = new Object();
+            returnData.user_uid = uid;
+            returnData.email = email;
+            returnData.nickname = nickname;
+            returnData.tutorial = false;
+
+            const result = new Object();
+            result.success = true;
+            result.data = returnData;
+            result.message = '(임시) 회원 가입에 성공했습니다.';
+            winston.log('info', `[AUTH][${req.clientIp}|${email}] ${result.message}`);
+            return res.status(201).send(result);
+    } catch (e) {
+        winston.log('error', `[AUTH][${req.clientIp}|${req.body.email}] (임시) 회원가입 Exception`);
 
         const result = new Object();
         result.success = false;
