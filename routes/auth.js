@@ -92,7 +92,7 @@ router.post('/email', clientIp, async (req, res, next) => {
             result.success = true;
             result.data = 'NONE';
             result.message = `[AUTH][${req.clientIp}|${email}] 토큰 전송에 성공했습니다.`;
-            return res.status(201).json(result);
+            return res.status(201).send(result);
         } else {
             const result = new Object();
             result.success = false;
