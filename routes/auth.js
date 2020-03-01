@@ -68,7 +68,7 @@ router.post('/email', clientIp, async (req, res, next) => {
             //메일로 토큰 보내기
             const transporter = nodemailer.createTransport({
                 service: 'gmail',
-                port: 456,
+                port: 465,
                 secure: true,
                 auth: {
                     user: process.env.gmail_user,
@@ -495,7 +495,7 @@ router.post('/password', clientIp, async (req, res, next) => {
             //메일로 토큰 보내기
             const transporter = nodemailer.createTransport({
                 service: 'gmail',
-                port: 456,
+                port: 465,
                 secure: true,
                 auth: {
                     user: process.env.gmail_user,
