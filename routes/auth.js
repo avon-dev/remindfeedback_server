@@ -82,26 +82,17 @@ router.post('/email', clientIp, async (req, res, next) => {
                 html: '회원가입을 위해 토큰을 입력하여 주세요.'
                     + `<br>token 정보 : ${token}` + `<br>유효시간 10분`,
             };
-            transporter.sendMail(emailOptions, (err, res) => {
-                if(err) {
-                    // 에러가 발생한 경우
-                    const result = new Object();
-                    result.success = false;
-                    result.data = 'NONE';
-                    result.message = `[AUTH][${req.clientIp}|${email}] 메일 전송 과정에서 에러가 발생했습니다.`;
-                    return res.status(200).send(result);
-                } else {
-                    // 토큰 생성 성공 메세지 리턴
-                    const result = new Object();
-                    result.success = true;
-                    result.data = 'NONE';
-                    result.message = `[AUTH][${req.clientIp}|${email}] 토큰 전송에 성공했습니다.`;
-                    return res.status(201).json(result);
-                }
-            }); //전송
+            transporter.sendMail(emailOptions, res);
 
             // 전송 포트 종료
             transporter.close();
+            
+            // 토큰 생성 성공 메세지 리턴
+            const result = new Object();
+            result.success = true;
+            result.data = 'NONE';
+            result.message = `[AUTH][${req.clientIp}|${email}] 토큰 전송에 성공했습니다.`;
+            return res.status(201).json(result);
         } else {
             const result = new Object();
             result.success = false;
