@@ -67,7 +67,7 @@ db.Feedback.belongsTo(db.User, {
   constraints: false
 });
 db.Feedback.belongsTo(db.User, {
-  foreignKey: 'user_uid', sourceKey: 'user_uid',
+  foreignKey: 'user_uid', sourceKey: 'user_uid', as: 'owner',
   constraints: false
 });
 
