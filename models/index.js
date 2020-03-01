@@ -63,10 +63,12 @@ db.User.hasMany(db.Friend, {
 
 //feedback 호출시 조언자 및 작성자 정보 반환 위한 관계
 db.Feedback.belongsTo(db.User, {
-  foreignKey: 'adviser_uid', sourceKey: 'user_uid', as: 'adviser'
+  foreignKey: 'adviser_uid', sourceKey: 'user_uid', as: 'adviser',
+  constraints: false
 });
 db.Feedback.belongsTo(db.User, {
-  foreignKey: 'user_uid', sourceKey: 'user_uid', as: 'owner'
+  foreignKey: 'user_uid', sourceKey: 'user_uid',
+  constraints: false
 });
 
 Object.keys(db).forEach(modelName => {

@@ -86,7 +86,7 @@ router.post('/email', clientIp, async (req, res, next) => {
 
             // 전송 포트 종료
             transporter.close();
-            
+
             // 토큰 생성 성공 메세지 리턴
             const result = new Object();
             result.success = true;
