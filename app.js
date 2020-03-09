@@ -207,18 +207,18 @@ if (cluster.isMaster) {
     res.render('error');
   });
 
-  require("greenlock-express")
-    .init({
-      packageRoot: __dirname,
-      configDir: process.env.HTTPS_CONFIGDIR,
-      maintainerEmail: process.env.DOMAIN_EMAIL,
-      cluster: false
-    })
-    .serve(httpsServer);
+  // require("greenlock-express")
+  //   .init({
+  //     packageRoot: __dirname,
+  //     configDir: process.env.HTTPS_CONFIGDIR,
+  //     maintainerEmail: process.env.DOMAIN_EMAIL,
+  //     cluster: false
+  //   })
+  //   .serve(httpsServer);
 
-  function httpsServer(glx) {
-    glx.serveApp(app);
-  }
+  // function httpsServer(glx) {
+  //   glx.serveApp(app);
+  // }
 
   app.listen(prod ? app.get('port') : 3000, () => {
     winston.log('info', `${app.get('port')}번 포트에서 서버 실행중입니다.`);
