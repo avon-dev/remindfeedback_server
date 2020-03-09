@@ -9,7 +9,8 @@ var instance_id = uuid.v4();
 
 // 워커 생성
 
-var cpuCount = os.cpus().length; //CPU 수
+// var cpuCount = os.cpus().length; //CPU 수
+var cpuCount = 1;
 var workerCount = cpuCount / 2; //2개의 컨테이너에 돌릴 예정 CPU수 / 2
 
 //마스터일 경우
