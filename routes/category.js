@@ -8,7 +8,7 @@ const router = express.Router();
 
 // Category CRUD API
 
-app.get('/cookie', (req, res) => { 
+router.get('/cookie', (req, res) => { 
     res.send('요청', req);
   });
 
