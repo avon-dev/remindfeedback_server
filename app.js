@@ -153,6 +153,7 @@ if (cluster.isMaster) {
       httpOnly: true,
       secure: false,
       domain: prod && '.remindfeedback.com',
+      maxAge: 600000,
     },
   }));
   // app.use(express.static(path.join(__dirname, 'public')));
@@ -162,6 +163,7 @@ if (cluster.isMaster) {
   app.get('/favicon.ico', (req, res) => {
     res.status(204);
   })
+
   app.get('/', (req, res) => { 
     res.send('remindfeedback 백엔드 정상 동작!');
   });

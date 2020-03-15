@@ -8,8 +8,8 @@ exports.clientIp = (req, res, next) => {
 };
 
 exports.isLoggedIn = (req, res, next) => {
-    // console.log('쿠키다쿠키',req.cookies)
-    console.log('로그인 여부',req.isAuthenticated());
+    console.log('쿠키',req.cookies);
+    console.log(req);
       if (req.isAuthenticated()) {
         winston.log('info', `[isLoggedIn][${req.clientIp}|${req.body.email}] 로그인 중`);
         next();
