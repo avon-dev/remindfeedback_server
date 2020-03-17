@@ -8,10 +8,6 @@ const router = express.Router();
 
 // Category CRUD API
 
-router.get('/cookie', (req, res) => { 
-    res.send('요청', req);
-  });
-
 // 카테고리 생성
 router.post('/', clientIp, isLoggedIn, async (req, res, next) => {
     try {

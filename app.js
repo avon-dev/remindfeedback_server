@@ -118,6 +118,7 @@ if (cluster.isMaster) {
   const { sequelize } = require('./models');
   const passportConfig = require('./passport');
   const app = express();
+  app.set('trust proxy', 1);
   sequelize.sync();
   passportConfig(passport);
 
@@ -151,7 +152,7 @@ if (cluster.isMaster) {
     secret: process.env.COOKIE_SECRET,
     cookie: {
       httpOnly: true,
-      secure: false,
+      secure: true,
       domain: prod && '.remindfeedback.com',
       maxAge: 600000,
     },
