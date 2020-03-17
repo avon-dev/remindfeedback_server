@@ -152,8 +152,7 @@ if (cluster.isMaster) {
     cookie: {
       httpOnly: true,
       secure: false,
-      domain: prod && '.remindfeedback.com',
-      maxAge: 600000,
+      domain: '.remindfeedback.com',
     },
   }));
   // app.use(express.static(path.join(__dirname, 'public')));
