@@ -118,7 +118,6 @@ if (cluster.isMaster) {
   const { sequelize } = require('./models');
   const passportConfig = require('./passport');
   const app = express();
-  app.set('trust proxy', 1);
   sequelize.sync();
   passportConfig(passport);
 
@@ -129,7 +128,7 @@ if (cluster.isMaster) {
     app.use(helmet());
     app.use(morgan('combined'));
     app.use(cors({
-      origin: 'http://remindfeedback.com',
+      origin: true,
       credentials: true,
     }));
   } else {
@@ -152,7 +151,7 @@ if (cluster.isMaster) {
     secret: process.env.COOKIE_SECRET,
     cookie: {
       httpOnly: true,
-      secure: true,
+      secure: false,
       domain: prod && '.remindfeedback.com',
       maxAge: 600000,
     },
