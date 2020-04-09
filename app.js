@@ -19,7 +19,7 @@ if (cluster.isMaster) {
   winston.log("info", "서버 CPU 수 : " + cpuCount + ", 생성할 워커 수 : " + workerCount)
 
   //워커 메시지 리스너
-  var workerMsgListener = function(msg) {
+  var workerMsgListener = function (msg) {
     var worker_id = msg.worker_id
 
     //마스터 아이디 요청
@@ -38,12 +38,12 @@ if (cluster.isMaster) {
   }
 
   //워커가 online상태가 되었을때
-  cluster.on("online", function(worker) {
+  cluster.on("online", function (worker) {
     winston.log("info", "워커 온라인 - 워커 ID : [" + worker.process.pid + "]")
   })
 
   //워커가 죽었을 경우 다시 살림
-  cluster.on("exit", function(worker) {
+  cluster.on("exit", function (worker) {
     winston.log("info", "워커 사망 - 사망한 워커 ID : [" + worker.process.pid + "]")
     winston.log("info", "다른 워커를 생성합니다.")
 
@@ -67,7 +67,7 @@ if (cluster.isMaster) {
   //마스터에게 master_id 요청
   process.send({ worker_id: worker_id, cmd: "MASTER_ID" })
   process
-    .on("message", function(msg) {
+    .on("message", function (msg) {
       if (msg.cmd === "MASTER_ID") {
         master_id = msg.master_id
       }
@@ -75,10 +75,10 @@ if (cluster.isMaster) {
     .on("unhandledRejection", (reason, p) => {
       winston.log("error", reason, " [Unhandled Rejection at Promise] ", p)
     })
-    .on("uncaughtException", err => {
+    .on("uncaughtException", (err) => {
       try {
         // 에러가 발생하면 3초 이내에 process를 죽인다.
-        const killtimer = setTimeout(function() {
+        const killtimer = setTimeout(function () {
           process.exit(1)
         }, 3000)
 
@@ -132,8 +132,8 @@ if (cluster.isMaster) {
     app.use(morgan("combined"))
     app.use(
       cors({
-        origin: "http://remindfeedback.com",
-        credentials: true
+        origin: true,
+        credentials: true,
       })
     )
   } else {
@@ -141,7 +141,7 @@ if (cluster.isMaster) {
     app.use(
       cors({
         origin: true,
-        credentials: true
+        credentials: true,
       })
     )
   }
@@ -152,33 +152,18 @@ if (cluster.isMaster) {
   app.use(express.json())
   app.use(express.urlencoded({ extended: false }))
   app.use(cookieParser(process.env.COOKIE_SECRET))
-  if (prod) {
-    app.use(
-      session({
-        resave: false,
-        saveUninitialized: false,
-        secret: process.env.COOKIE_SECRET,
-        cookie: {
-          httpOnly: true,
-          secure: false,
-          domain: prod && ".remindfeedback.com"
-        }
-      })
-    )
-  } else {
-    app.use(
-      session({
-        resave: false,
-        saveUninitialized: false,
-        secret: process.env.COOKIE_SECRET,
-        cookie: {
-          httpOnly: true,
-          secure: false
-        }
-      })
-    )
-  }
-
+  app.use(
+    session({
+      resave: false,
+      saveUninitialized: false,
+      secret: process.env.COOKIE_SECRET,
+      cookie: {
+        httpOnly: true,
+        secure: false,
+        domain: ".remindfeedback.com",
+      },
+    })
+  )
   // app.use(express.static(path.join(__dirname, 'public')));
   app.use(flash()) //1회성 메세지
   app.use(passport.initialize()) //설정초기화 (미들웨어 연결)
@@ -186,12 +171,9 @@ if (cluster.isMaster) {
   app.get("/favicon.ico", (req, res) => {
     res.status(204)
   })
-  app.get("/", (req, res) => {
-    let result = new Object()
-    result.message = "remindfeedback 백앤드 정상작동!"
-    result.session = req.session
 
-    res.json(result)
+  app.get("/", (req, res) => {
+    res.send("remindfeedback 백엔드 정상 동작!")
   })
 
   // // Worker 테스트 주소
@@ -217,12 +199,12 @@ if (cluster.isMaster) {
   app.use("/comments", commentRouter)
 
   // catch 404 and forward to error handler
-  app.use(function(req, res, next) {
+  app.use(function (req, res, next) {
     next(createError(404))
   })
 
   // error handler
-  app.use(function(err, req, res, next) {
+  app.use(function (err, req, res, next) {
     // set locals, only providing error in development
     res.locals.message = err.message
     res.locals.error = req.app.get("env") === "development" ? err : {}
