@@ -412,7 +412,7 @@ router.get('/mine/:lastid', clientIp, isLoggedIn, async (req, res, next) => {
         const category = JSON.parse(user.category)
         result.data = await Feedback.findAll({
             where: { user_uid: req.user.user_uid, id: { [Op.lt]: lastid } },
-            order: [['write_date', 'DESC']],
+            order: [['createdAt', 'DESC']],
             limit: 10,
             include: [{
                 model: User,
@@ -466,7 +466,7 @@ router.get('/mine/:lastid/:limit', clientIp, isLoggedIn, async (req, res, next) 
         const category = JSON.parse(user.category)
         result.data = await Feedback.findAll({
             where: { user_uid: req.user.user_uid, id: { [Op.lt]: lastid } },
-            order: [['write_date', 'DESC']],
+            order: [['createdAt', 'DESC']],
             limit,
             include: [{
                 model: User,
